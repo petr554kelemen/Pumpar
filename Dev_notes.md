@@ -25,6 +25,14 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] **3 – Telefon:** stránka pro telefon, párování přes QR, skenování kamerou, kód se pošle do hry na NB.
 - [ ] **4 – Převod hry do Phaseru:** scény Stojan a Obchod, skenované zboží jde do košíku.
 - [ ] **5 – Peněženka:** trvalý zůstatek, placení naskenovanými bankovkami, výpočet vrácení.
+  **Odměna za přesnost tankování** (návrh do dílny ✏️ s hráčem):
+  - Pozorování ze staré verze: hráč „cukne“ hned na začátku (aby nepřelil) a zbytek bankovky utratí
+    v obchodě, vždy si vezme největší bankovku → tankování ho nic nenaučí.
+  - Nově: odměna podle vzdálenosti od předvolby, **stejně pro nedolití i přetečení**:
+    přesně 5 teček + 🏆 · do 0,1 L 4 · do 0,5 L 3 · do 1 L 2 · do 2 L 1 · dál 0.
+  - Přesnost zobrazit graficky (terč / ukazatel s pásmy zelená–žlutá–červená + ručička), ne číslem.
+  - Odměna jde do peněženky → peníze na obchod si hráč vydělá u stojanu.
+  - Starou verzi (`public/stara-verze.html`) neměnit – hráč její pravidla zná (viz Pravidla jsou zákon).
 - [ ] **6 – Platební terminál:** telefon ukáže částku → sken karty `K…` → PIN → „Platba schválena“ + účtenka.
 - [ ] **Hlas (průběžně od fáze 0):** služba `voice`, seznam frází, generování souborů; první fráze pro pípnutí a placení.
 - [ ] **Garáž (s fází 4):** přiřazení SPZ → autíčko ve hře (vzhled, jméno), měnitelné rodičem/hráčem;
@@ -100,3 +108,5 @@ _(zatím nic)_
   od začátku, verzovaný obrázkový návod). Kategorie odsouhlasit s hráčem před prvním tiskem.
 - 2026-11-16 (uživatel): Upřesnění – když hráč pravidla spoluvytváří, platí až po dokončení. Do README rituál
   dílna ✏️ (vymýšlí se, smí se měnit) → razítko ✅ (hráč schválí, pak platí a tiskne se).
+- 2026-11-16 (uživatel + Claude): Pozorování ze staré verze (cuknutí na začátku, utrácení zbytku největší
+  bankovky). Návrh: odměna za přesnost tankování → zapsáno do fáze 5. Starou verzi neměnit.
