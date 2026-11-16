@@ -165,17 +165,28 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
   ve hře, je samostatné, **měnitelné přiřazení** – hráč si auta přerozděluje.
 - Rozpoznání: `parseCode` → `druh: 'auto'` (`spz`, `majitel`), tabulka slabik `SPZ_SLABIKY` v `codes.ts`.
 
-## Tisk štítků
-- **Herní štítky (zboží, bankovky, karty) se tisknou na laserové tiskárně na archy štítků A4.**
-  - Stránka `tisk.html` vykreslí arch přímo v prohlížeči (CSS v mm, `@page A4`) → tisk / PDF.
-  - Štítek: velké písmeno kategorie, piktogram, cena tečkami (až 30) + číslice, Code128 a/nebo QR.
-  - **Černobíle** → na štítcích **černé piktogramy s výraznými obrysy**, ne barevná emoji (vyjdou šedě).
-    Ve hře na obrazovce zůstávají barevná emoji; piktogram a emoji musí být jasně „stejná věc“.
-  - Tisk ovládá rodič, hráč podává papíry.
-  - Bankovky a karty lze tisknout na papír/tvrdší papír a vystřihnout.
-- **Phomemo Smart Mini Label Maker D30** (BT, tisk z aplikace v telefonu, štítky 12 × 40 mm)
-  se pro herní štítky **nepoužívá** – příliš malé. Případně později pro drobnosti, které tiskne hráč sám.
-- Při případném termotisku: nelaminovat za tepla (termopapír zčerná) – izolepa nebo studená laminace.
+## Tisk štítků (2026-11-16)
+| Co | Kam | Čím | Poznámka |
+|---|---|---|---|
+| **Zboží** (`P001`, `S001`…) | **laminovaná visačka**, hráč ji přiváže/uváže na zboží | laser (papír) + laminace + dírka | hráč sám rozhoduje, co čím označí |
+| **SPZ** (`LA01`, `KE01`) | autíčka nebo prošlé platební karty | **D30** termoštítek 12 × 40 mm | z plastu jde dolů snáz než laserová samolepka |
+| **Herní karta** (`K001`) | prošlá platební karta | D30 | |
+| **Bankovky** (`B020`) | kód přímo na papírové bankovce | laser, papír | bez samolepek |
+| **Rodičovské kódy** (`9001`) | list pro rodiče | laser, papír | hráč je nemá mít po ruce |
+
+- **Ceny se na štítky netisknou.** Visačka nese jen co to je (písmeno kategorie, obrázek, kód).
+  Kolik to stojí, určuje ceník ve hře (nastavuje „vedoucí pumpy“ v dílně ✏️) – změna ceny = žádný nový tisk.
+- **O značení rozhoduje hráč.** Hra nekontroluje, na čem visačka visí. Pomůcka: **obrázkový seznam
+  „kam co“** (jako pexeso – obrázek na visačce = obrázek na seznamu), žádný text.
+- **Hlas popisuje, nepřikazuje** („Es jako sladkosti“), aby hráče neomezoval v rozhodování.
+- **Laser + laminace:** visačky, bankovky, obrázkový seznam. Tisk ovládá rodič, hráč podává papíry.
+  Černobíle → **černé piktogramy s výraznými obrysy** (barevná emoji vyjdou šedě); ve hře zůstávají
+  barevná emoji a piktogram s emoji musí být jasně „stejná věc“.
+  Stránka `tisk.html` vykreslí arch přímo v prohlížeči (CSS v mm, `@page A4`) → tisk / PDF.
+- **Phomemo Smart Mini Label Maker D30** (BT, tisk z aplikace v telefonu, štítky 12 × 40 mm, ~203 dpi):
+  SPZ a karty. Krátký kód se vejde: Code128 `LA01` ≈ 22 × 8 mm, QR ≈ 10 × 10 mm, vedle text `LA-01`.
+  Aplikace tiskárny by měla umět Code128 i QR sama (napsat `LA01`) – ověřit.
+- **Termoštítky nelaminovat za tepla** (zčernají). Laminuje se jen laserový tisk.
 
 ## Hlas a písmena
 - **Hlas = předgenerované audio soubory.** Hra jen přehrává soubory – žádné TTS za běhu

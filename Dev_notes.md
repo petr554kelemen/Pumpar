@@ -17,9 +17,11 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [x] **0 – Kostra:** git, Node LTS v26, Phaser 4.2.1 + Vite 8 lokálně, `src/services/` a `src/scenes/`,
   sběrnice událostí, zkušební scéna, GitHub Pages (https://petr554kelemen.github.io/Pumpar/).
   Pozn.: na PC jsou k dispozici i TBarCode (TEC-IT), ImageMagick, Python 3.13 – zatím nepotřeba.
-- [ ] **1 – Katalog + tisk:** `catalog`, stránka `tisk.html` (JsBarcode / QR) s archem štítků A4.
-  Nejdřív **testovací arch** (Code128 vs QR v různých velikostech) → vytisknout → ověřit čtení
-  telefonem i čtečkou → teprve pak celý katalog.
+- [ ] **1 – Katalog + tisk:** `catalog` (kód → název, obrázek, cena – ceny jen ve hře), technické testy tisku:
+  - **D30:** SPZ jako Code128 i QR (z aplikace Phomemo) → ověřit čtení čtečkou i telefonem,
+  - **laser:** testovací visačky (velikost pro laminovací kapsy, dírka) a bankovky, Code128 vs QR,
+  - stránka `tisk.html` (visačky, bankovky, obrázkový seznam „kam co“).
+  Herní visačky/štítky až po odsouhlasení s hráčem (dílna ✏️ → razítko ✅).
 - [x] **2 – Vstup kódů:** klávesnice/USB čtečka (kód + Enter), převod CZ znaků na číslice, testovací scéna „Pípni něco“.
   Ověření se skutečnou čtečkou čeká na její příjezd (viz TODO).
 - [ ] **3 – Telefon:** stránka pro telefon, párování přes QR, skenování kamerou, kód se pošle do hry na NB.
@@ -42,8 +44,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 
 ## TODO
 - [ ] Otevřít https://petr554kelemen.github.io/Pumpar/ na NB hráče (Linux, Chrome) – ověřit zobrazení a zvuk.
-- [ ] Zjistit formát archu štítků A4 (rozměr, sloupce × řádky, okraje / kód archu) – krabice je v kanceláři.
-  Do té doby testovací arch na obyčejný papír s ořezovými čarami.
+- [ ] Zjistit rozměr laminovacích kapes (pro velikost visaček). Archy samolepek A4 už nejsou potřeba
+  (zboží = laminované visačky, SPZ/karty = D30).
 - [ ] Po příjezdu USB čtečky: ověřit Code128 i QR, nastavit jazyk klávesnice ve čtečce.
 - [ ] Vybrat hlas – poslechnout `hlas_test_vety.txt` (hlavně samotné „M.“, „Eř“, „Chá“). Pořadí zkoušení:
   1. Balabolka (máme, český mluvčí; hromadně přes `balcon.exe`),
@@ -110,3 +112,6 @@ _(zatím nic)_
   dílna ✏️ (vymýšlí se, smí se měnit) → razítko ✅ (hráč schválí, pak platí a tiskne se).
 - 2026-11-16 (uživatel + Claude): Pozorování ze staré verze (cuknutí na začátku, utrácení zbytku největší
   bankovky). Návrh: odměna za přesnost tankování → zapsáno do fáze 5. Starou verzi neměnit.
+- 2026-11-16 (uživatel + Claude): Plán štítků: zboží = laminované visačky (laser), hráč je sám přiváže
+  (obrázkový seznam „kam co“), SPZ a karty = D30 termoštítky (z plastu jdou dolů), bankovky = laser papír.
+  Ceny se netisknou (jen ceník ve hře). Hlas popisuje, nepřikazuje. README → Tisk štítků přepsán.
