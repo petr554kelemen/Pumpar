@@ -1,0 +1,16 @@
+# Závislosti a build (Vite)
+node_modules/
+dist/
+
+# Lokální nastavení a tajnosti
+.env
+.env.*
+.claude/settings.local.json
+
+# Systémové a Dropbox soubory
+.DS_Store
+Thumbs.db
+desktop.ini
+.dropbox
+*conflicted copy*
+*konfliktní kopie*

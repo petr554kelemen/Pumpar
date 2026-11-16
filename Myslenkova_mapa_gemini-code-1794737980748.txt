@@ -1,0 +1,15 @@
+⛽ ČERPACÍ STANICE
+                                    │
+        ┌───────────────────────────┼───────────────────────────┐
+        ▼                           ▼                           ▼
+1. FYZICKÝ SVĚT & HW         2. HLAVNÍ HRA (PHASER)      3. BONUS & ROZŠÍŘENÍ
+   ├─ Termotiskárna (Code128)   ├─ Fáze A: Příprava směny   ├─ Herní koutek (odměny)
+   │   ├─ 1xx: Hračky           │   ├─ Pípnutí zboží        │   ├─ Cisterna (trubky)
+   │   ├─ 2xx: Jídlo & pití     │   ├─ Drag & Drop do cen   │   ├─ Parkoviště (Rush Hour)
+   │   ├─ 3xx: Služby           │   └─ Zamčení & Otevření   │   └─ Šachová mini-úloha
+   │   └─ 4xx: Paliva           ├─ Fáze B: Prodej & Kasír   └─ Mobilní terminál (Wi-Fi)
+   ├─ USB čtečka (HID režim)    │   ├─ Stojan & Tankování       ├─ QR kódy po bytě
+   └─ Reálné rekvizity          │   ├─ Košík & Rozpočet         ├─ Závora do pokoje
+       ├─ Hračky ze skladu      │   └─ Sklad (Vyprodáno)        └─ Reálný vysavač
+       └─ Vysavač & Myčka       └─ Fáze C: Uzávěrka směny
+                                    └─ Denní tržba v trezoru
