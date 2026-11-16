@@ -73,8 +73,10 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 ### Pravidla jsou zákon
 1. **Nic provizorního před hráčem.** Kategorie, písmena, obrázky, slabiky SPZ, ceny i zvuky vidí hráč až
    ve finální podobě. Testovací obrazovky a nasazenou verzi nejdřív zkouší rodič.
-2. **Tisk = definitivní pravidlo.** Před prvním tiskem štítků odsouhlasit (ideálně spoluvytvořit) s hráčem
-   kategorie, písmena a obrázky. Pravidlo, které sám vymyslí, bude hájit.
+2. **Hráč pravidla spoluvytváří – platí až po „orazítkování“.** Dokud se vymýšlí, je pravidlo v **dílně ✏️**
+   a smí se měnit. Platným se stane, až ho hráč sám **orazítkuje ✅** (podpis/razítko na návodu). Teprve pak
+   se tiskne. Pozdější změna = vrátit do dílny ✏️, upravit, znovu orazítkovat (nový návod s vyšším číslem).
+   Pravidlo, které sám vytvořil a schválil, bude hájit.
 3. **Měnitelnost je součástí pravidel od začátku.** Co se má měnit, musí to mít v pravidlech od prvního dne:
    - „Auta se dají přeparkovat“ (přiřazení SPZ → auto),
    - „Ceny ráno nastavuje vedoucí pumpy“ (příprava směny),

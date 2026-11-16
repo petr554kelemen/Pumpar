@@ -98,3 +98,5 @@ _(zatím nic)_
 - 2026-11-16 (Claude + uživatel): Zjištění – hráč striktně drží jednou nastavená pravidla. Do README
   zásady „Pravidla jsou zákon“ (nic provizorního před hráčem, tisk = definitivní, měnitelnost v pravidlech
   od začátku, verzovaný obrázkový návod). Kategorie odsouhlasit s hráčem před prvním tiskem.
+- 2026-11-16 (uživatel): Upřesnění – když hráč pravidla spoluvytváří, platí až po dokončení. Do README rituál
+  dílna ✏️ (vymýšlí se, smí se měnit) → razítko ✅ (hráč schválí, pak platí a tiskne se).
