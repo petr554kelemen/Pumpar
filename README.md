@@ -134,7 +134,7 @@ Tedy čokoláda i zmrzlina → `S`.
 
 Kategorie jsou návrh, hráč je může upravit. Úkoly typu „Pípni něco na Es“ / „Dones všechno na Pé“.
 
-### SPZ aut (návrh 2026-11-16)
+### SPZ aut (2026-11-16)
 **Slabika + 2 číslice**, v kódu bez pomlčky (`LA01`), na obrazovce s pomlčkou (`LA-01`).
 Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se naučí poznat.
 - `LA01`–`LA10` – auta hráče,
@@ -144,6 +144,11 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
   (čtečka s CZ rozložením by poslala jiný znak).
 - Hlas: „La – nula jedna“ (nulu vždy vyslovit – hráč ji tak čte).
 - Původ slabik se v repozitáři neuvádí (osobní údaje).
+- **SPZ se pípají:** štítek je na autíčku nebo na **prošlé platební kartě** (stane se znovu „funkční“).
+  Pípnutí = auto přijelo ke stojanu.
+- **SPZ ≠ konkrétní autíčko.** Kód říká jen „čí auto a kolikáté“. Které autíčko to je a jak vypadá
+  ve hře, je samostatné, **měnitelné přiřazení** – hráč si auta přerozděluje.
+- Rozpoznání: `parseCode` → `druh: 'auto'` (`spz`, `majitel`), tabulka slabik `SPZ_SLABIKY` v `codes.ts`.
 
 ## Tisk štítků
 - **Herní štítky (zboží, bankovky, karty) se tisknou na laserové tiskárně na archy štítků A4.**

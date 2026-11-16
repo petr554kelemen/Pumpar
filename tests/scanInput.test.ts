@@ -47,6 +47,30 @@ test('parseCode: zakázaná a neznámá písmena i špatný formát jsou chyba',
   }
 });
 
+test('parseCode: SPZ aut – slabika + 2 číslice', () => {
+  const r = parseCode('LA01');
+  assert.equal(r.druh, 'auto');
+  if (r.druh !== 'auto') return;
+  assert.equal(r.spz, 'LA-01');
+  assert.equal(r.cislo, 1);
+  assert.equal(r.majitel, 'hrac');
+
+  const k = parseCode('ke10');
+  assert.equal(k.druh === 'auto' && k.majitel, 'rodic');
+  assert.equal(parseCode('LA99').druh, 'auto');
+});
+
+test('parseCode: neplatné SPZ jsou chyba', () => {
+  for (const kod of ['LA00', 'XA01', 'PE01', 'LA1', 'LA001X', 'L-01']) {
+    assert.equal(parseCode(kod).druh, 'chyba', kod);
+  }
+});
+
+test('parseCode: SPZ nekoliduje se zbožím', () => {
+  assert.equal(parseCode('A001').druh, 'zbozi');
+  assert.equal(parseCode('LA01').druh, 'auto');
+});
+
 test('normalizeChar: české rozložení – horní řada na číslice', () => {
   assert.deepEqual([...'+ěščřžýáíé'].map(normalizeChar).join(''), '1234567890');
   assert.equal(normalizeChar('Ě'), '2'); // Caps Lock

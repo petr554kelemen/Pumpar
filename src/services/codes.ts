@@ -1,5 +1,6 @@
 // Rozpoznání herních kódů (formát viz README → Formát kódů).
-// Písmeno + 3 číslice; písmeno = kategorie. Rodičovské kódy: 9 + 3 číslice.
+// Zboží apod.: písmeno + 3 číslice (písmeno = kategorie). SPZ aut: slabika + 2 číslice.
+// Rodičovské kódy: 9 + 3 číslice.
 // Bez závislosti na Phaseru.
 
 export const MAX_BANKNOTE = 30;
@@ -39,25 +40,64 @@ interface CategoryCode {
   kategorie: Category;
 }
 
+export type CarOwner = 'hrac' | 'rodic';
+
+/**
+ * SPZ aut: slabika + 2 číslice (`LA01`, na obrazovce `LA-01`). Štítky jsou na autíčkách
+ * nebo na prošlých platebních kartách. SPZ říká jen „čí auto a kolikáté“ – které autíčko to
+ * právě je a jak vypadá ve hře, bude samostatné, měnitelné přiřazení (hráč auta přerozděluje).
+ * Původ slabik se v repozitáři neuvádí (osobní údaje).
+ */
+export const SPZ_SLABIKY = {
+  LA: { majitel: 'hrac' },
+  KE: { majitel: 'rodic' },
+} as const satisfies Record<string, { majitel: CarOwner }>;
+
+export type SpzSlabika = keyof typeof SPZ_SLABIKY;
+export const MAX_SPZ_CISLO = 99;
+
 /** Výsledek rozpoznání kódu – podle `druh` TypeScript ví, která pole jsou k dispozici. */
 export type CodeInfo =
   | (CategoryCode & { druh: 'zbozi' })
   | (CategoryCode & { druh: 'karta' })
   | (CategoryCode & { druh: 'bankovka'; hodnota: number })
+  | { druh: 'auto'; kod: string; slabika: SpzSlabika; cislo: number; spz: string; majitel: CarOwner }
   | { druh: 'rodic'; kod: string }
   | { druh: 'chyba'; kod: string };
 
 const CATEGORY_RE = /^([A-Z])(\d{3})$/;
+const SPZ_RE = /^([A-Z]{2})(\d{2})$/;
 const ADMIN_RE = /^9\d{3}$/;
 
 function isCategoryLetter(ch: string): ch is CategoryLetter {
   return Object.hasOwn(CATEGORIES, ch);
 }
 
+function isSpzSlabika(text: string): text is SpzSlabika {
+  return Object.hasOwn(SPZ_SLABIKY, text);
+}
+
+function parseSpz(kod: string): CodeInfo | null {
+  const m = SPZ_RE.exec(kod);
+  const slabika = m?.[1];
+  const cisloText = m?.[2];
+  if (!slabika || !cisloText) return null;
+  if (!isSpzSlabika(slabika)) return { druh: 'chyba', kod };
+
+  const cislo = Number.parseInt(cisloText, 10);
+  if (cislo < 1 || cislo > MAX_SPZ_CISLO) return { druh: 'chyba', kod };
+
+  const { majitel } = SPZ_SLABIKY[slabika];
+  return { druh: 'auto', kod, slabika, cislo, spz: `${slabika}-${cisloText}`, majitel };
+}
+
 export function parseCode(raw: unknown): CodeInfo {
   const kod = String(raw ?? '').trim().toUpperCase();
 
   if (ADMIN_RE.test(kod)) return { druh: 'rodic', kod };
+
+  const spz = parseSpz(kod);
+  if (spz) return spz;
 
   const m = CATEGORY_RE.exec(kod);
   const pismeno = m?.[1];

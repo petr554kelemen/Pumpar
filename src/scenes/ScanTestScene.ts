@@ -10,9 +10,11 @@ const EMOJI_PAD = { x: 10, y: 30 };
 
 type PismenoInfo = Extract<CodeInfo, { druh: 'zbozi' | 'karta' }>;
 type BankovkaInfo = Extract<CodeInfo, { druh: 'bankovka' }>;
+type AutoInfo = Extract<CodeInfo, { druh: 'auto' }>;
 
 // Fáze 2: „Pípni něco“ – ukáže, co čtečka (zatím klávesnice) přečetla.
 // Zboží: velké písmeno kategorie + obrázek. Bankovka: číslo + stejný počet teček.
+// Auto (SPZ): obrázek auta + SPZ jako tabulka.
 // Chyba: velký ❌ (hráč zná jako „chyba“).
 export class ScanTestScene extends Phaser.Scene {
   private vysledek!: Phaser.GameObjects.Container;
@@ -27,7 +29,7 @@ export class ScanTestScene extends Phaser.Scene {
 
     // Popisek jen pro rodiče.
     this.add
-      .text(width / 2, 40, 'Zkouška čtečky – napiš kód a Enter (např. P001, S002, B020, K001)', {
+      .text(width / 2, 40, 'Zkouška čtečky – napiš kód a Enter (např. P001, B020, K001, LA01, KE03)', {
         fontFamily: FONT,
         fontSize: '22px',
         color: '#95a5a6',
@@ -61,6 +63,11 @@ export class ScanTestScene extends Phaser.Scene {
         this.ukazBankovku(info);
         beep.win();
         break;
+      case 'auto':
+        this.ukazAuto(info);
+        beep.tick(660, 0.1);
+        setTimeout(() => beep.tick(990, 0.15), 120);
+        break;
       case 'rodic':
         this.vysledek.add([this.emoji(0, -40, '⚙️', 160), this.popisek(0, 110, kod)]);
         beep.tick(400, 0.08);
@@ -69,6 +76,11 @@ export class ScanTestScene extends Phaser.Scene {
         this.vysledek.add([this.emoji(0, -30, '❌', 240).setName('chyba'), this.popisek(0, 150, kod)]);
         beep.error();
         break;
+      default: {
+        // Nový druh kódu bez zobrazení → chyba kontroly typů (TS hlídá úplnost výčtu).
+        const neosetreno: never = info;
+        throw new Error(`Neošetřený druh kódu: ${JSON.stringify(neosetreno)}`);
+      }
     }
 
     this.tweens.add({
@@ -123,6 +135,32 @@ export class ScanTestScene extends Phaser.Scene {
         .setOrigin(0.5)
         .setName('hodnota'),
       ...tecky,
+    ]);
+  }
+
+  /** Auto u stojanu: obrázek auta + SPZ jako skutečná tabulka (bílá, modrý pruh vlevo). */
+  private ukazAuto(info: AutoInfo): void {
+    const sirka = 560;
+    const vyska = 130;
+    const y = 130;
+    const pruh = 60;
+
+    this.vysledek.add([
+      this.emoji(0, -110, info.majitel === 'hrac' ? '🚙' : '🚗', 200).setName('auto'),
+      this.add.rectangle(0, y, sirka, vyska, 0xffffff).setStrokeStyle(6, 0x111111).setName('spz_tabulka'),
+      this.add.rectangle(-sirka / 2 + pruh / 2 + 3, y, pruh, vyska - 6, 0x1f4fbf).setName('spz_pruh'),
+      this.add
+        .text(-sirka / 2 + pruh / 2 + 3, y + 30, 'CZ', { fontFamily: FONT, fontSize: '26px', color: '#ffffff' })
+        .setOrigin(0.5),
+      this.add
+        .text(pruh / 2, y, info.spz, {
+          fontFamily: FONT,
+          fontSize: '96px',
+          fontStyle: 'bold',
+          color: '#111111',
+        })
+        .setOrigin(0.5)
+        .setName('spz'),
     ]);
   }
 

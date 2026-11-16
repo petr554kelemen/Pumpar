@@ -27,6 +27,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] **5 – Peněženka:** trvalý zůstatek, placení naskenovanými bankovkami, výpočet vrácení.
 - [ ] **6 – Platební terminál:** telefon ukáže částku → sken karty `K…` → PIN → „Platba schválena“ + účtenka.
 - [ ] **Hlas (průběžně od fáze 0):** služba `voice`, seznam frází, generování souborů; první fráze pro pípnutí a placení.
+- [ ] **Garáž (s fází 4):** přiřazení SPZ → autíčko ve hře (vzhled, jméno), měnitelné rodičem/hráčem;
+  pípnutí SPZ = auto přijede ke stojanu (+ úkol „natankuj …“).
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
 - [ ] **7 – Rozšíření z mapy:** příprava směny (drag & drop cen), uzávěrka a tržba, minihry za odměnu, QR kódy po bytě.
 
@@ -87,3 +89,7 @@ _(zatím nic)_
   (`GameEvents` – překlep v názvu události nebo chybějící údaj hlásí `tsc`), `CodeInfo` jako sjednocení podle `druh`.
   Skripty: `typecheck`, `build` = `tsc && vite build`, testy `node --test` spouští `.ts` přímo.
   Ověřeno: `tsc` bez chyb (a zkušební chyby zachytí), 12/12 testů, build, headless Chrome beze změny chování.
+- 2026-11-16 (Claude): **SPZ aut** – slabika + 2 číslice (`LA01` hráč, `KE01` rodič, čísla 01–99).
+  `parseCode` → `druh: 'auto'`; ScanTestScene ukáže auto + SPZ jako tabulku. Přepínač druhů kódu ve scéně
+  hlídá úplnost (`never`). 15/15 testů, typecheck OK, ověřeno v Chrome (`laé+` → LA-01).
+  Štítky SPZ budou na autíčkách nebo prošlých platebních kartách; přiřazení SPZ → auto bude měnitelné (Garáž).
