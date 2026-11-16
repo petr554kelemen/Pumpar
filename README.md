@@ -73,8 +73,10 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 - Párování telefonu zvládne hráč sám (QR + ikony stavu: 📶 ✅ ❌).
 
 ### Pravidla jsou zákon
-1. **Nic provizorního před hráčem.** Kategorie, písmena, obrázky, slabiky SPZ, ceny i zvuky vidí hráč až
-   ve finální podobě. Testovací obrazovky a nasazenou verzi nejdřív zkouší rodič.
+1. **Nic provizorního před hráčem – ve hře.** Pravidlem se věc stává, až když má **ve hře význam**
+   (hra ji ukáže, pojmenuje, ocení). Kategorie, písmena, obrázky, slabiky SPZ, ceny i zvuky proto hráč
+   ve hře uvidí až ve finální podobě; testovací obrazovky a nasazenou verzi nejdřív zkouší rodič.
+   Samotný technický tisk bez významu (zkušební štítky, test čitelnosti) nevadí – hráč u něj může pomáhat.
 2. **Hráč pravidla spoluvytváří – platí až po „orazítkování“.** Dokud se vymýšlí, je pravidlo v **dílně ✏️**
    a smí se měnit. Platným se stane, až ho hráč sám **orazítkuje ✅** (podpis/razítko na návodu). Teprve pak
    se tiskne. Pozdější změna = vrátit do dílny ✏️, upravit, znovu orazítkovat (nový návod s vyšším číslem).
