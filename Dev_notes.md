@@ -10,10 +10,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - WISH = nápady hráče a rodiče; do plánu/TODO se přesouvají až po domluvě s uživatelem.
 
 ## Další krok
-- Fáze 0: založit projekt Phaser 3 + Vite (+ git), kostru služeb a sběrnice, ověřit běh na NB.
+- Fáze 0: založit projekt Phaser 3 + Vite, kostru služeb a sběrnice, nasadit na GitHub Pages, ověřit běh na NB.
 
 ## Plán (fáze)
-- [ ] **0 – Kostra:** Phaser 3 + Vite, git, složky `services/` a `scenes/`, sběrnice událostí, nasazení na GitHub Pages.
+- [ ] **0 – Kostra:** Phaser 3 + Vite, git ✅, složky `services/` a `scenes/`, sběrnice událostí, nasazení na GitHub Pages.
 - [ ] **1 – Katalog + tisk:** `catalog`, stránka `tisk.html` (JsBarcode / QR) s archem štítků A4.
   Nejdřív **testovací arch** (Code128 vs QR v různých velikostech) → vytisknout → ověřit čtení
   telefonem i čtečkou → teprve pak celý katalog.
@@ -54,4 +54,6 @@ _(zatím nic)_
 
 ## Stav
 - 2026-11-16 (Claude): Sestaven plán, rozdělena dokumentace na README.md (popis) a Dev_notes.md (provoz),
-  založeny CLAUDE.md / AGENTS.md / GEMINI.md, testovací věty pro hlas. Kód zatím nezačat, není git repozitář.
+  založeny CLAUDE.md / AGENTS.md / GEMINI.md, testovací věty pro hlas.
+- 2026-11-16 (Claude + uživatel): Založen git, veřejný repozitář https://github.com/petr554kelemen/Pumpar
+  (publikováno z VS Code). Osobní údaje hráče z dokumentace odstraněny – repozitář je veřejný.
