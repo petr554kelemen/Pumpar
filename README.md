@@ -6,9 +6,23 @@ Nápady na rozšíření pochází od samotného hráče – hra má být jednod
 Tento soubor popisuje **co hra je a jak je navržena**. Průběh práce, plán, TODO a chyby
 jsou v [Dev_notes.md](Dev_notes.md).
 
+## Spuštění (vývoj na Windows)
+```
+npm install        # jednou po naklonování
+npm run dev        # vývojový server s automatickým obnovováním (http://localhost:5173)
+npm run build      # sestavení do dist/
+npm run preview    # náhled sestavené verze
+```
+Po každém `push` do `main` se hra sama nasadí na GitHub Pages (`.github/workflows/deploy.yml`):
+https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-verze.html`.
+
 ## Soubory
-- `cerpaci_stanice_simulator_pro_male_pumpare.html` – současná funkční verze (jeden soubor, čisté HTML/JS,
-  bez Phaseru – stojan, obchod se 6 produkty, bankovky 15/20/25 teček).
+- `index.html`, `src/main.js` – vstup nové hry (Phaser 4).
+- `src/services/` – služby bez závislosti na Phaseru (`eventBus.js`, `beep.js`, …).
+- `src/scenes/` – Phaser scény (zatím `StationScene.js` – zkušební scéna kostry).
+- `public/stara-verze.html` – původní funkční verze (jeden soubor, čisté HTML/JS, bez Phaseru – stojan,
+  obchod se 6 produkty, bankovky 15/20/25 teček). Zůstává hratelná, dokud ji nová verze nenahradí.
+- `public/` – soubory kopírované do buildu beze změny (později zvuky, obrázky).
 - `gemini-code-1794737833330.md`, `Myslenkova_mapa_gemini-code-1794737980748.txt` – původní plán
   a myšlenková mapa (Gemini). Číselné kódy 1xx–4xx z nich jsou nahrazeny (viz Formát kódů).
 - `hlas_test_vety.txt` – testovací věty pro výběr hlasu.
@@ -38,7 +52,10 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 - **Hra běží na notebooku hráče s Linuxem** (Chrome/Chromium) – **jen hraní**, otevírá se z GitHub Pages
   (záložka/zástupce na ploše). Na NB se nic neklonuje ani nevyvíjí.
 - **Vývoj probíhá výhradně na Windows** (tato složka, VS Code).
-- **Engine: Phaser 3** (+ Vite). Současná HTML verze se převede do Phaser scén.
+- **Engine: Phaser 4** (+ Vite, obojí lokálně v projektu). Původně plánován Phaser 3; při zakládání
+  (2026-11-16) byla aktuální stabilní 4.2.1 → zvolen Phaser 4. Stará HTML verze se převede do Phaser scén.
+- **Node.js LTS** (v26). `node_modules/` a `dist/` jsou vyřazené ze synchronizace Dropboxu
+  (`Set-Content -Path <slozka> -Stream com.dropbox.ignored -Value 1`) – po smazání složky nastavit znovu.
 - **Telefon = vzdálená čtečka a platební terminál.** K dispozici Android i iPhone.
   - Skenování kamerou na obou (Android: `BarcodeDetector`, iPhone/záloha: ZXing).
   - NFC nálepky (NTAG, Web NFC) jsou k dispozici, ale odloženy – později bonus jen pro Android.

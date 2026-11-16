@@ -10,20 +10,14 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - WISH = nápady hráče a rodiče; do plánu/TODO se přesouvají až po domluvě s uživatelem.
 
 ## Další krok
-- Fáze 0: založit projekt Phaser 3 + Vite, kostru služeb a sběrnice, nasadit na GitHub Pages, ověřit běh na NB.
+- Dokončit fázi 0: uživatel zapne GitHub Pages (Settings → Pages → Source: „GitHub Actions“),
+  ověřit nasazení na https://petr554kelemen.github.io/Pumpar/ a spuštění na NB hráče (Linux, Chrome).
+- Pak fáze 1 (testovací arch štítků na obyčejný papír) nebo 2 (vstup kódů z klávesnice).
 
 ## Plán (fáze)
-- [ ] **0 – Kostra:** Phaser 3 + Vite, git ✅, složky `services/` a `scenes/`, sběrnice událostí, nasazení na GitHub Pages.
-  Příprava prostředí (zjištěno 2026-11-16):
-  - Node.js v23.6.1 + npm 11.11.0 nainstalováno. Node 23 je mimo podporu → doporučen přechod na LTS
-    (`winget install OpenJS.NodeJS.LTS`), není blokující.
-  - **Vite lokálně v projektu** (`npm install -D vite`, spouštět `npm run dev` / `npm run build`), ne globálně.
-    Globálně je jen Parcel – nepoužívá se.
-  - **`node_modules/` a `dist/` vyřadit ze synchronizace Dropboxu** hned po vytvoření (PowerShell):
-    `Set-Content -Path node_modules -Stream com.dropbox.ignored -Value 1` (totéž pro `dist`).
-    V gitu jsou už vyřazeny přes `.gitignore`.
-  - Nasazení: GitHub Actions → GitHub Pages (`vite build`, `base: '/Pumpar/'`).
-  - K dispozici na PC (asi nepotřeba): TBarCode (TEC-IT), ImageMagick, Python 3.13.
+- [ ] **0 – Kostra:** ✅ git, ✅ Node LTS v26, ✅ Phaser 4.2.1 + Vite 8 lokálně, ✅ `src/services/` a `src/scenes/`,
+  ✅ sběrnice událostí, ✅ zkušební scéna, ✅ workflow pro GitHub Pages, ☐ zapnout Pages + ověřit na NB.
+  Pozn.: na PC jsou k dispozici i TBarCode (TEC-IT), ImageMagick, Python 3.13 – zatím nepotřeba.
 - [ ] **1 – Katalog + tisk:** `catalog`, stránka `tisk.html` (JsBarcode / QR) s archem štítků A4.
   Nejdřív **testovací arch** (Code128 vs QR v různých velikostech) → vytisknout → ověřit čtení
   telefonem i čtečkou → teprve pak celý katalog.
@@ -67,3 +61,8 @@ _(zatím nic)_
   založeny CLAUDE.md / AGENTS.md / GEMINI.md, testovací věty pro hlas.
 - 2026-11-16 (Claude + uživatel): Založen git, veřejný repozitář https://github.com/petr554kelemen/Pumpar
   (publikováno z VS Code). Osobní údaje hráče z dokumentace odstraněny – repozitář je veřejný.
+- 2026-11-16 (Claude): Fáze 0 – kostra. Node LTS v26.13.1, Phaser 4.2.1 (místo plánované 3, se souhlasem
+  uživatele), Vite 8.3.8 lokálně; `node_modules/` a `dist/` vyřazeny z Dropboxu. Sběrnice `eventBus.js`,
+  zvuky `beep.js` (ze staré verze), zkušební `StationScene` (klepnutí na ⛽ / mezerník → 'pip' → tečka
+  + číslice do 30). Stará hra přesunuta do `public/stara-verze.html`. Workflow `deploy.yml` pro Pages.
+  Ověřeno: `npm run build` OK, headless Chrome – scéna se vykreslí (WebGL), bez chyb v konzoli.
