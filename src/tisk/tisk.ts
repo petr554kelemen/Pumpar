@@ -4,6 +4,8 @@
 import JsBarcode from 'jsbarcode';
 import { toString as qrSvg } from 'qrcode';
 import { VISACKA, rozlozeniListu, sirkaCode128Mm } from './layout.ts';
+import { D30_DELKY_MM, D30_VARIANTY, type D30Delka, popisVarianty as popisD30 } from './d30.ts';
+import { stahniPng, vykresliStitekD30 } from './d30Render.ts';
 
 type Varianta =
   | { kod: string; typ: 'code128'; modulMm: number }
@@ -61,7 +63,8 @@ async function vytvorQr(kod: string, velikostMm: number): Promise<HTMLElement> {
   const obal = document.createElement('div');
   obal.className = 'qr';
   obal.style.width = obal.style.height = `${velikostMm}mm`;
-  obal.innerHTML = await qrSvg(kod, { type: 'svg', margin: 0, errorCorrectionLevel: 'M' });
+  // Oprava chyb H (30 %): u 4znakových kódů QR nezvětší a lépe snese škrábance i odlesk fólie.
+  obal.innerHTML = await qrSvg(kod, { type: 'svg', margin: 0, errorCorrectionLevel: 'H' });
   return obal;
 }
 
@@ -120,6 +123,57 @@ async function vykresli(): Promise<void> {
   );
   list.append(...visacky, meritko(r.okrajY));
   stranky.append(list);
+}
+
+// ---------- Štítky D30 (SPZ) ----------
+
+const D30_TEST_KODY = ['LA01', 'KE01'];
+
+function jeD30Delka(n: number): n is D30Delka {
+  return (D30_DELKY_MM as readonly number[]).includes(n);
+}
+
+function vykresliD30(delkaMm: D30Delka): void {
+  const obal = document.getElementById('d30-stitky');
+  if (!obal) return;
+  obal.replaceChildren();
+
+  for (const kod of D30_TEST_KODY) {
+    D30_VARIANTY.forEach((v, i) => {
+      const karta = document.createElement('figure');
+      karta.className = 'd30-karta';
+      const popis = document.createElement('figcaption');
+      popis.textContent = `${kod} · ${popisD30(v)}`;
+
+      const canvas = vykresliStitekD30(kod, v, delkaMm);
+      if (!canvas) {
+        const nic = document.createElement('div');
+        nic.className = 'd30-nevejde';
+        nic.textContent = `Na ${delkaMm} mm se nevejde`;
+        karta.append(nic, popis);
+      } else {
+        canvas.style.width = `${canvas.width * 3}px`; // náhled 3× – vidět jednotlivé body
+        const tlacitko = document.createElement('button');
+        tlacitko.type = 'button';
+        tlacitko.textContent = '⬇️ Stáhnout PNG';
+        tlacitko.addEventListener('click', () =>
+          stahniPng(canvas, `D30_${delkaMm}mm_${kod}_${v.typ}_${v.bodyNaModul}b_${i + 1}.png`),
+        );
+        karta.append(canvas, popis, tlacitko);
+      }
+      obal.append(karta);
+    });
+  }
+}
+
+const vyberDelky = document.getElementById('d30-delka');
+if (vyberDelky instanceof HTMLSelectElement) {
+  const prekresli = (): void => {
+    const delka = Number(vyberDelky.value);
+    if (jeD30Delka(delka)) vykresliD30(delka);
+  };
+  vyberDelky.addEventListener('change', prekresli);
+  prekresli();
 }
 
 document.getElementById('tisknout')?.addEventListener('click', () => window.print());

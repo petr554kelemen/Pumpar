@@ -19,7 +19,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   sběrnice událostí, zkušební scéna, GitHub Pages (https://petr554kelemen.github.io/Pumpar/).
   Pozn.: na PC jsou k dispozici i TBarCode (TEC-IT), ImageMagick, Python 3.13 – zatím nepotřeba.
 - [ ] **1 – Katalog + tisk:** `catalog` (kód → název, obrázek, cena – ceny jen ve hře), technické testy tisku:
-  - **D30:** SPZ jako Code128 i QR (z aplikace Phomemo) → ověřit čtení čtečkou i telefonem,
+  - **D30:** ✅ `tisk.html` sekce D30 – PNG 1:1 v bodech (12 × 30 / 12 × 40 mm), Code128 2–3 body/modul,
+    QR H 3–4 body/modul → ☐ vytisknout z aplikace Phomemo, ověřit čtení čtečkou i telefonem,
   - **laser:** ✅ testovací list `tisk.html` (25 visaček: Code128 0,2–0,33 mm, QR 10–20 mm, ostatní druhy kódů)
     → ☐ vytisknout, vystříhat, zalaminovat, ověřit čtení čtečkou i telefonem, zvolit velikost,
   - ☐ bankovky, obrázkový seznam „kam co“, katalog (až po dílně s hráčem).
@@ -121,3 +122,7 @@ _(zatím nic)_
   5 × 5 visaček 38 × 52 mm na A4, testy), technický test Code128/QR (JsBarcode, qrcode). Opraven postup
   laminace: visačky se nejdřív vystříhají, pak rozloží do kapsy A5 s mezerami (README). 19/19 testů,
   typecheck OK, ověřeno tiskem do PDF v Chrome.
+- 2026-11-16 (Claude): Fáze 1 – štítky D30 (SPZ): `d30.ts` (výpočty v bodech 203 dpi, testy), `d30Render.ts`
+  (PNG čistě černobílé, Code128 2/3 body na modul, QR H 3/4 body), sekce na `tisk.html` s výběrem délky
+  30/40 mm a stažením PNG. QR na laserových visačkách přepnut z M na H. 22/22 testů, typecheck OK,
+  ověřeno v Chrome (240 × 96 bodů, šířka Code128 sedí s výpočtem).

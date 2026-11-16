@@ -21,6 +21,21 @@
     <button type="button" id="tisknout">🖨️ Tisknout</button>
   </header>
   <main id="stranky"></main>
+  <section class="d30 jen-obrazovka">
+    <h2>Štítky D30 – technický test (SPZ)</h2>
+    <p>
+      Obrázky přesně v bodech tiskárny (203 dpi, čistě černobílé). Stáhnout do telefonu → aplikace Phomemo →
+      vložit obrázek na štítek <b>bez zvětšení/zmenšení</b>. QR s nejvyšší opravou chyb H (30 %) – u 4znakových
+      kódů to velikost nezvětší.
+    </p>
+    <label>Délka štítku:
+      <select id="d30-delka">
+        <option value="30">12 × 30 mm</option>
+        <option value="40">12 × 40 mm</option>
+      </select>
+    </label>
+    <div id="d30-stitky" class="d30-stitky"></div>
+  </section>
   <script type="module" src="/src/tisk/tisk.ts"></script>
 </body>
 </html>

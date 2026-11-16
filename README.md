@@ -185,9 +185,15 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
   Černobíle → **černé piktogramy s výraznými obrysy** (barevná emoji vyjdou šedě); ve hře zůstávají
   barevná emoji a piktogram s emoji musí být jasně „stejná věc“.
   Stránka `tisk.html` vykreslí arch přímo v prohlížeči (CSS v mm, `@page A4`) → tisk / PDF.
-- **Phomemo Smart Mini Label Maker D30** (BT, tisk z aplikace v telefonu, štítky 12 × 40 mm, ~203 dpi):
-  SPZ a karty. Krátký kód se vejde: Code128 `LA01` ≈ 22 × 8 mm, QR ≈ 10 × 10 mm, vedle text `LA-01`.
-  Aplikace tiskárny by měla umět Code128 i QR sama (napsat `LA01`) – ověřit.
+- **Phomemo Smart Mini Label Maker D30** (BT, tisk z aplikace v telefonu, štítky **12 × 30** nebo 12 × 40 mm,
+  203 dpi = 0,125 mm/bod): SPZ a karty. Obrázky štítků generuje `tisk.html` (sekce D30) **přesně v bodech
+  tiskárny**, čistě černobílé → stáhnout PNG do telefonu → aplikace Phomemo, vložit bez změny velikosti.
+  - Code128 `LA01`: 2 body/modul (0,25 mm) = 24,8 mm → vejde se na 30 mm i s textem `LA-01` pod kódem;
+    3 body/modul (0,375 mm) jen na 40 mm.
+  - QR (21 × 21 modulů) s opravou chyb **H (30 %)** – u 4znakových kódů nezvětší rozměr; 3 body/modul ≈ 9,4 mm
+    (tichá zóna 2), 4 body/modul ≈ 11,5 mm (tichá zóna 1); vedle velký text `LA-01`.
+  - Výpočty v `src/tisk/d30.ts` (testy), vykreslení `src/tisk/d30Render.ts`.
+- **QR všude s opravou chyb H** (i na laserových visačkách) – snese škrábance a odlesk fólie.
 - **Visačky – tisk a laminace:**
   - visačka **38 × 52 mm**, na list A4 **5 × 5 = 25 visaček těsně vedle sebe** (tmavě šedé čáry = střih,
     jeden střih oddělí dvě visačky), nahoře **10 mm volno na dírku** (čárkovaný kroužek pro děrovačku),
