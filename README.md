@@ -71,7 +71,9 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 ## Technické řešení
 - **Hra běží na notebooku hráče s Linuxem** (Chrome/Chromium) – **jen hraní**, otevírá se z GitHub Pages
   (záložka/zástupce na ploše). Na NB se nic neklonuje ani nevyvíjí.
-- **Vývoj probíhá výhradně na Windows** (tato složka, VS Code).
+- **Vývoj probíhá výhradně na Windows notebooku** (tato složka, VS Code).
+- **Stolní PC (Windows)** – je na něm Balabolka s českým hlasem; slouží jen k případnému generování zvuků
+  (soubory se do projektu dostanou přes Dropbox), nevyvíjí se na něm.
 - **Jazyk: TypeScript** (od 2026-11-16; původní jednosouborová hra byla v JS). TypeScript 7, režim `strict`,
   jen „odmazatelná“ syntaxe (`erasableSyntaxOnly` – bez `enum`/`namespace`), importy s příponou `.ts`.
   Kontrolu dělá `tsc` (`npm run typecheck`, i součást `npm run build` → chyba typů zastaví nasazení).
