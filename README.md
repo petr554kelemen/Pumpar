@@ -173,8 +173,9 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
 | Co | Kam | Čím | Poznámka |
 |---|---|---|---|
 | **Zboží** (`P001`, `S001`…) | **laminovaná visačka**, hráč ji přiváže/uváže na zboží | laser (papír) + laminace + dírka | hráč sám rozhoduje, co čím označí |
-| **SPZ** (`LA01`, `KE01`) | autíčka nebo prošlé platební karty | **D30** termoštítek 12 × 40 mm | z plastu jde dolů snáz než laserová samolepka |
-| **Herní karta** (`K001`) | prošlá platební karta | D30 | |
+| **SPZ** (`LA01`, `KE01`) na kartě | prošlá platební karta | **laser + QR H** (laminovaný / přelepený štítek) | místo na velký QR, odolné slunci |
+| **SPZ** na autíčku | autíčko | D30 termoštítek (jde z plastu dolů) – nebo malá visačka/přívěsek s QR | termotisk bledne na slunci |
+| **Herní karta** (`K001`) | prošlá platební karta | **laser + QR H** | |
 | **Bankovky** (`B020`) | kód přímo na papírové bankovce | laser, papír | bez samolepek |
 | **Rodičovské kódy** (`9001`) | list pro rodiče | laser, papír | hráč je nemá mít po ruce |
 
@@ -196,6 +197,11 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
     (tichá zóna 2), 4 body/modul ≈ 11,5 mm (tichá zóna 1); vedle velký text `LA-01`.
   - Výpočty v `src/tisk/d30.ts` (testy), vykreslení `src/tisk/d30Render.ts`.
 - **QR všude s opravou chyb H** (i na laserových visačkách) – snese škrábance a odlesk fólie.
+- **Preferovaný kód: QR** (karty, visačky). Důvody: snáší čtení z úhlu (telefon si podle rohových
+  čtverců dopočítá perspektivu, u čárového kódu to nejde), poškození i odlesky. Code128 jen tam, kde je
+  málo místa na výšku (D30). Test rozhodne hlavně o **nejmenší spolehlivé velikosti QR**.
+- **Termotisk (D30) bledne/černá na slunci a v teple** – jen tam, kde je potřeba snadné odlepení a štítek
+  nebude na slunci. Laserový toner pod laminací vydrží.
 - **Visačky – tisk a laminace:**
   - visačka **38 × 52 mm**, na list A4 **5 × 5 = 25 visaček těsně vedle sebe** (tmavě šedé čáry = střih,
     jeden střih oddělí dvě visačky), nahoře **10 mm volno na dírku** (čárkovaný kroužek pro děrovačku),

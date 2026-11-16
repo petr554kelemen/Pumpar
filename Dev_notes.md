@@ -126,3 +126,6 @@ _(zatím nic)_
   (PNG čistě černobílé, Code128 2/3 body na modul, QR H 3/4 body), sekce na `tisk.html` s výběrem délky
   30/40 mm a stažením PNG. QR na laserových visačkách přepnut z M na H. 22/22 testů, typecheck OK,
   ověřeno v Chrome (240 × 96 bodů, šířka Code128 sedí s výpočtem).
+- 2026-11-17 (uživatel + Claude): Rozhodnutí o kódech: **QR (oprava H) preferovaný** – karty a visačky laserem;
+  QR lépe snáší úhel (telefon), poškození a odlesk; termotisk D30 bledne na slunci → jen autíčka (odlepitelnost),
+  případně i autíčka visačkou s QR. Do testu přidat čtení z úhlu 30°/45°. README → Tisk štítků upraven.
