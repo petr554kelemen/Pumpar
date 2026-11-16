@@ -186,6 +186,13 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
 - **Phomemo Smart Mini Label Maker D30** (BT, tisk z aplikace v telefonu, štítky 12 × 40 mm, ~203 dpi):
   SPZ a karty. Krátký kód se vejde: Code128 `LA01` ≈ 22 × 8 mm, QR ≈ 10 × 10 mm, vedle text `LA-01`.
   Aplikace tiskárny by měla umět Code128 i QR sama (napsat `LA01`) – ověřit.
+- **Visačky – laminace v kapsách A5** (148 × 210 mm): více malých visaček s rozestupy (fólie se mezi nimi
+  spojí), po laminaci rozstříhat a udělat dírku děrovačkou. Výchozí návrh (ověřit testovacím tiskem):
+  - visačka **38 × 52 mm**, mezery **8 mm**, okraj kapsy ≥ 9 mm → **3 × 3 = 9 visaček na A5**,
+    na list A4 dvě poloviny A5 (18 visaček), list se po tisku rozstřihne napůl,
+  - nahoře **10 mm volno na dírku**, pod tím velké písmeno + piktogram, dole kód
+    (Code128 `P001` ≈ 20 mm široký, nebo QR ≈ 15 × 15 mm),
+  - ořezové značky jen v mezerách.
 - **Termoštítky nelaminovat za tepla** (zčernají). Laminuje se jen laserový tisk.
 
 ## Hlas a písmena

@@ -44,8 +44,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 
 ## TODO
 - [ ] Otevřít https://petr554kelemen.github.io/Pumpar/ na NB hráče (Linux, Chrome) – ověřit zobrazení a zvuk.
-- [ ] Zjistit rozměr laminovacích kapes (pro velikost visaček). Archy samolepek A4 už nejsou potřeba
-  (zboží = laminované visačky, SPZ/karty = D30).
+- [x] Laminovací kapsy: **A5**, více visaček s rozestupy, rozstříhat, děrovačka (návrh rozměrů v README → Tisk štítků).
+  Archy samolepek A4 už nejsou potřeba (zboží = laminované visačky, SPZ/karty = D30).
 - [ ] Po příjezdu USB čtečky: ověřit Code128 i QR, nastavit jazyk klávesnice ve čtečce.
 - [ ] Vybrat hlas – poslechnout `hlas_test_vety.txt` (hlavně samotné „M.“, „Eř“, „Chá“). Pořadí zkoušení:
   1. Balabolka (máme, český mluvčí; hromadně přes `balcon.exe`),
