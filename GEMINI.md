@@ -7,4 +7,5 @@ Projekt: Čerpací stanice – webová hra pro předškoláka (5 let).
 2. **Po práci aktualizuj Dev_notes.md:** řádek do „Stav“ (datum, kdo, co), „Další krok“, zaškrtni hotové
    fáze/TODO, opravené chyby přesuň z BUG do FIX. Ostatní modely na tebe navazují jen přes tyto soubory.
 3. **Trvalá rozhodnutí patří do README.md.** Nepřepisuj je potichu – pokud s něčím nesouhlasíš, zeptej se uživatele.
-4. Komunikuj česky. Soubory `CLAUDE.md`, `AGENTS.md` a `GEMINI.md` mají stejný obsah – při změně uprav všechny tři.
+4. Kód je v **TypeScriptu**. Před commitem musí projít `npm run typecheck` a `npm test`.
+5. Komunikuj česky. Soubory `CLAUDE.md`, `AGENTS.md` a `GEMINI.md` mají stejný obsah – při změně uprav všechny tři.

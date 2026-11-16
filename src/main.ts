@@ -1,8 +1,8 @@
 import Phaser from 'phaser';
-import { bus } from './services/eventBus.js';
-import { startKeyboardScanner } from './services/scanInput.js';
-import { ScanTestScene } from './scenes/ScanTestScene.js';
-import { StationScene } from './scenes/StationScene.js';
+import { bus } from './services/eventBus.ts';
+import { startKeyboardScanner } from './services/scanInput.ts';
+import { ScanTestScene } from './scenes/ScanTestScene.ts';
+import { StationScene } from './scenes/StationScene.ts';
 
 // Vstupní bod hry. Scény jen zobrazují; logika a hardware jsou ve službách (src/services).
 

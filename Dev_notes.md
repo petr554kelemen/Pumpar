@@ -78,3 +78,7 @@ _(zatím nic)_
   `X001` → ❌; bez chyb v konzoli. Opraveno: StationScene po návratu nezačínala od nuly; Enter v ní
   kolidoval se čtečkou (odebrán); oříznuté velké emoji (padding). V README opraven příklad CZ rozložení
   (`P101` přijde jako `P+é+`, ne `Pě0ě`).
+- 2026-11-16 (Claude): **Převod na TypeScript** (TS 7.0.2, strict, `erasableSyntaxOnly`). Typovaná sběrnice
+  (`GameEvents` – překlep v názvu události nebo chybějící údaj hlásí `tsc`), `CodeInfo` jako sjednocení podle `druh`.
+  Skripty: `typecheck`, `build` = `tsc && vite build`, testy `node --test` spouští `.ts` přímo.
+  Ověřeno: `tsc` bez chyb (a zkušební chyby zachytí), 12/12 testů, build, headless Chrome beze změny chování.

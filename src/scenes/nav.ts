@@ -1,17 +1,21 @@
 // Přepínání scén velkými ikonami vlevo nahoře (hráč nečte → jen obrázky).
 
-const SCENES = [
+import type Phaser from 'phaser';
+
+export type SceneKey = 'Station' | 'ScanTest';
+
+const SCENES: ReadonlyArray<{ key: SceneKey; ikona: string }> = [
   { key: 'Station', ikona: '⛽' },
   { key: 'ScanTest', ikona: '📟' },
 ];
 
-export function addNav(scene) {
+export function addNav(scene: Phaser.Scene): void {
   SCENES.forEach(({ key, ikona }, i) => {
     const aktivni = scene.scene.key === key;
     const tlacitko = scene.add
       .text(20 + i * 90, 16, ikona, {
         fontSize: '56px',
-        backgroundColor: aktivni ? '#37404c' : undefined,
+        ...(aktivni ? { backgroundColor: '#37404c' } : {}),
         padding: { x: 6, y: 4 },
       })
       .setName(`nav_${key}`)

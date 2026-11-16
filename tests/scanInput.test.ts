@@ -1,12 +1,12 @@
 // Spuštění: npm test  (vestavěný node:test, bez prohlížeče)
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseCode } from '../src/services/codes.js';
-import { normalizeChar, KeyCollector } from '../src/services/scanInput.js';
+import { parseCode } from '../src/services/codes.ts';
+import { normalizeChar, KeyCollector } from '../src/services/scanInput.ts';
 
-const type = (collector, text, start = 0, step = 20) => {
+const type = (collector: KeyCollector, text: string[], start = 0, step = 20) => {
   let t = start;
-  let result = null;
+  let result: string | null = null;
   for (const key of text) {
     result = collector.push(key, (t += step)) ?? result;
   }
@@ -16,6 +16,7 @@ const type = (collector, text, start = 0, step = 20) => {
 test('parseCode: zboží podle písmene kategorie', () => {
   const r = parseCode('P001');
   assert.equal(r.druh, 'zbozi');
+  if (r.druh !== 'zbozi') return;
   assert.equal(r.pismeno, 'P');
   assert.equal(r.cislo, 1);
   assert.equal(r.kategorie.nazev, 'pití');
@@ -27,8 +28,10 @@ test('parseCode: malá písmena a mezery nevadí', () => {
 });
 
 test('parseCode: bankovka do 30', () => {
-  assert.equal(parseCode('B020').hodnota, 20);
-  assert.equal(parseCode('B030').hodnota, 30);
+  const b20 = parseCode('B020');
+  const b30 = parseCode('B030');
+  assert.equal(b20.druh === 'bankovka' && b20.hodnota, 20);
+  assert.equal(b30.druh === 'bankovka' && b30.hodnota, 30);
   assert.equal(parseCode('B031').druh, 'chyba');
   assert.equal(parseCode('B000').druh, 'chyba');
 });

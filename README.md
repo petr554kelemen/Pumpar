@@ -10,22 +10,23 @@ jsou v [Dev_notes.md](Dev_notes.md).
 ```
 npm install        # jednou po naklonování
 npm run dev        # vývojový server s automatickým obnovováním (http://localhost:5173)
-npm run build      # sestavení do dist/
+npm run typecheck  # kontrola typů (TypeScript) – totéž hlásí VS Code v panelu Problems
+npm run build      # kontrola typů + sestavení do dist/
 npm run preview    # náhled sestavené verze
-npm test           # testy služeb (node:test, bez prohlížeče)
+npm test           # testy služeb (node:test spouští .ts přímo, bez prohlížeče)
 ```
 Po každém `push` do `main` se hra sama nasadí na GitHub Pages (`.github/workflows/deploy.yml`):
 https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-verze.html`.
 
 ## Soubory
-- `index.html`, `src/main.js` – vstup nové hry (Phaser 4).
+- `index.html`, `src/main.ts` – vstup nové hry (Phaser 4, TypeScript).
 - `src/services/` – služby bez závislosti na Phaseru:
-  - `eventBus.js` – sběrnice událostí (seznam událostí v hlavičce souboru),
-  - `codes.js` – rozpoznání kódů (`parseCode`, tabulka kategorií `CATEGORIES`),
-  - `scanInput.js` – vstup kódů z klávesnice / USB čtečky (převod CZ rozložení, ochrana proti dvojímu čtení),
-  - `beep.js` – jednoduché zvuky.
-- `src/scenes/` – Phaser scény: `ScanTestScene.js` („Pípni něco“, výchozí), `StationScene.js` (zkušební stojan),
-  `nav.js` (přepínání scén ikonami ⛽ 📟 vlevo nahoře).
+  - `eventBus.ts` – sběrnice událostí; **všechny události a jejich data v rozhraní `GameEvents`**,
+  - `codes.ts` – rozpoznání kódů (`parseCode` → `CodeInfo`, tabulka kategorií `CATEGORIES`),
+  - `scanInput.ts` – vstup kódů z klávesnice / USB čtečky (převod CZ rozložení, ochrana proti dvojímu čtení),
+  - `beep.ts` – jednoduché zvuky.
+- `src/scenes/` – Phaser scény: `ScanTestScene.ts` („Pípni něco“, výchozí), `StationScene.ts` (zkušební stojan),
+  `nav.ts` (přepínání scén ikonami ⛽ 📟 vlevo nahoře).
 - `tests/` – testy služeb (`npm test`).
 - `public/stara-verze.html` – původní funkční verze (jeden soubor, čisté HTML/JS, bez Phaseru – stojan,
   obchod se 6 produkty, bankovky 15/20/25 teček). Zůstává hratelná, dokud ji nová verze nenahradí.
@@ -36,6 +37,7 @@ https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-ver
 - `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` – pokyny pro AI asistenty (stejný obsah).
 
 ## Pracovní dohody
+- **Před commitem musí projít `npm run typecheck` a `npm test`.** Panel Problems ve VS Code má být čistý.
 - **Kódování: výhradně UTF-8, konce řádků LF.** Vynuceno `.editorconfig`, `.vscode/settings.json`
   (bez automatického odhadu kódování) a `.gitattributes`. Uživatel má jiné projekty v CP1250 –
   nikdy nepřebírat jejich nastavení.
@@ -70,6 +72,9 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 - **Hra běží na notebooku hráče s Linuxem** (Chrome/Chromium) – **jen hraní**, otevírá se z GitHub Pages
   (záložka/zástupce na ploše). Na NB se nic neklonuje ani nevyvíjí.
 - **Vývoj probíhá výhradně na Windows** (tato složka, VS Code).
+- **Jazyk: TypeScript** (od 2026-11-16; původní jednosouborová hra byla v JS). TypeScript 7, režim `strict`,
+  jen „odmazatelná“ syntaxe (`erasableSyntaxOnly` – bez `enum`/`namespace`), importy s příponou `.ts`.
+  Kontrolu dělá `tsc` (`npm run typecheck`, i součást `npm run build` → chyba typů zastaví nasazení).
 - **Engine: Phaser 4** (+ Vite, obojí lokálně v projektu). Původně plánován Phaser 3; při zakládání
   (2026-11-16) byla aktuální stabilní 4.2.1 → zvolen Phaser 4. Stará HTML verze se převede do Phaser scén.
 - **Node.js LTS** (v26). `node_modules/` a `dist/` jsou vyřazené ze synchronizace Dropboxu

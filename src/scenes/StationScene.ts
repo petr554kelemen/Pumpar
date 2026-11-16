@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
-import { bus } from '../services/eventBus.js';
-import * as beep from '../services/beep.js';
-import { addNav } from './nav.js';
+import { bus } from '../services/eventBus.ts';
+import * as beep from '../services/beep.ts';
+import { addNav, type SceneKey } from './nav.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
 const MAX_DOTS = 30;
@@ -12,11 +12,16 @@ const DOTS_PER_ROW = 10;
 // scéna na 'pip' reaguje přidáním tečky + číslice (zásada „číslo vždy dvakrát“).
 // Enter se zde nepoužívá – ukončuje kód ze čtečky.
 export class StationScene extends Phaser.Scene {
+  private count = 0;
+  private dots: Phaser.GameObjects.Arc[] = [];
+  private pumpa!: Phaser.GameObjects.Text;
+  private pocitadlo!: Phaser.GameObjects.Text;
+
   constructor() {
-    super('Station');
+    super('Station' satisfies SceneKey);
   }
 
-  create() {
+  create(): void {
     const { width } = this.scale;
     // Stav se nastavuje při každém spuštění scény (návrat z jiné scény začíná od nuly).
     this.count = 0;
@@ -38,9 +43,9 @@ export class StationScene extends Phaser.Scene {
       .setName('pumpa')
       .setOrigin(0.5)
       .setInteractive({ useHandCursor: true });
-    this.pumpa.on('pointerdown', () => bus.emit('pip'));
+    this.pumpa.on('pointerdown', () => bus.emit('pip', {}));
 
-    this.input.keyboard.on('keydown-SPACE', () => bus.emit('pip'));
+    this.input.keyboard?.on('keydown-SPACE', () => bus.emit('pip', {}));
 
     // Číslice (číslo vždy dvakrát: číslice + stejný počet teček).
     this.pocitadlo = this.add
@@ -58,7 +63,7 @@ export class StationScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, unsubscribe);
   }
 
-  onPip() {
+  private onPip(): void {
     if (this.count >= MAX_DOTS) {
       this.resetDots();
       return;
@@ -79,7 +84,7 @@ export class StationScene extends Phaser.Scene {
     if (this.count === MAX_DOTS) beep.win();
   }
 
-  addDot(index) {
+  private addDot(index: number): void {
     const { width } = this.scale;
     const gap = 46;
     const row = Math.floor(index / DOTS_PER_ROW);
@@ -93,7 +98,7 @@ export class StationScene extends Phaser.Scene {
     this.dots.push(dot);
   }
 
-  resetDots() {
+  private resetDots(): void {
     this.dots.forEach((d) => d.destroy());
     this.dots = [];
     this.count = 0;
