@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tisk visaček</title>
+  <link rel="stylesheet" href="/src/tisk/tisk.css">
+</head>
+<body>
+  <header class="ovladani">
+    <h1>Tisk visaček – technický test</h1>
+    <p>
+      Jen pro rodiče. Tisknout na A4 <b>ve skutečné velikosti (100 %)</b>, bez „přizpůsobit stránce“,
+      okraje „žádné“, záhlaví a zápatí vypnout. Kontrola: měřítko dole musí mít přesně 50 mm.
+    </p>
+    <p>
+      Postup: vytisknout → vystříhat visačky po šedých čarách → do kapsy A5 rozložit 3 × 3 s mezerami
+      cca 8 mm (fólie se spojí jen tam, kde není papír) → laminovat → stříhat uprostřed mezer →
+      děrovačkou dírka v čárkovaném kroužku.
+    </p>
+    <button type="button" id="tisknout">🖨️ Tisknout</button>
+  </header>
+  <main id="stranky"></main>
+  <script type="module" src="/src/tisk/tisk.ts"></script>
+</body>
+</html>

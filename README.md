@@ -28,6 +28,7 @@ https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-ver
 - `src/scenes/` – Phaser scény: `ScanTestScene.ts` („Pípni něco“, výchozí), `StationScene.ts` (zkušební stojan),
   `nav.ts` (přepínání scén ikonami ⛽ 📟 vlevo nahoře).
 - `tests/` – testy služeb (`npm test`).
+- `tisk.html`, `src/tisk/` – stránka pro tisk visaček (jen pro rodiče); `layout.ts` = rozvržení listu (mm).
 - `public/stara-verze.html` – původní funkční verze (jeden soubor, čisté HTML/JS, bez Phaseru – stojan,
   obchod se 6 produkty, bankovky 15/20/25 teček). Zůstává hratelná, dokud ji nová verze nenahradí.
 - `public/` – soubory kopírované do buildu beze změny (později zvuky, obrázky).
@@ -186,13 +187,13 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
 - **Phomemo Smart Mini Label Maker D30** (BT, tisk z aplikace v telefonu, štítky 12 × 40 mm, ~203 dpi):
   SPZ a karty. Krátký kód se vejde: Code128 `LA01` ≈ 22 × 8 mm, QR ≈ 10 × 10 mm, vedle text `LA-01`.
   Aplikace tiskárny by měla umět Code128 i QR sama (napsat `LA01`) – ověřit.
-- **Visačky – laminace v kapsách A5** (148 × 210 mm): více malých visaček s rozestupy (fólie se mezi nimi
-  spojí), po laminaci rozstříhat a udělat dírku děrovačkou. Výchozí návrh (ověřit testovacím tiskem):
-  - visačka **38 × 52 mm**, mezery **8 mm**, okraj kapsy ≥ 9 mm → **3 × 3 = 9 visaček na A5**,
-    na list A4 dvě poloviny A5 (18 visaček), list se po tisku rozstřihne napůl,
-  - nahoře **10 mm volno na dírku**, pod tím velké písmeno + piktogram, dole kód
-    (Code128 `P001` ≈ 20 mm široký, nebo QR ≈ 15 × 15 mm),
-  - ořezové značky jen v mezerách.
+- **Visačky – tisk a laminace:**
+  - visačka **38 × 52 mm**, na list A4 **5 × 5 = 25 visaček těsně vedle sebe** (šedé čáry = střih,
+    jeden střih oddělí dvě visačky), nahoře **10 mm volno na dírku** (čárkovaný kroužek pro děrovačku),
+    pod tím velké písmeno + piktogram, dole kód,
+  - postup: vytisknout (100 %, bez okrajů) → vystříhat → do kapsy **A5** rozložit **3 × 3 s mezerami
+    ~8 mm** (fólie se spojí jen tam, kde není papír) → laminovat → stříhat uprostřed mezer → děrovačka,
+  - stránka **`tisk.html`** (na webu `…/Pumpar/tisk.html`) – zatím technický test velikostí kódů.
 - **Termoštítky nelaminovat za tepla** (zčernají). Laminuje se jen laserový tisk.
 
 ## Hlas a písmena

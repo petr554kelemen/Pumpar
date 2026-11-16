@@ -1,0 +1,133 @@
+/* Stránka pro tisk visaček. Rozměry v mm odpovídají skutečnému tisku (při tisku 100 %). */
+
+@page {
+  size: A4;
+  margin: 0;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #d5d8dc;
+  color: #111;
+}
+
+.ovladani {
+  max-width: 210mm;
+  margin: 16px auto;
+  padding: 0 8px;
+}
+
+.ovladani h1 {
+  font-size: 1.4rem;
+  margin: 0 0 8px;
+}
+
+.ovladani p {
+  margin: 4px 0;
+  line-height: 1.4;
+}
+
+.ovladani button {
+  margin-top: 8px;
+  font-size: 1.2rem;
+  padding: 8px 18px;
+  cursor: pointer;
+}
+
+.list {
+  position: relative;
+  width: 210mm;
+  height: 297mm;
+  margin: 0 auto 24px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 25%);
+  overflow: hidden;
+}
+
+/* Visačka: šedý obrys = čára pro stříhání (sousední visačky sdílí jeden střih). */
+.visacka {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 1.5mm;
+  border: 0.15mm solid #999;
+}
+
+/* Kroužek pro děrovačku (průměr 6 mm, uprostřed zóny pro dírku). */
+.dirka {
+  position: absolute;
+  top: 2mm;
+  left: 50%;
+  width: 6mm;
+  height: 6mm;
+  margin-left: -3mm;
+  border: 0.2mm dashed #888;
+  border-radius: 50%;
+}
+
+.pismeno {
+  font-size: 15mm;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.kod {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kod svg {
+  display: block;
+}
+
+.qr svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.popis {
+  font-size: 2.2mm;
+  color: #444;
+}
+
+.meritko {
+  position: absolute;
+  left: 20mm;
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  font-size: 3mm;
+}
+
+.meritko .cara {
+  display: inline-block;
+  width: 50mm;
+  height: 2mm;
+  border: 0.3mm solid #000;
+  border-top: none;
+}
+
+@media print {
+  body {
+    background: none;
+  }
+
+  .ovladani {
+    display: none;
+  }
+
+  .list {
+    margin: 0;
+    box-shadow: none;
+    break-after: page;
+  }
+}

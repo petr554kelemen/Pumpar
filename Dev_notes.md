@@ -11,7 +11,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 
 ## Další krok
 - Pořadí fází: 0 ✅ → 2 ✅ → **1** → 3 (fáze 1 čekala na tisk; čísla fází se nemění).
-- Fáze 1: katalog zboží + testovací arch štítků (Code128 vs QR) na obyčejný papír s ořezovými čarami.
+- Fáze 1: vytisknout testovací list (https://petr554kelemen.github.io/Pumpar/tisk.html), zalaminovat,
+  ověřit čtení (telefon hned, čtečka po příjezdu) → zvolit typ a velikost kódu. Paralelně D30 test SPZ.
 
 ## Plán (fáze)
 - [x] **0 – Kostra:** git, Node LTS v26, Phaser 4.2.1 + Vite 8 lokálně, `src/services/` a `src/scenes/`,
@@ -19,8 +20,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   Pozn.: na PC jsou k dispozici i TBarCode (TEC-IT), ImageMagick, Python 3.13 – zatím nepotřeba.
 - [ ] **1 – Katalog + tisk:** `catalog` (kód → název, obrázek, cena – ceny jen ve hře), technické testy tisku:
   - **D30:** SPZ jako Code128 i QR (z aplikace Phomemo) → ověřit čtení čtečkou i telefonem,
-  - **laser:** testovací visačky (velikost pro laminovací kapsy, dírka) a bankovky, Code128 vs QR,
-  - stránka `tisk.html` (visačky, bankovky, obrázkový seznam „kam co“).
+  - **laser:** ✅ testovací list `tisk.html` (25 visaček: Code128 0,2–0,33 mm, QR 10–20 mm, ostatní druhy kódů)
+    → ☐ vytisknout, vystříhat, zalaminovat, ověřit čtení čtečkou i telefonem, zvolit velikost,
+  - ☐ bankovky, obrázkový seznam „kam co“, katalog (až po dílně s hráčem).
   Herní visačky/štítky až po odsouhlasení s hráčem (dílna ✏️ → razítko ✅).
 - [x] **2 – Vstup kódů:** klávesnice/USB čtečka (kód + Enter), převod CZ znaků na číslice, testovací scéna „Pípni něco“.
   Ověření se skutečnou čtečkou čeká na její příjezd (viz TODO).
@@ -115,3 +117,7 @@ _(zatím nic)_
 - 2026-11-16 (uživatel + Claude): Plán štítků: zboží = laminované visačky (laser), hráč je sám přiváže
   (obrázkový seznam „kam co“), SPZ a karty = D30 termoštítky (z plastu jdou dolů), bankovky = laser papír.
   Ceny se netisknou (jen ceník ve hře). Hlas popisuje, nepřikazuje. README → Tisk štítků přepsán.
+- 2026-11-16 (Claude): Fáze 1 – stránka `tisk.html` (Vite multi-page), `src/tisk/layout.ts` (rozvržení
+  5 × 5 visaček 38 × 52 mm na A4, testy), technický test Code128/QR (JsBarcode, qrcode). Opraven postup
+  laminace: visačky se nejdřív vystříhají, pak rozloží do kapsy A5 s mezerami (README). 19/19 testů,
+  typecheck OK, ověřeno tiskem do PDF v Chrome.
