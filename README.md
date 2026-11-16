@@ -35,7 +35,9 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 - Párování telefonu zvládne hráč sám (QR + ikony stavu: 📶 ✅ ❌).
 
 ## Technické řešení
-- **Hra běží na notebooku s Linuxem** (Chrome/Chromium).
+- **Hra běží na notebooku hráče s Linuxem** (Chrome/Chromium) – **jen hraní**, otevírá se z GitHub Pages
+  (záložka/zástupce na ploše). Na NB se nic neklonuje ani nevyvíjí.
+- **Vývoj probíhá výhradně na Windows** (tato složka, VS Code).
 - **Engine: Phaser 3** (+ Vite). Současná HTML verze se převede do Phaser scén.
 - **Telefon = vzdálená čtečka a platební terminál.** K dispozici Android i iPhone.
   - Skenování kamerou na obou (Android: `BarcodeDetector`, iPhone/záloha: ZXing).
