@@ -10,7 +10,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - WISH = nápady hráče a rodiče; do plánu/TODO se přesouvají až po domluvě s uživatelem.
 
 ## Další krok
-- Fáze 1 (testovací arch štítků na obyčejný papír) nebo 2 (vstup kódů z klávesnice) – dle domluvy.
+- Pořadí fází: 0 ✅ → 2 ✅ → **1** → 3 (fáze 1 čekala na tisk; čísla fází se nemění).
+- Fáze 1: katalog zboží + testovací arch štítků (Code128 vs QR) na obyčejný papír s ořezovými čarami.
 
 ## Plán (fáze)
 - [x] **0 – Kostra:** git, Node LTS v26, Phaser 4.2.1 + Vite 8 lokálně, `src/services/` a `src/scenes/`,
@@ -19,7 +20,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] **1 – Katalog + tisk:** `catalog`, stránka `tisk.html` (JsBarcode / QR) s archem štítků A4.
   Nejdřív **testovací arch** (Code128 vs QR v různých velikostech) → vytisknout → ověřit čtení
   telefonem i čtečkou → teprve pak celý katalog.
-- [ ] **2 – Vstup kódů:** klávesnice/USB čtečka (kód + Enter), převod CZ znaků na číslice, testovací scéna „Pípni něco“.
+- [x] **2 – Vstup kódů:** klávesnice/USB čtečka (kód + Enter), převod CZ znaků na číslice, testovací scéna „Pípni něco“.
+  Ověření se skutečnou čtečkou čeká na její příjezd (viz TODO).
 - [ ] **3 – Telefon:** stránka pro telefon, párování přes QR, skenování kamerou, kód se pošle do hry na NB.
 - [ ] **4 – Převod hry do Phaseru:** scény Stojan a Obchod, skenované zboží jde do košíku.
 - [ ] **5 – Peněženka:** trvalý zůstatek, placení naskenovanými bankovkami, výpočet vrácení.
@@ -69,3 +71,10 @@ _(zatím nic)_
   všechny soubory ověřeny jako UTF-8. Do README dohoda o JSON scénách pro Phaser Editor a pojmenování objektů.
 - 2026-11-16 (Claude + uživatel): GitHub Pages zapnuty, nasazení zelené. Ověřeno: hra, stará verze
   i skript vrací 200. **Fáze 0 hotová** (zbývá jen vyzkoušet na NB hráče – viz TODO).
+- 2026-11-16 (Claude): **Fáze 2 hotová.** `codes.js` (parseCode, kategorie), `scanInput.js` (KeyCollector:
+  Enter ukončí, pauza >3 s zahodí rozepsané, stejný kód do 1,5 s se ignoruje, CZ `+ěščřžýáíé` → číslice),
+  scéna `ScanTestScene` („Pípni něco“ – písmeno + obrázek / bankovka číslo + tečky / ❌), přepínání scén `nav.js`.
+  12 testů (`npm test`) OK. Ověřeno v headless Chrome simulací čtečky: `P+é+` → P101 pití, `B023` → 23 teček,
+  `X001` → ❌; bez chyb v konzoli. Opraveno: StationScene po návratu nezačínala od nuly; Enter v ní
+  kolidoval se čtečkou (odebrán); oříznuté velké emoji (padding). V README opraven příklad CZ rozložení
+  (`P101` přijde jako `P+é+`, ne `Pě0ě`).

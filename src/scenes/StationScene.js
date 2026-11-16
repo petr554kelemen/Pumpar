@@ -1,23 +1,27 @@
 import Phaser from 'phaser';
 import { bus } from '../services/eventBus.js';
 import * as beep from '../services/beep.js';
+import { addNav } from './nav.js';
 
 const FONT = 'Arial, Helvetica, sans-serif';
 const MAX_DOTS = 30;
 const DOTS_PER_ROW = 10;
 
 // Fáze 0: zkušební scéna kostry.
-// Klepnutí na stojan (nebo mezerník/Enter) vyšle do sběrnice 'pip';
+// Klepnutí na stojan (nebo mezerník) vyšle do sběrnice 'pip';
 // scéna na 'pip' reaguje přidáním tečky + číslice (zásada „číslo vždy dvakrát“).
+// Enter se zde nepoužívá – ukončuje kód ze čtečky.
 export class StationScene extends Phaser.Scene {
   constructor() {
     super('Station');
-    this.count = 0;
-    this.dots = [];
   }
 
   create() {
     const { width } = this.scale;
+    // Stav se nastavuje při každém spuštění scény (návrat z jiné scény začíná od nuly).
+    this.count = 0;
+    this.dots = [];
+    addNav(this);
 
     // Malý popisek jen pro rodiče (hráč nečte).
     this.add
@@ -37,7 +41,6 @@ export class StationScene extends Phaser.Scene {
     this.pumpa.on('pointerdown', () => bus.emit('pip'));
 
     this.input.keyboard.on('keydown-SPACE', () => bus.emit('pip'));
-    this.input.keyboard.on('keydown-ENTER', () => bus.emit('pip'));
 
     // Číslice (číslo vždy dvakrát: číslice + stejný počet teček).
     this.pocitadlo = this.add

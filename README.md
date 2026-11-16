@@ -12,14 +12,21 @@ npm install        # jednou po naklonování
 npm run dev        # vývojový server s automatickým obnovováním (http://localhost:5173)
 npm run build      # sestavení do dist/
 npm run preview    # náhled sestavené verze
+npm test           # testy služeb (node:test, bez prohlížeče)
 ```
 Po každém `push` do `main` se hra sama nasadí na GitHub Pages (`.github/workflows/deploy.yml`):
 https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-verze.html`.
 
 ## Soubory
 - `index.html`, `src/main.js` – vstup nové hry (Phaser 4).
-- `src/services/` – služby bez závislosti na Phaseru (`eventBus.js`, `beep.js`, …).
-- `src/scenes/` – Phaser scény (zatím `StationScene.js` – zkušební scéna kostry).
+- `src/services/` – služby bez závislosti na Phaseru:
+  - `eventBus.js` – sběrnice událostí (seznam událostí v hlavičce souboru),
+  - `codes.js` – rozpoznání kódů (`parseCode`, tabulka kategorií `CATEGORIES`),
+  - `scanInput.js` – vstup kódů z klávesnice / USB čtečky (převod CZ rozložení, ochrana proti dvojímu čtení),
+  - `beep.js` – jednoduché zvuky.
+- `src/scenes/` – Phaser scény: `ScanTestScene.js` („Pípni něco“, výchozí), `StationScene.js` (zkušební stojan),
+  `nav.js` (přepínání scén ikonami ⛽ 📟 vlevo nahoře).
+- `tests/` – testy služeb (`npm test`).
 - `public/stara-verze.html` – původní funkční verze (jeden soubor, čisté HTML/JS, bez Phaseru – stojan,
   obchod se 6 produkty, bankovky 15/20/25 teček). Zůstává hratelná, dokud ji nová verze nenahradí.
 - `public/` – soubory kopírované do buildu beze změny (později zvuky, obrázky).
@@ -75,7 +82,7 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 - **USB čtečka (HID)** – chová se jako klávesnice (kód + Enter); vyvíjí se a testuje psaním na klávesnici.
   Deklaruje i 2D kódy → **QR kódy lze používat vedle Code128** (čte je i telefon).
   - **Pozor na české rozložení klávesnice:** čtečka posílá klávesy dle US layoutu, s CZ layoutem
-    přijde `P101` jako `Pě0ě` (číslice → `+ěščřžýáíé`, prohozené Y/Z). Řešení: nastavit jazyk
+    přijde `P101` jako `P+é+` (číslice → `+ěščřžýáíé`, prohozené Y/Z). Řešení: nastavit jazyk
     ve čtečce (konfigurační kódy z manuálu) a navíc v `scanInput` převádět `ěščřžýáíé` → `1–9,0`.
 - Webkamera NB jen jako záloha (malé kódy čte špatně).
 - **Platba kartou = hraná** (herní karta s kódem + PIN na klávesnici), žádné skutečné platby.

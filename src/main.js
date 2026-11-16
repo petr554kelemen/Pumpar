@@ -1,7 +1,14 @@
 import Phaser from 'phaser';
+import { bus } from './services/eventBus.js';
+import { startKeyboardScanner } from './services/scanInput.js';
+import { ScanTestScene } from './scenes/ScanTestScene.js';
 import { StationScene } from './scenes/StationScene.js';
 
 // Vstupní bod hry. Scény jen zobrazují; logika a hardware jsou ve službách (src/services).
+
+// Klávesnice / USB čtečka → událost 'scan' ve sběrnici (běží nezávisle na scénách).
+startKeyboardScanner(bus);
+
 new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
@@ -12,5 +19,6 @@ new Phaser.Game({
     width: 1280,
     height: 720,
   },
-  scene: [StationScene],
+  // První scéna je výchozí. Ve fázi 2 začínáme zkouškou čtečky.
+  scene: [ScanTestScene, StationScene],
 });
