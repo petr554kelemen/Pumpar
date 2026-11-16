@@ -41,6 +41,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   3. Microsoft Azure TTS (neurální Antonín/Vlasta, free kvóta),
   4. Google Cloud TTS (free kvóta, účet s kartou).
   Rozhoduje poslech, ideálně i hráčem.
+  - 2026-11-16: Na vývojovém PC je český hlas **Microsoft Jakub** (Windows OneCore; klasické SAPI5 rozhraní ho
+    nevidí – Balabolka ho možná nenabídne). Ukázka testovacích vět vygenerována přímo přes Windows
+    (WinRT `SpeechSynthesizer`, PowerShell) – **pokud Jakub obstojí, Balabolka není potřeba**, soubory lze
+    generovat skriptem v projektu. Balabolka na tomto PC nenalezena (možná přenosná / jiný PC). Čeká na poslech.
 - [ ] Projít s hráčem kategorie a písmena kódů (README → Formát kódů).
 
 ## BUG
