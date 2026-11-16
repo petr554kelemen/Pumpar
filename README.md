@@ -194,6 +194,8 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
     pod tím velké písmeno + piktogram, dole kód,
   - postup: vytisknout (100 %, bez okrajů) → vystříhat (zvládne hráč – čáry jsou výrazné) → do kapsy **A5** rozložit **3 × 3 s mezerami
     ~8 mm** (fólie se spojí jen tam, kde není papír) → laminovat → stříhat uprostřed mezer → děrovačka,
+  - **kdo co dělá:** tisk a laminace rodič v kanceláři (běžný laminátor – hlídat zavedení fólie, horký),
+    stříhání papíru hráč doma, stříhání zalaminované fólie (tuhá) zkusí hráč, jinak rodič,
   - stránka **`tisk.html`** (na webu `…/Pumpar/tisk.html`) – zatím technický test velikostí kódů.
 - **Termoštítky nelaminovat za tepla** (zčernají). Laminuje se jen laserový tisk.
 
