@@ -49,7 +49,8 @@ body {
   overflow: hidden;
 }
 
-/* Visačka: šedý obrys = čára pro stříhání (sousední visačky sdílí jeden střih). */
+/* Visačka: obrys = čára pro stříhání (sousední visačky sdílí jeden střih).
+   Stříhá i hráč → čára výrazná, ale ne černá (aby nesplývala s kódem). */
 .visacka {
   position: absolute;
   display: flex;
@@ -57,7 +58,7 @@ body {
   align-items: center;
   justify-content: space-between;
   padding-bottom: 1.5mm;
-  border: 0.15mm solid #999;
+  border: 0.35mm solid #555;
 }
 
 /* Kroužek pro děrovačku (průměr 6 mm, uprostřed zóny pro dírku). */

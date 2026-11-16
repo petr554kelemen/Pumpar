@@ -55,6 +55,7 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 - rozumí „menší / větší“, zatím hlavně v grafickém zobrazení,
 - **nečte** – hra se musí obejít bez textu,
 - zvládá jednoduché ovládání techniky (spárování telefonu, zapnutí Bluetooth),
+- **stříhá běžnými nůžkami** (od 3 let, opatrně) → visačky si vystříhá sám; laminátor (horký) obsluhuje rodič,
 - symbol **X / ❌ chápe jako „chyba“**.
 - **striktně dodržuje jednou nastavená pravidla** – co jednou uvidí nebo dostane vytištěné, je pro něj
   zákon („tak to ten pán napsal“) a pozdější změny odmítá. Má-li návod, použije ho jako důkaz.
@@ -188,10 +189,10 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
   SPZ a karty. Krátký kód se vejde: Code128 `LA01` ≈ 22 × 8 mm, QR ≈ 10 × 10 mm, vedle text `LA-01`.
   Aplikace tiskárny by měla umět Code128 i QR sama (napsat `LA01`) – ověřit.
 - **Visačky – tisk a laminace:**
-  - visačka **38 × 52 mm**, na list A4 **5 × 5 = 25 visaček těsně vedle sebe** (šedé čáry = střih,
+  - visačka **38 × 52 mm**, na list A4 **5 × 5 = 25 visaček těsně vedle sebe** (tmavě šedé čáry = střih,
     jeden střih oddělí dvě visačky), nahoře **10 mm volno na dírku** (čárkovaný kroužek pro děrovačku),
     pod tím velké písmeno + piktogram, dole kód,
-  - postup: vytisknout (100 %, bez okrajů) → vystříhat → do kapsy **A5** rozložit **3 × 3 s mezerami
+  - postup: vytisknout (100 %, bez okrajů) → vystříhat (zvládne hráč – čáry jsou výrazné) → do kapsy **A5** rozložit **3 × 3 s mezerami
     ~8 mm** (fólie se spojí jen tam, kde není papír) → laminovat → stříhat uprostřed mezer → děrovačka,
   - stránka **`tisk.html`** (na webu `…/Pumpar/tisk.html`) – zatím technický test velikostí kódů.
 - **Termoštítky nelaminovat za tepla** (zčernají). Laminuje se jen laserový tisk.
