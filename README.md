@@ -55,6 +55,8 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 - **nečte** – hra se musí obejít bez textu,
 - zvládá jednoduché ovládání techniky (spárování telefonu, zapnutí Bluetooth),
 - symbol **X / ❌ chápe jako „chyba“**.
+- **striktně dodržuje jednou nastavená pravidla** – co jednou uvidí nebo dostane vytištěné, je pro něj
+  zákon („tak to ten pán napsal“) a pozdější změny odmítá. Má-li návod, použije ho jako důkaz.
 
 ## Zásady návrhu
 - **Žádný text jako jediný nositel informace.** Vše má ikonu/emoji, barvu a zvuk; text je jen pro rodiče.
@@ -67,6 +69,17 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 - **❌ = chyba** (neznámý kód, málo peněz).
 - **Úrovně obtížnosti** pro růst: nejdřív jen tečky → tečky + číslice → později slova.
 - Párování telefonu zvládne hráč sám (QR + ikony stavu: 📶 ✅ ❌).
+
+### Pravidla jsou zákon
+1. **Nic provizorního před hráčem.** Kategorie, písmena, obrázky, slabiky SPZ, ceny i zvuky vidí hráč až
+   ve finální podobě. Testovací obrazovky a nasazenou verzi nejdřív zkouší rodič.
+2. **Tisk = definitivní pravidlo.** Před prvním tiskem štítků odsouhlasit (ideálně spoluvytvořit) s hráčem
+   kategorie, písmena a obrázky. Pravidlo, které sám vymyslí, bude hájit.
+3. **Měnitelnost je součástí pravidel od začátku.** Co se má měnit, musí to mít v pravidlech od prvního dne:
+   - „Auta se dají přeparkovat“ (přiřazení SPZ → auto),
+   - „Ceny ráno nastavuje vedoucí pumpy“ (příprava směny),
+   - **obrázkový návod s číslem verze** („Návod 1“, „Návod 2“…) – změna = nový návod s vyšším číslem,
+     který starý nahradí. Platí nejnovější návod.
 
 ## Technické řešení
 - **Hra běží na notebooku hráče s Linuxem** (Chrome/Chromium) – **jen hraní**, otevírá se z GitHub Pages
@@ -132,7 +145,7 @@ Tedy čokoláda i zmrzlina → `S`.
 | `Kxxx` | herní platební karta | „Ká jako karta“ | `K001` |
 | `9xxx` | rodičovské povely (přidat peníze, reset) – **jen číslice** | – | `9001` |
 
-Kategorie jsou návrh, hráč je může upravit. Úkoly typu „Pípni něco na Es“ / „Dones všechno na Pé“.
+Kategorie jsou **návrh – před prvním tiskem odsouhlasit s hráčem** (viz Pravidla jsou zákon). Úkoly typu „Pípni něco na Es“ / „Dones všechno na Pé“.
 
 ### SPZ aut (2026-11-16)
 **Slabika + 2 číslice**, v kódu bez pomlčky (`LA01`), na obrazovce s pomlčkou (`LA-01`).

@@ -48,7 +48,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     (WinRT `SpeechSynthesizer`, PowerShell) – **pokud Jakub obstojí, Balabolka není potřeba**, soubory lze
     generovat skriptem v projektu. Balabolka je na stolním PC uživatele (ne na vývojovém NB) – porovnat s Jakubem, zjistit název jejího
     českého hlasu. Čeká na poslech.
-- [ ] Projít s hráčem kategorie a písmena kódů (README → Formát kódů).
+- [ ] **Před prvním tiskem štítků** projít s hráčem kategorie, písmena, obrázky a slabiky SPZ
+  (README → Formát kódů, Pravidla jsou zákon). Do té doby hráči hru na Pages neukazovat.
+- [ ] Obrázkový „Návod 1“ s pravidly hry (verzovaný – změna = nový návod s vyšším číslem).
 
 ## BUG
 _(zatím nic)_
@@ -93,3 +95,6 @@ _(zatím nic)_
   `parseCode` → `druh: 'auto'`; ScanTestScene ukáže auto + SPZ jako tabulku. Přepínač druhů kódu ve scéně
   hlídá úplnost (`never`). 15/15 testů, typecheck OK, ověřeno v Chrome (`laé+` → LA-01).
   Štítky SPZ budou na autíčkách nebo prošlých platebních kartách; přiřazení SPZ → auto bude měnitelné (Garáž).
+- 2026-11-16 (Claude + uživatel): Zjištění – hráč striktně drží jednou nastavená pravidla. Do README
+  zásady „Pravidla jsou zákon“ (nic provizorního před hráčem, tisk = definitivní, měnitelnost v pravidlech
+  od začátku, verzovaný obrázkový návod). Kategorie odsouhlasit s hráčem před prvním tiskem.
