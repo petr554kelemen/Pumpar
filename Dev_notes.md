@@ -10,13 +10,11 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - WISH = nápady hráče a rodiče; do plánu/TODO se přesouvají až po domluvě s uživatelem.
 
 ## Další krok
-- Dokončit fázi 0: uživatel zapne GitHub Pages (Settings → Pages → Source: „GitHub Actions“),
-  ověřit nasazení na https://petr554kelemen.github.io/Pumpar/ a spuštění na NB hráče (Linux, Chrome).
-- Pak fáze 1 (testovací arch štítků na obyčejný papír) nebo 2 (vstup kódů z klávesnice).
+- Fáze 1 (testovací arch štítků na obyčejný papír) nebo 2 (vstup kódů z klávesnice) – dle domluvy.
 
 ## Plán (fáze)
-- [ ] **0 – Kostra:** ✅ git, ✅ Node LTS v26, ✅ Phaser 4.2.1 + Vite 8 lokálně, ✅ `src/services/` a `src/scenes/`,
-  ✅ sběrnice událostí, ✅ zkušební scéna, ✅ workflow pro GitHub Pages, ☐ zapnout Pages + ověřit na NB.
+- [x] **0 – Kostra:** git, Node LTS v26, Phaser 4.2.1 + Vite 8 lokálně, `src/services/` a `src/scenes/`,
+  sběrnice událostí, zkušební scéna, GitHub Pages (https://petr554kelemen.github.io/Pumpar/).
   Pozn.: na PC jsou k dispozici i TBarCode (TEC-IT), ImageMagick, Python 3.13 – zatím nepotřeba.
 - [ ] **1 – Katalog + tisk:** `catalog`, stránka `tisk.html` (JsBarcode / QR) s archem štítků A4.
   Nejdřív **testovací arch** (Code128 vs QR v různých velikostech) → vytisknout → ověřit čtení
@@ -31,6 +29,7 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] **7 – Rozšíření z mapy:** příprava směny (drag & drop cen), uzávěrka a tržba, minihry za odměnu, QR kódy po bytě.
 
 ## TODO
+- [ ] Otevřít https://petr554kelemen.github.io/Pumpar/ na NB hráče (Linux, Chrome) – ověřit zobrazení a zvuk.
 - [ ] Zjistit formát archu štítků A4 (rozměr, sloupce × řádky, okraje / kód archu) – krabice je v kanceláři.
   Do té doby testovací arch na obyčejný papír s ořezovými čarami.
 - [ ] Po příjezdu USB čtečky: ověřit Code128 i QR, nastavit jazyk klávesnice ve čtečce.
@@ -68,3 +67,5 @@ _(zatím nic)_
   Ověřeno: `npm run build` OK, headless Chrome – scéna se vykreslí (WebGL), bez chyb v konzoli.
 - 2026-11-16 (Claude): Kódování vynuceno na UTF-8 + LF (`.editorconfig`, `.vscode/settings.json`),
   všechny soubory ověřeny jako UTF-8. Do README dohoda o JSON scénách pro Phaser Editor a pojmenování objektů.
+- 2026-11-16 (Claude + uživatel): GitHub Pages zapnuty, nasazení zelené. Ověřeno: hra, stará verze
+  i skript vrací 200. **Fáze 0 hotová** (zbývá jen vyzkoušet na NB hráče – viz TODO).
