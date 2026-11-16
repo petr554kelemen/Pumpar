@@ -66,3 +66,5 @@ _(zatím nic)_
   zvuky `beep.js` (ze staré verze), zkušební `StationScene` (klepnutí na ⛽ / mezerník → 'pip' → tečka
   + číslice do 30). Stará hra přesunuta do `public/stara-verze.html`. Workflow `deploy.yml` pro Pages.
   Ověřeno: `npm run build` OK, headless Chrome – scéna se vykreslí (WebGL), bez chyb v konzoli.
+- 2026-11-16 (Claude): Kódování vynuceno na UTF-8 + LF (`.editorconfig`, `.vscode/settings.json`),
+  všechny soubory ověřeny jako UTF-8. Do README dohoda o JSON scénách pro Phaser Editor a pojmenování objektů.

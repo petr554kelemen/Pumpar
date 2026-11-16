@@ -1,0 +1,7 @@
+{
+  // Projekt je výhradně v UTF-8 (jiné projekty bývají v CP1250 – nepřebírat).
+  "files.encoding": "utf8",
+  "files.autoGuessEncoding": false,
+  "files.eol": "\n",
+  "files.insertFinalNewline": true
+}

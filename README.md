@@ -28,6 +28,17 @@ https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-ver
 - `hlas_test_vety.txt` – testovací věty pro výběr hlasu.
 - `CLAUDE.md`, `AGENTS.md`, `GEMINI.md` – pokyny pro AI asistenty (stejný obsah).
 
+## Pracovní dohody
+- **Kódování: výhradně UTF-8, konce řádků LF.** Vynuceno `.editorconfig`, `.vscode/settings.json`
+  (bez automatického odhadu kódování) a `.gitattributes`. Uživatel má jiné projekty v CP1250 –
+  nikdy nepřebírat jejich nastavení.
+- **Grafika / rozložení scén:** když se řeší vzhled, uživatel si může vyžádat **JSON scény pro Phaser Editor**,
+  aby viděl rozložení a názvy objektů a domluva o konkrétních blocích byla jednoznačná.
+  - Herní objekty proto pojmenovávat **stejně v kódu i ve scéně** (`setName('pumpa')`, proměnná `this.pumpa`),
+    česky bez diakritiky, krátce a výstižně.
+  - Před prvním použitím ověřit, kterou verzi Phaseru podporuje aktuální Phaser Editor
+    (projekt používá Phaser 4) a jaký formát `.scene` očekává.
+
 ## Cílový hráč
 Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dovedností:
 - počítá vzestupně do 30, sčítá malá čísla, orientuje se v rozsahu,
