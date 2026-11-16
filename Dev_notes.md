@@ -14,6 +14,16 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 
 ## Plán (fáze)
 - [ ] **0 – Kostra:** Phaser 3 + Vite, git ✅, složky `services/` a `scenes/`, sběrnice událostí, nasazení na GitHub Pages.
+  Příprava prostředí (zjištěno 2026-11-16):
+  - Node.js v23.6.1 + npm 11.11.0 nainstalováno. Node 23 je mimo podporu → doporučen přechod na LTS
+    (`winget install OpenJS.NodeJS.LTS`), není blokující.
+  - **Vite lokálně v projektu** (`npm install -D vite`, spouštět `npm run dev` / `npm run build`), ne globálně.
+    Globálně je jen Parcel – nepoužívá se.
+  - **`node_modules/` a `dist/` vyřadit ze synchronizace Dropboxu** hned po vytvoření (PowerShell):
+    `Set-Content -Path node_modules -Stream com.dropbox.ignored -Value 1` (totéž pro `dist`).
+    V gitu jsou už vyřazeny přes `.gitignore`.
+  - Nasazení: GitHub Actions → GitHub Pages (`vite build`, `base: '/Pumpar/'`).
+  - K dispozici na PC (asi nepotřeba): TBarCode (TEC-IT), ImageMagick, Python 3.13.
 - [ ] **1 – Katalog + tisk:** `catalog`, stránka `tisk.html` (JsBarcode / QR) s archem štítků A4.
   Nejdřív **testovací arch** (Code128 vs QR v různých velikostech) → vytisknout → ověřit čtení
   telefonem i čtečkou → teprve pak celý katalog.
