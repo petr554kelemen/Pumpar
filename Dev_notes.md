@@ -64,9 +64,11 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] **Garáž (s fází 4):** přiřazení SPZ → autíčko ve hře (vzhled, jméno), měnitelné rodičem/hráčem;
   pípnutí SPZ = auto přijede ke stojanu (+ úkol „natankuj …“).
 - [ ] **Otevírání benzínky (s fází 4, nápad hráče):** bez benzináře je benzínka zavřená – zákaz, auta netankují.
-  Benzinář pípne **služební kartu** → otevřeno (světla, závora, hlas „Benzínka je otevřená!“); stejnou kartou
-  na konci směny zavře (později uzávěrka/tržba z fáze 7). **Do dílny ✏️:** vzhled a kód karty (nesmí se plést
-  s platební K), kolik karet (hráč / rodič), jak vypadá „zavřeno“ (🚫 / závora / 🔒). Nejdřív nanečisto.
+  **Odemyká se kódem u dveří** (hráč má kódový zámek i na pokladničce; karta by se ztrácela, používá se jen ráno):
+  u zamčených dveří 🔒 číselná klávesnice → kód → otevřeno (světla, hlas „Benzínka je otevřená!“). Na konci směny
+  zavřít (později uzávěrka/tržba z fáze 7). Služební karta jen jako záložní varianta.
+  **Do dílny ✏️:** kód (zvolí hráč, jiný než PIN karty 1234), počet číslic, zavírání tlačítkem nebo kódem,
+  jak vypadá „zavřeno“ (🚫 / závora / 🔒). Nejdřív nanečisto.
 - [ ] **Žetony – vysavač a vzduch (nápad hráče):** vysavač (V) i dofoukání vzduchu jedou jen na žeton.
   Žeton se koupí v obchodě za peníze ze hry → pípnout u stroje → běží (ubývající čas graficky) → „hotovo“.
   Bez žetonu: „Potřebuješ žeton.“ **Do dílny ✏️:** jeden žeton na obojí, nebo dva; fyzické žetony (laminovaná
@@ -218,3 +220,4 @@ _(zatím nic)_
 - 2026-11-17 (uživatel): Platba kartou chráněná PINem (hráč PINy zná a zadává) → Plán fáze 6.
 - 2026-11-17 (uživatel): PIN univerzální pro všechny karty.
 - 2026-11-17 (uživatel): Herní PIN = 1234 (při zadávání jen hvězdičky).
+- 2026-11-17 (uživatel): Benzínka se odemyká kódem u dveří (jako hráčova pokladnička), ne kartou.
