@@ -17,6 +17,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   Hráč dál hraje starou verzi, novou uvidí až hotovou (Pravidla jsou zákon, bod 1).
 - Fáze 1: vytisknout testovací list (https://petr554kelemen.github.io/Pumpar/tisk.html), zalaminovat,
   ověřit čtení (telefon hned, čtečka po příjezdu) → zvolit typ a velikost kódu. Paralelně D30 test SPZ.
+  - D30 výsledek 1 (2026-11-17): štítek 12 × 40, **QR H 4 body/modul** (≈ 11,5 mm, tichá zóna jen 1 modul):
+    telefon načetl **s menšími problémy** (malý kód = blízko = ostření; úzký okraj). Zkusit i QR 3 body
+    (tichá zóna 2) a hlavně **čtečku** – ta rozhodne.
 
 ## Plán (fáze)
 - [x] **0 – Kostra:** git, Node LTS v26, Phaser 4.2.1 + Vite 8 lokálně, `src/services/` a `src/scenes/`,
@@ -270,3 +273,4 @@ _(zatím nic)_
 - 2026-11-17 (uživatel + Claude): Vzduch – odstraněn přepínač nápovědy (s barevnými cenami nedává smysl).
 - 2026-11-17 (hráč + Claude): Hráč vyzkoušel vzduch (logiku pochopil hned), přidán jeho nápad – vozík s vlastní
   nápravou. 38/38 testů, ověřeno v Chrome.
+- 2026-11-17 (uživatel): D30 test – QR 4 b/modul na 12 × 40 telefon přečetl s menšími problémy; čeká na čtečku.
