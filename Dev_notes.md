@@ -100,6 +100,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     kola se postupně nafouknou + cink, 🚗➡️ další auto. **S prázdným kolem se nejezdí:** 🚗➡️ při prázdném kole
     = nad ním bliká ❗ + chybový zvuk, auto zůstane. Doplatit lze další kartou; karta si pamatuje zůstatek
     (prázdná kolečka) do odjezdu auta.
+  - **Kontrola plného kola = 1 tečka** (návrh rodiče): plné kolo jde vybrat taky (nápověda 1 tečka),
+    po zaplacení krátká kontrola + ✅; dofouknuté kolo dostane ✅ taky. Mix cen (3 + 3 + 1 + 1) = sčítání.
   - Později (grafika, ne pro návrh): při foukání **okénko PIP** se zvětšeným kolem (druhá kamera Phaseru
     zaměřená na foukané kolo) – vidět, jak se ploška zaobluje. Prototyp je zatím skica. Nápovědu přepíná rodič (💡 vlevo dole). Bez hlasu.
   - Hráč: **dvě obtížnosti** – *s nápovědou* (u vybraného kola 3 tečky, cena roste viditelně) a *bez nápovědy*
@@ -251,3 +253,5 @@ _(zatím nic)_
 - 2026-11-17 (uživatel + Claude): Vzduch – s prázdným kolem nelze odjet (bliká ❗), doplacení další kartou,
   zůstatek karty v rámci auta. Ověřeno v Chrome.
 - 2026-11-17 (uživatel + Claude): Vzduch – odstraněny nápravy, kola blíž ke karoserii.
+- 2026-11-17 (uživatel + Claude): Vzduch – kontrola plného kola za 1 tečku, hotová kola ✅. 36/36 testů, ověřeno
+  v Chrome (2 prázdná + 2 plná = 8 teček z karty 20).

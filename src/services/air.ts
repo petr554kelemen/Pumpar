@@ -1,7 +1,9 @@
 // Dofukování kol (nápad hráče). Bez závislosti na Phaseru – testovatelné.
-// Jedno kolo = 3 tečky. Platí se jednou kartou; malá karta je odmítnuta, přeplatek zůstane na kartě.
+// Dofouknutí kola = 3 tečky, kontrola plného kola = 1 tečka. Platí se jednou kartou; malá karta je odmítnuta,
+// přeplatek zůstane na kartě.
 
 export const CENA_KOLA = 3;
+export const CENA_KONTROLY = 1;
 
 /** Kola: L/P = levé/pravé, P/Z = přední/zadní. */
 export const KOLA = ['LP', 'PP', 'LZ', 'PZ'] as const;
@@ -19,6 +21,16 @@ export function noveAuto(rng: () => number = Math.random): Record<KoloId, boolea
 
 export function cenaKol(pocet: number): number {
   return pocet * CENA_KOLA;
+}
+
+/** Cena za jedno vybrané kolo: podhuštěné se dofoukne (3), plné se jen zkontroluje (1). */
+export function cenaKola(podhustene: boolean): number {
+  return podhustene ? CENA_KOLA : CENA_KONTROLY;
+}
+
+/** Cena za všechna vybraná kola (true = podhuštěné). */
+export function cenaVyberu(vybrana: readonly boolean[]): number {
+  return vybrana.reduce((soucet, podhustene) => soucet + cenaKola(podhustene), 0);
 }
 
 export type Platba = { ok: true; zbytek: number } | { ok: false; chybi: number };

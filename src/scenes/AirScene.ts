@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { bus, type GameEvents } from '../services/eventBus.ts';
 import * as beep from '../services/beep.ts';
-import { CENA_KOLA, KOLA, type KoloId, cenaKol, noveAuto, zaplat } from '../services/air.ts';
+import { KOLA, type KoloId, cenaKola, cenaVyberu, noveAuto, zaplat } from '../services/air.ts';
 import { addNav, type SceneKey } from './nav.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
@@ -25,6 +25,8 @@ interface Kolo {
   ramecek: Phaser.GameObjects.Graphics;
   podhustene: boolean;
   vybrane: boolean;
+  /** Zaplacené a hotové (dofouknuté nebo zkontrolované) – ukazuje ✅. */
+  zkontrolovane: boolean;
   /** 0 = splasklé (rozplácnuté), 1 = plné. */
   plnost: number;
   napoveda: Phaser.GameObjects.Arc[];
@@ -121,7 +123,17 @@ export class AirScene extends Phaser.Scene {
     const ramecek = this.add.graphics();
     const obal = this.add.container(p.x, p.y, [ramecek, g]).setName(`kolo_${id}`);
     obal.setSize(R_KOLA * 2.6, R_KOLA * 2.4).setInteractive({ useHandCursor: true });
-    const kolo: Kolo = { id, obal, g, ramecek, podhustene, vybrane: false, plnost: podhustene ? 0 : 1, napoveda: [] };
+    const kolo: Kolo = {
+      id,
+      obal,
+      g,
+      ramecek,
+      podhustene,
+      vybrane: false,
+      zkontrolovane: false,
+      plnost: podhustene ? 0 : 1,
+      napoveda: [],
+    };
     obal.on('pointerdown', () => this.klepniNaKolo(kolo));
     this.auto.add(obal);
     this.kresliKolo(kolo);
@@ -167,8 +179,8 @@ export class AirScene extends Phaser.Scene {
 
   private klepniNaKolo(k: Kolo): void {
     if (this.stav !== 'vyber') return;
-    if (!k.podhustene) {
-      // Plné kolo – není co foukat.
+    if (k.zkontrolovane) {
+      // Už hotové (✅) – není co dělat.
       beep.tick(260, 0.08);
       this.tweens.add({ targets: k.obal, scale: { from: 1.08, to: 1 }, duration: 150 });
       return;
@@ -179,16 +191,17 @@ export class AirScene extends Phaser.Scene {
     this.prekresliNapovedu(k);
   }
 
-  /** 3 tečky vedle vybraného kola (jen se zapnutou nápovědou). */
+  /** Tečky ceny vedle vybraného kola – 3 za dofouknutí, 1 za kontrolu (jen se zapnutou nápovědou). */
   private prekresliNapovedu(k: Kolo): void {
     k.napoveda.forEach((t) => t.destroy());
     k.napoveda = [];
     if (!k.vybrane || !napovedaZapnuta) return;
     const p = KOLO_POZICE[k.id];
     const smer = Math.sign(p.x);
-    for (let i = 0; i < CENA_KOLA; i++) {
+    const pocet = cenaKola(k.podhustene);
+    for (let i = 0; i < pocet; i++) {
       const t = this.add
-        .circle(p.x + smer * (R_KOLA * 1.5 + 22), p.y + (i - 1) * 26, 10, ZLUTA)
+        .circle(p.x + smer * (R_KOLA * 1.5 + 22), p.y + (i - (pocet - 1) / 2) * 26, 10, ZLUTA)
         .setStrokeStyle(2, 0xfef9e7)
         .setName(`napoveda_${k.id}_${i + 1}`);
       this.auto.add(t);
@@ -251,13 +264,14 @@ export class AirScene extends Phaser.Scene {
     if (vybrana.length === 0) {
       // Nejdřív vybrat kola.
       beep.tick(300, 0.08);
-      this.kola.filter((k) => k.podhustene).forEach((k) =>
+      this.kola.filter((k) => !k.zkontrolovane).forEach((k) =>
         this.tweens.add({ targets: k.obal, scale: { from: 1.15, to: 1 }, duration: 250 }),
       );
       return;
     }
 
-    const platba = zaplat(karta.zbyva, cenaKol(vybrana.length));
+    const cena = cenaVyberu(vybrana.map((k) => k.podhustene));
+    const platba = zaplat(karta.zbyva, cena);
     if (!platba.ok) {
       this.odmitni(karta);
       return;
@@ -270,13 +284,13 @@ export class AirScene extends Phaser.Scene {
       k.napoveda = [];
     });
 
-    // Tečky z karty odletí ke kolům (odečítání viditelně): 3 na každé kolo.
-    const cena = cenaKol(vybrana.length);
+    // Tečky z karty odletí ke kolům (odečítání viditelně): 3 k dofukovanému, 1 ke kontrolovanému.
+    const cile = vybrana.flatMap((k) => Array.from({ length: cenaKola(k.podhustene) }, () => k));
     const prvni = karta.hodnota - karta.zbyva; // dřív utracené tečky jsou na začátku
     karta.zbyva -= cena;
     for (let i = 0; i < cena; i++) {
       const zdroj = karta.tecky[prvni + i];
-      const kolo = vybrana[Math.floor(i / CENA_KOLA)];
+      const kolo = cile[i];
       if (!zdroj || !kolo) continue;
       const start = { x: karta.obal.x + zdroj.x, y: karta.obal.y + zdroj.y };
       zdroj.setFillStyle(ZLUTA, 0); // na kartě zůstane prázdné kolečko
@@ -290,7 +304,7 @@ export class AirScene extends Phaser.Scene {
         delay: i * 140,
         ease: 'Quad.InOut',
         onComplete: () => {
-          beep.tick(600 + (i % CENA_KOLA) * 120, 0.05);
+          beep.tick(600 + (i % 3) * 120, 0.05);
           letici.destroy();
         },
       });
@@ -334,6 +348,20 @@ export class AirScene extends Phaser.Scene {
       this.hotovo();
       return;
     }
+    if (!k.podhustene) {
+      // Plné kolo – jen kontrola tlaku: krátké „psst“ a ✅.
+      beep.tick(2600, 0.04);
+      this.tweens.add({
+        targets: k.obal,
+        scale: { from: 1.12, to: 1 },
+        duration: 400,
+        onComplete: () => {
+          this.oznacHotove(k);
+          this.nafoukni(kola, index + 1);
+        },
+      });
+      return;
+    }
     const stav = { t: k.plnost };
     this.tweens.add({
       targets: stav,
@@ -346,15 +374,28 @@ export class AirScene extends Phaser.Scene {
       },
       onComplete: () => {
         k.podhustene = false;
-        k.vybrane = false;
         k.plnost = 1;
-        this.kresliKolo(k);
-        beep.tick(1320, 0.18); // cink
+        this.oznacHotove(k);
         this.nafoukni(kola, index + 1);
       },
     });
     // Syčení vzduchu – rychlé tiché cvakání
     this.time.addEvent({ delay: 90, repeat: 13, callback: () => beep.tick(2400 + Math.random() * 600, 0.02) });
+  }
+
+  /** Kolo je zaplacené a v pořádku: zrušit výběr, cink a ✅ nad kolem. */
+  private oznacHotove(k: Kolo): void {
+    k.vybrane = false;
+    k.zkontrolovane = true;
+    this.kresliKolo(k);
+    beep.tick(1320, 0.18); // cink
+    const p = KOLO_POZICE[k.id];
+    const fajfka = this.add
+      .text(p.x, p.y - R_KOLA - 30, '✅', { fontSize: '40px', padding: { x: 6, y: 10 } })
+      .setOrigin(0.5)
+      .setName(`hotovo_${k.id}`);
+    this.auto.add(fajfka);
+    this.tweens.add({ targets: fajfka, scale: { from: 0, to: 1 }, duration: 250, ease: 'Back.Out' });
   }
 
   /** Po nafouknutí: zbývají-li prázdná kola, dá se doplatit; jinak oslava. */

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { KOLA, cenaKol, noveAuto, zaplat } from '../src/services/air.ts';
+import { KOLA, cenaKol, cenaVyberu, noveAuto, zaplat } from '../src/services/air.ts';
 
 test('Vzduch: kolo stojí 3 tečky', () => {
   assert.deepEqual([1, 2, 3, 4].map(cenaKol), [3, 6, 9, 12]);
@@ -17,4 +17,10 @@ test('Vzduch: nové auto má vždy aspoň jedno podhuštěné kolo', () => {
   assert.equal(KOLA.filter((k) => auto[k]).length, 1);
   const vsechna = noveAuto(() => 0.1);
   assert.equal(KOLA.filter((k) => vsechna[k]).length, 4);
+});
+
+test('Vzduch: kontrola plného kola stojí 1 tečku, dofouknutí 3', () => {
+  assert.equal(cenaVyberu([true, true, false, false]), 8);
+  assert.equal(cenaVyberu([false]), 1);
+  assert.equal(cenaVyberu([]), 0);
 });
