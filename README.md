@@ -219,7 +219,8 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
   i po jednotlivých frázích. Výběr hlasu: viz Dev_notes.md.
 - **Hlas: Speechtech** (licencovaný, na stolním PC; český hlas – pravděpodobně Radka) – zřetelnější písmena
   i výslovnost než Microsoft Jakub. Ve slovech „ch“ čte správně; jen samotné písmeno „CH“ rozloží na dvě.
-  → **Písmena se hlasu zadávají jejich názvem**, ne znakem: „em“, „bé“, „chá“ (ne „M“, „B“, „CH“).
+  → **Písmena se hlasu zadávají jejich názvem**, ne znakem: „em“, „bé“, „chá“ (ne „M“, „B“, „CH“),
+  i uprostřed věty: „Chá. Chá jako chleba.“ (ověřeno poslechem).
   Písmeno CH ve hře zatím není (i ve škole přichází mezi posledními).
 - **Jeden hlas pro celou hru** – hráč slyší písmena vždy stejně. Hlasy se nemíchají.
 - Generování: rodič uloží fráze ze Speechtechu do WAV podle seznamu frází (pojmenování souborů = klíč fráze).

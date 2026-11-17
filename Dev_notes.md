@@ -147,4 +147,4 @@ _(zatím nic)_
   problém jen „ch“ (čte c + h) → fráze bez „ch“, písmeno CH ve hře zatím ne. Jeden hlas pro celou hru.
   Jakub zůstává jako záloha. README → Hlas a písmena přepsán. Zjistit přesný název hlasu Speechtechu.
 - 2026-11-17 (uživatel): Upřesnění Speechtech: „ch“ ve slovech OK, jen samotné „CH“ rozdělí → písmena zadávat
-  názvem („chá“). Omezení „fráze bez ch“ zrušeno. Ověřit ve Speechtechu „chá.“ / „Chá!“.
+  názvem („chá“). Omezení „fráze bez ch“ zrušeno. Ověřeno: „Chá. Chá jako chleba.“ zní přirozeně.
