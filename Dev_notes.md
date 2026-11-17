@@ -241,3 +241,4 @@ _(zatím nic)_
   (předvolba 5 L, přetečení, zadání 1.25, tankování myší i šipkami).
 - 2026-11-17 (Claude): Prototyp dofukování kol (scéna 🛞) pro ukázku hráči v dílně. 35/35 testů, typecheck OK,
   ověřeno v Chrome (výběr kol, odmítnutí B001, platba kartou 20, foukání, další auto).
+- 2026-11-17 (uživatel + Claude): Rozhodnutí – hra není responzivní (notebook, FIT); telefon = vlastní stránky na výšku.

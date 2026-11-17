@@ -104,6 +104,8 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 ## Technické řešení
 - **Hra běží na notebooku hráče s Linuxem** (Chrome/Chromium) – **jen hraní**, otevírá se z GitHub Pages
   (záložka/zástupce na ploše). Na NB se nic neklonuje ani nevyvíjí.
+- **Hra není responzivní.** Pevná plocha 1280 × 720, Phaser ji zmenší/zvětší na okno (FIT) – cíl je notebook.
+  Telefon hru nezobrazuje: má **vlastní jednoduché stránky na výšku** (čtečka kódů – fáze 3, terminál – fáze 6).
 - **Vývoj probíhá výhradně na Windows notebooku** (tato složka, VS Code).
 - **Stolní PC (Windows)** – je na něm Balabolka s českým hlasem; slouží jen k případnému generování zvuků
   (soubory se do projektu dostanou přes Dropbox), nevyvíjí se na něm.
