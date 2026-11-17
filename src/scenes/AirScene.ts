@@ -8,13 +8,14 @@ const FONT = 'Arial, Helvetica, sans-serif';
 const NOMINALY = [10, 15, 20] as const;
 const ZLUTA = 0xf1c40f;
 
-/** Plánek auta: střed karoserie a rozmístění kol (kola vytočená ven jako nohy „přejeté žáby“). */
+/** Plánek auta ze shora; kola v rozích nakreslená z boku (kulatá s ráfkem), aby bylo vidět splasknutí. */
 const AUTO = { x: 430, y: 400 };
-const KOLO_POZICE: Readonly<Record<KoloId, { x: number; y: number; uhel: number }>> = {
-  LP: { x: -145, y: -105, uhel: -25 },
-  PP: { x: 145, y: -105, uhel: 25 },
-  LZ: { x: -145, y: 105, uhel: 25 },
-  PZ: { x: 145, y: 105, uhel: -25 },
+const R_KOLA = 42;
+const KOLO_POZICE: Readonly<Record<KoloId, { x: number; y: number }>> = {
+  LP: { x: -155, y: -105 },
+  PP: { x: 155, y: -105 },
+  LZ: { x: -155, y: 105 },
+  PZ: { x: 155, y: 105 },
 };
 
 interface Kolo {
@@ -41,7 +42,7 @@ type Stav = 'vyber' | 'placeni' | 'hotovo';
 // Nápověda (3 tečky u vybraného kola) – přepíná rodič; pamatuje se mezi auty.
 let napovedaZapnuta = true;
 
-// Dofukování kol (nápad hráče): auto jako plánek ze shora, podhuštěná kola rozplácnutá.
+// Dofukování kol (nápad hráče): auto jako plánek ze shora, kola z boku – splasklé má dole plošku.
 // Hráč vybere kola, zaplatí jednou kartou (10/15/20 klepnutím, nebo pípnutím bankovky B…).
 // Málo teček = odmítnuto. Tečky z karty odletí ke kolům, zbytek zůstane na kartě.
 export class AirScene extends Phaser.Scene {
@@ -120,8 +121,8 @@ export class AirScene extends Phaser.Scene {
     const p = KOLO_POZICE[id];
     const g = this.add.graphics();
     const ramecek = this.add.graphics();
-    const obal = this.add.container(p.x, p.y, [ramecek, g]).setAngle(p.uhel).setName(`kolo_${id}`);
-    obal.setSize(90, 100).setInteractive({ useHandCursor: true });
+    const obal = this.add.container(p.x, p.y, [ramecek, g]).setName(`kolo_${id}`);
+    obal.setSize(R_KOLA * 2.6, R_KOLA * 2.4).setInteractive({ useHandCursor: true });
     const kolo: Kolo = { id, obal, g, ramecek, podhustene, vybrane: false, plnost: podhustene ? 0 : 1, napoveda: [] };
     obal.on('pointerdown', () => this.klepniNaKolo(kolo));
     this.auto.add(obal);
@@ -129,30 +130,40 @@ export class AirScene extends Phaser.Scene {
     return kolo;
   }
 
+  /** Kolo z boku. Splasklé (plnost 0) má dole plošku a boky vyboulené do stran; ráfek klesne níž. */
   private kresliKolo(k: Kolo): void {
     const t = k.plnost;
-    const w = Phaser.Math.Linear(84, 38, t); // splasklé = široké, rozplácnuté
-    const h = Phaser.Math.Linear(50, 76, t);
+    const R = R_KOLA;
+    const ploska = R * Phaser.Math.Linear(0.66, 1, t); // y spodní plošky (1 = žádná ploška)
+    const boule = (1 - t) * 0.4; // vyboulení boků u země
+    const body: Phaser.Math.Vector2[] = [];
+    for (let a = 0; a < 360; a += 5) {
+      const rad = Phaser.Math.DegToRad(a);
+      const y = Math.min(Math.sin(rad) * R, ploska);
+      const dole = Math.max(0, y / R); // 0 nahoře/uprostřed, 1 u země
+      body.push(new Phaser.Math.Vector2(Math.cos(rad) * R * (1 + boule * dole * dole), y));
+    }
+
     const g = k.g;
     g.clear();
-    if (t < 1) {
-      // Vyboulené boky splasklé pneumatiky („přejetá žába“) – světlejší, čím víc je splasklá.
-      const boule = (1 - t) * 26;
-      g.fillStyle(0x4d4d4d);
-      g.fillEllipse(0, 0, w + boule, h * 0.8);
-    }
     g.fillStyle(0x1b1b1b);
-    g.fillRoundedRect(-w / 2, -h / 2, w, h, Math.min(w, h) * 0.3);
-    g.lineStyle(3, 0x4a4a4a);
-    for (let i = 1; i < 5; i++) {
-      const y = -h / 2 + (i * h) / 5;
-      g.lineBetween(-w / 2 + 6, y, w / 2 - 6, y);
+    g.fillPoints(body, true);
+    // Ráfek s paprsky (jako 🛞); u splasklého kola klesne k zemi.
+    const ry = (1 - t) * R * 0.05;
+    g.fillStyle(0xaab7c4);
+    g.fillCircle(0, ry, R * 0.52);
+    g.lineStyle(5, 0x5d6d7e);
+    for (let i = 0; i < 5; i++) {
+      const rad = Phaser.Math.DegToRad(-90 + i * 72);
+      g.lineBetween(0, ry, Math.cos(rad) * R * 0.46, ry + Math.sin(rad) * R * 0.46);
     }
+    g.fillStyle(0x34495e);
+    g.fillCircle(0, ry, R * 0.16);
 
     k.ramecek.clear();
     if (k.vybrane) {
       k.ramecek.lineStyle(5, ZLUTA);
-      k.ramecek.strokeRoundedRect(-w / 2 - 9, -h / 2 - 9, w + 18, h + 18, 16);
+      k.ramecek.strokeCircle(0, 0, R * (1 + boule) + 10);
     }
   }
 
@@ -179,7 +190,7 @@ export class AirScene extends Phaser.Scene {
     const smer = Math.sign(p.x);
     for (let i = 0; i < CENA_KOLA; i++) {
       const t = this.add
-        .circle(p.x + smer * 78, p.y + (i - 1) * 26, 10, ZLUTA)
+        .circle(p.x + smer * (R_KOLA * 1.5 + 22), p.y + (i - 1) * 26, 10, ZLUTA)
         .setStrokeStyle(2, 0xfef9e7)
         .setName(`napoveda_${k.id}_${i + 1}`);
       this.auto.add(t);

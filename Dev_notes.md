@@ -93,8 +93,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     rozplácnuté/vyboulené, plné úzké a rovné. Hráč sám pozná, která kola potřebují vzduch; při foukání se kolo
     postupně zúží + „cink“. Nestačí-li karta, auto odjede s některým kolem splasklým. Objekty `kolo_LP`,
     `kolo_PP`, `kolo_LZ`, `kolo_PZ` (levé/pravé, přední/zadní) – JSON pro Phaser Editor na požádání.
-  - [x] **Prototyp (scéna `AirScene`, ikona 🛞, logika `src/services/air.ts`):** auto-plánek, náhodně 1–4 kola
-    splasklá, klepnutím výběr (žlutý rámeček, s nápovědou 3 tečky), karty 10/15/20 klepnutím nebo pípnutím `B…`
+  - [x] **Prototyp (scéna `AirScene`, ikona 🛞, logika `src/services/air.ts`):** auto-plánek ze shora, kola
+    v rozích **z boku** (kulatá s ráfkem jako 🛞; splasklé má **dole plošku** a vyboulené boky – přání rodiče),
+    náhodně 1–4 kola splasklá, klepnutím výběr (žlutý rámeček, s nápovědou 3 tečky), karty 10/15/20 klepnutím nebo pípnutím `B…`
     (jiná hodnota = dočasná karta), malá = ❌ + zatřesení, jinak tečky odletí ke kolům (na kartě prázdná kolečka),
     kola se postupně nafouknou + cink, 🚗➡️ další auto. Nápovědu přepíná rodič (💡 vlevo dole). Bez hlasu.
   - Hráč: **dvě obtížnosti** – *s nápovědou* (u vybraného kola 3 tečky, cena roste viditelně) a *bez nápovědy*
@@ -242,3 +243,4 @@ _(zatím nic)_
 - 2026-11-17 (Claude): Prototyp dofukování kol (scéna 🛞) pro ukázku hráči v dílně. 35/35 testů, typecheck OK,
   ověřeno v Chrome (výběr kol, odmítnutí B001, platba kartou 20, foukání, další auto).
 - 2026-11-17 (uživatel + Claude): Rozhodnutí – hra není responzivní (notebook, FIT); telefon = vlastní stránky na výšku.
+- 2026-11-17 (Claude): Vzduch – kola překreslena z boku (ráfek, splasklé s ploškou dole), ověřeno v Chrome.
