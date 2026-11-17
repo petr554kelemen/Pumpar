@@ -30,6 +30,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] **3 – Telefon:** stránka pro telefon, párování přes QR, skenování kamerou, kód se pošle do hry na NB.
 - [ ] **4 – Převod hry do Phaseru:** scény Stojan a Obchod, skenované zboží jde do košíku.
 - [ ] **5 – Peněženka:** trvalý zůstatek, placení naskenovanými bankovkami, výpočet vrácení.
+  **Peníze = staré platební karty s hodnotou (nápad hráče):** nominály **10, 15, 20** (kódy `B010`, `B015`, `B020`
+  – formát beze změny). Na kartě 85,6 × 54 mm: QR ~20 mm vlevo, tečky po 5 v řadě vpravo, číslo pro rodiče.
+  **Kombinování karet:** placení sčítá pípnuté karty („10 z 12, chybí 2“), přeplatek se vrací do peněženky
+  graficky (tečky). Platební karta `K` (PIN, terminál) zůstává jako druhý způsob – musí vypadat jinak (💳, bez teček).
   **Odměna za přesnost tankování** (návrh do dílny ✏️ s hráčem):
   - Pozorování ze staré verze: hráč „cukne“ hned na začátku (aby nepřelil) a zbytek bankovky utratí
     v obchodě, vždy si vezme největší bankovku → tankování ho nic nenaučí.
@@ -172,3 +176,5 @@ _(zatím nic)_
 - 2026-11-17 (uživatel): Nápad hráče – žeton k vysavači a na dofoukání vzduchu → Plán.
 - 2026-11-17 (uživatel): Hráč: vzduch 3 tečky za kolo (4 kola = 12, desítka nestačí) → vracení peněz. Bankovce
   možná říká „karta s tečkami“ – ověřit pro hlasové fráze.
+- 2026-11-17 (uživatel): Hráč: peníze na starých platebních kartách, hodnoty 10/15/20, karty se kombinují
+  → Plán fáze 5 (sčítání plateb, vracení). Šablona karty na tisk.html až po testu tisku.
