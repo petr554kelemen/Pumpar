@@ -250,3 +250,4 @@ _(zatím nic)_
 - 2026-11-17 (Claude): Vzduch – kola překreslena z boku (ráfek, splasklé s ploškou dole), ověřeno v Chrome.
 - 2026-11-17 (uživatel + Claude): Vzduch – s prázdným kolem nelze odjet (bliká ❗), doplacení další kartou,
   zůstatek karty v rámci auta. Ověřeno v Chrome.
+- 2026-11-17 (uživatel + Claude): Vzduch – odstraněny nápravy, kola blíž ke karoserii.

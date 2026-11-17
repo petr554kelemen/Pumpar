@@ -12,10 +12,10 @@ const ZLUTA = 0xf1c40f;
 const AUTO = { x: 430, y: 400 };
 const R_KOLA = 42;
 const KOLO_POZICE: Readonly<Record<KoloId, { x: number; y: number }>> = {
-  LP: { x: -155, y: -105 },
-  PP: { x: 155, y: -105 },
-  LZ: { x: -155, y: 105 },
-  PZ: { x: 155, y: 105 },
+  LP: { x: -138, y: -105 },
+  PP: { x: 138, y: -105 },
+  LZ: { x: -138, y: 105 },
+  PZ: { x: 138, y: 105 },
 };
 
 interface Kolo {
@@ -98,9 +98,6 @@ export class AirScene extends Phaser.Scene {
   private vytvorAuto(y: number): void {
     this.auto = this.add.container(AUTO.x, y).setName('auto');
     const g = this.add.graphics().setName('auto_karoserie');
-    // „Nohy“ – nápravy ke kolům
-    g.lineStyle(10, 0x5d6d7e);
-    for (const id of KOLA) g.lineBetween(0, KOLO_POZICE[id].y, KOLO_POZICE[id].x * 0.8, KOLO_POZICE[id].y);
     // Karoserie ze shora
     g.fillStyle(0xc0392b);
     g.fillRoundedRect(-85, -165, 170, 330, 45);
