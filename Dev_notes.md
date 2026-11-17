@@ -259,3 +259,5 @@ _(zatím nic)_
   v Chrome (2 prázdná + 2 plná = 8 teček z karty 20).
 - 2026-11-17 (uživatel + Claude): Vzduch – barevné disky po nápravách (modrý 2, červený 3, zelený 5). 37/37 testů,
   ověřeno v Chrome.
+- 2026-11-17 (uživatel + Claude): Vzduch – světlá plocha stání (beton) pod autem, aby černá kola a ploška
+  splasklého kola byly na tmavém pozadí vidět.

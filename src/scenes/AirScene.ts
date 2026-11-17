@@ -77,6 +77,8 @@ export class AirScene extends Phaser.Scene {
     this.docasnaKarta = null;
     addNav(this);
 
+    // Světlá plocha stání (beton) – černé pneumatiky na ní jsou dobře vidět, i ploška splasklého kola.
+    this.add.rectangle(AUTO.x, AUTO.y, 560, 480, 0xb3bcc4).setStrokeStyle(4, 0xd5dbe0).setName('stani');
     NOMINALY.forEach((h, i) => this.karty.push(this.vytvorKartu(h, 1010, 175 + i * 185)));
     this.vytvorAuto(AUTO.y);
 
