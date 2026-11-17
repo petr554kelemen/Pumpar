@@ -102,6 +102,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     🧑‍🔧 **obsluha** (🔑 💳) odemyká sama kódem / kartou **kdykoli**; 🚗 **zákazník** kód nemá – klepnutí na dveře
     před otevírací dobou = zámek cukne, hodiny se zahoupou; v otevírací době se benzínka sama rozsvítí, klepnutím
     na dveře zákazník vejde (zatím → stojan). Pozor: hráč rozlišuje benzinář/pumpař – ve frázích „benzinář“.
+  - **Čekání zákazníka (nápad rodiče):** před otevírací dobou nabídnout dvě cesty (obrázky, bez textu):
+    🎮 **zahraj si hru** (minihra na čekání – navázat na fázi 7 „minihry za odměnu“; po otevírací době zpět
+    ke dveřím) nebo 🚗↩️ **přijeď za chvíli** (auto odjede, scéna se ztlumí / hodiny poběží, v otevírací době
+    přijede znovu – stejný mechanismus jako WISH Státní svátek). Kterou minihru – do dílny ✏️.
   - **Jeden zámek pro všechno** (upřesnění rodiče): s benzínkou se souběžně otevírá i obchod, myčka a pumpa
     (vzduch 🛞). Odpovídá to hře – všechny scény jsou dostupné až po odemčení, 🔒 zavírá všechno.
   - **Do dílny ✏️:** co dělá zákazník uvnitř (obchod?), délka čekání (2 min), zda obsluha musí taky čekat
