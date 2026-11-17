@@ -19,6 +19,6 @@ new Phaser.Game({
     width: 1280,
     height: 720,
   },
-  // První scéna je výchozí. Ve fázi 2 začínáme zkouškou čtečky.
-  scene: [ScanTestScene, StationScene],
+  // První scéna je výchozí: výdejní stojan.
+  scene: [StationScene, ScanTestScene],
 });

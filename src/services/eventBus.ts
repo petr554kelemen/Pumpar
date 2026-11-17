@@ -8,8 +8,6 @@ export type ScanSource = 'klavesnice' | 'kamera' | 'telefon';
 
 /** Seznam všech událostí a jejich dat. Novou událost přidej sem – TypeScript pak hlídá všechna použití. */
 export interface GameEvents {
-  /** Testovací pípnutí (fáze 0). */
-  pip: Record<string, never>;
   /** Naskenovaný kód (fáze 2+). */
   scan: { kod: string; info: CodeInfo; zdroj: ScanSource };
   /** Rozepsaný kód z klávesnice/čtečky (po každé klávese) – jen pro ladicí zobrazení. */

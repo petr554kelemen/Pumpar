@@ -10,7 +10,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - WISH = nápady hráče a rodiče; do plánu/TODO se přesouvají až po domluvě s uživatelem.
 
 ## Další krok
-- Pořadí fází: 0 ✅ → 2 ✅ → **1** → 3 (fáze 1 čekala na tisk; čísla fází se nemění).
+- Pořadí fází: 0 ✅ → 2 ✅ → **1** a **4** souběžně → 3 (čísla fází se nemění).
+- Fáze 4: stojan převeden (rodič ho vyzkouší proti staré verzi) → další: obchod (zboží pípáním do košíku).
+  Hráč dál hraje starou verzi, novou uvidí až hotovou (Pravidla jsou zákon, bod 1).
 - Fáze 1: vytisknout testovací list (https://petr554kelemen.github.io/Pumpar/tisk.html), zalaminovat,
   ověřit čtení (telefon hned, čtečka po příjezdu) → zvolit typ a velikost kódu. Paralelně D30 test SPZ.
 
@@ -29,6 +31,11 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   Ověření se skutečnou čtečkou čeká na její příjezd (viz TODO).
 - [ ] **3 – Telefon:** stránka pro telefon, párování přes QR, skenování kamerou, kód se pošle do hry na NB.
 - [ ] **4 – Převod hry do Phaseru:** scény Stojan a Obchod, skenované zboží jde do košíku.
+  - [x] Stojan (`StationScene` + logika `src/services/pump.ts`): předvolba (klávesnice jako na pokladně,
+    5/10/15 L, 🎲 3–22,80 L), rychle ⬆️ 0,07 L / 45 ms, pomalu ⬇️ 0,01 L / 95 ms (držet tlačítko/šipku),
+    vyhodnocení přesně / před cílem / přeteklo, zvuky jako stará verze. Litry v setinách (celá čísla).
+  - [ ] Předvolby „+ Obchod“ a tlačítko „Jít platit“ – až s obchodem.
+  - [ ] Obchod.
 - [ ] **5 – Peněženka:** trvalý zůstatek, placení naskenovanými bankovkami, výpočet vrácení.
   **Volba platby jako na samoobslužné pokladně (nápad hráče):**
   - 💳 **Kartou (jednodušší):** karta (`K…`, stará platební karta s QR) má **zůstatek** uložený ve hře
@@ -223,3 +230,6 @@ _(zatím nic)_
 - 2026-11-17 (uživatel): Herní PIN = 1234 (při zadávání jen hvězdičky).
 - 2026-11-17 (uživatel): Benzínka se odemyká kódem u dveří (jako hráčova pokladnička), ne kartou.
 - 2026-11-17 (uživatel): Zásada „kde jsou dvě cesty, platí obě“ → README; dveře benzínky: kód nebo karta.
+- 2026-11-17 (Claude): Fáze 4 – stojan převeden ze staré verze do Phaseru (pravidla beze změny, bez obchodu),
+  výchozí scéna je teď stojan ⛽. Událost `pip` (fáze 0) odstraněna. 32/32 testů, typecheck OK, ověřeno v Chrome
+  (předvolba 5 L, přetečení, zadání 1.25, tankování myší i šipkami).
