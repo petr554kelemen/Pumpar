@@ -30,11 +30,16 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] **3 – Telefon:** stránka pro telefon, párování přes QR, skenování kamerou, kód se pošle do hry na NB.
 - [ ] **4 – Převod hry do Phaseru:** scény Stojan a Obchod, skenované zboží jde do košíku.
 - [ ] **5 – Peněženka:** trvalý zůstatek, placení naskenovanými bankovkami, výpočet vrácení.
-  **Peníze = staré platební karty s hodnotou (nápad hráče):** nominály **10, 15, 20** (kódy `B010`, `B015`, `B020`
-  – formát beze změny). Na kartě 85,6 × 54 mm: QR ~20 mm vlevo, tečky po 5 v řadě vpravo, číslo pro rodiče.
-  **Platí se vždy jednou kartou** (hráč porovná menší/větší, sčítat přes 10 zatím neumí → žádné kombinování).
-  Karta s málo tečkami = **odmítnuta** ❌ „nedostatek financí“ → musí vybrat větší. Přeplatek se vrací
-  do peněženky graficky (tečky; počítá hra). Kombinování karet případně později, až zvládne sčítání přes 10. Platební karta `K` (PIN, terminál) zůstává jako druhý způsob – musí vypadat jinak (💳, bez teček).
+  **Volba platby jako na samoobslužné pokladně (nápad hráče):**
+  - 💳 **Kartou (jednodušší):** karta (`K…`, stará platební karta s QR) má **zůstatek** uložený ve hře
+    (vytištěné tečky by neubývaly → zůstatek se ukáže po pípnutí). Hráč vybere kartu, na které je dost
+    (porovnání). Tečky z karty viditelně odletí k nákupu (odečítání), zůstatek se zmenší. Málo teček = odmítnuto ❌
+    „nedostatek financí“ → jiná karta. Jedna karta na nákup.
+  - 💵 **Penězi (těžší):** bankovky/mince **1, 2, 3, 5, 10** (`B001`, `B002`, `B003`, `B005`, `B010`).
+    Pípá postupně, hra plní „nádobu“ teček nákupu (sčítání vidět), přeplatek se vrací tečkami.
+  - Nahrazuje předchozí návrh „karty s hodnotou 10/15/20“.
+  - **Do dílny ✏️:** počáteční zůstatek karty a jak se dobíjí (výplata za tankování?), vzhled mincí
+    (laminovaná kolečka s QR, tečky, barva podle hodnoty), kolik kusů od každé hodnoty, PIN/terminál (fáze 6).
   **Odměna za přesnost tankování** (návrh do dílny ✏️ s hráčem):
   - Pozorování ze staré verze: hráč „cukne“ hned na začátku (aby nepřelil) a zbytek bankovky utratí
     v obchodě, vždy si vezme největší bankovku → tankování ho nic nenaučí.
@@ -195,3 +200,5 @@ _(zatím nic)_
 - 2026-11-17 (uživatel): Vzduch ve dvou obtížnostech – s nápovědou teček a bez nápovědy (počítá sám).
 - 2026-11-17 (uživatel + Claude): README Zásady návrhu – „Matematika skrytá ve hře“ (porovnávání, rozsahy,
   sčítání, násobilka, odečítání jako viditelné odlétání teček).
+- 2026-11-17 (uživatel): Platba jako v samoobslužné pokladně: kartou se zůstatkem (porovnání, odečítání) nebo
+  penězi 1/2/3/5/10 (sčítání) → Plán fáze 5, nahrazuje karty s hodnotou 10/15/20.
