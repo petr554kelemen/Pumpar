@@ -65,6 +65,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     rozplácnuté/vyboulené, plné úzké a rovné. Hráč sám pozná, která kola potřebují vzduch; při foukání se kolo
     postupně zúží + „cink“. Nestačí-li karta, auto odjede s některým kolem splasklým. Objekty `kolo_LP`,
     `kolo_PP`, `kolo_LZ`, `kolo_PZ` (levé/pravé, přední/zadní) – JSON pro Phaser Editor na požádání.
+  - Hráč: **dvě obtížnosti** – *s nápovědou* (u vybraného kola 3 tečky, cena roste viditelně) a *bez nápovědy*
+    (ví, že kolo = 3 tečky, spočítá si sám a vybere kartu; hra jen potvrdí/odmítne). Přepíná rodič / nový návod.
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
   Pořadí obtížnosti úkolů: hláska na **začátku** slova → na **konci** → **uprostřed** (nejtěžší, jen jako výzva).
 - [ ] **7 – Rozšíření z mapy:** příprava směny (drag & drop cen), uzávěrka a tržba, minihry za odměnu, QR kódy po bytě.
@@ -190,3 +192,4 @@ _(zatím nic)_
   Upřesnění: „kombinovat“ = vybrat vhodnou kartu, ne sčítat → platí jedna karta, malá je odmítnuta.
 - 2026-11-17 (uživatel): Hráč: s menší kartou objedná méně kol (1–3) → výběr kol ve hře, cena roste tečkami.
 - 2026-11-17 (uživatel): Hráč: tlak v pneumatikách obrázkem – auto jako plánek pro pojišťovnu, kola vytočená ven („přejetá žába“).
+- 2026-11-17 (uživatel): Vzduch ve dvou obtížnostech – s nápovědou teček a bez nápovědy (počítá sám).
