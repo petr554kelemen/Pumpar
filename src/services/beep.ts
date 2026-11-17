@@ -31,6 +31,11 @@ export function win(): void {
   [523.25, 659.25, 783.99, 1046.5].forEach((n, i) => setTimeout(() => tick(n, 0.22), i * 110));
 }
 
+/** Časové znamení jako v rozhlase: 1 kHz, krátké pípnutí; poslední (celá) delší. */
+export function casoveZnameni(posledni = false): void {
+  tick(1000, posledni ? 0.5 : 0.12);
+}
+
 export function error(): void {
   tick(180, 0.25);
   setTimeout(() => tick(140, 0.3), 150);

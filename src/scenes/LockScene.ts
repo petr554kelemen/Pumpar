@@ -83,6 +83,11 @@ export class LockScene extends Phaser.Scene {
     this.dvere.setInteractive({ useHandCursor: true }).on('pointerdown', () => this.klepnutiNaDvere());
     this.tik();
     this.time.addEvent({ delay: 250, loop: true, callback: () => this.tik() });
+    // Časové znamení před otevírací dobou (nostalgie rodiče – rozhlas): 3 pípnutí, poslední delší přesně v čas.
+    const doOtevreni = this.od.getTime() - Date.now();
+    [2000, 1000, 0].forEach((pred) => {
+      if (doOtevreni - pred > 0) this.time.delayedCall(doOtevreni - pred, () => beep.casoveZnameni(pred === 0));
+    });
     this.kresliVolbu();
 
     const odhlasit = [
@@ -224,7 +229,6 @@ export class LockScene extends Phaser.Scene {
     if (!this.otviraciDoba && jeOtevreno(ted, this.od)) {
       this.otviraciDoba = true;
       this.cedulka.setFillStyle(BARVA.cedulkaOtevreno);
-      beep.tick(1046.5, 0.25);
       this.tweens.add({ targets: this.cedulka, alpha: 0.5, duration: 200, yoyo: true, repeat: 2 });
       // Zákazníkovi benzínku „odemkl benzinář“ – rozsvítí se, dveře zvou dál.
       if (this.role === 'zakaznik') this.rozsvit();

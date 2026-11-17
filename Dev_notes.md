@@ -94,7 +94,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     Navigace má nově 🔒 = zavřít benzínku (konec směny) → zpět ke dveřím.
   - [x] **Hodiny – učení času (nápad rodiče):** nad dveřmi ručičkové hodiny se skutečným časem (čísla 1–12,
     červená vteřinovka), na dveřích cedulka „OTEVŘENO OD“ s malými hodinami + čas číslem. Otevírací doba =
-    za ~2 minuty od příchodu (zaokrouhleno na celou minutu). V otevírací době cedulka zezelená + cink.
+    za ~2 minuty od příchodu (zaokrouhleno na celou minutu). V otevírací době cedulka zezelená.
+    **Časové znamení** (nostalgie rodiče – rozhlas): 3 pípnutí 1 kHz, poslední delší přesně v otevírací dobu.
+    Později s hlasem: „Bylo právě šest / sedm / osm hodin.“ (stačí ranní hodiny – hráč chodí do školky;
+    hodí se, až bude otevírací doba na celou hodinu).
   - [x] **Dva režimy (nápad rodiče) – volba na začátku scény** (dvě velké karty, bez textu):
     🧑‍🔧 **obsluha** (🔑 💳) odemyká sama kódem / kartou **kdykoli**; 🚗 **zákazník** kód nemá – klepnutí na dveře
     před otevírací dobou = zámek cukne, hodiny se zahoupou; v otevírací době se benzínka sama rozsvítí, klepnutím
@@ -174,6 +177,9 @@ _(zatím nic)_
   podle fyzické klávesy (`e.code`).
 
 ## WISH
+- **Státní svátek – zavřeno** (nápad rodiče): občas (náhodně / podle kalendáře) je svátek → na dveřích
+  vlaječka ČR 🇨🇿, benzínka se neotevře. Zákazník odjede autem a za 2–3 minuty přijede znovu, pak hra pokračuje
+  normálně. Hráč už ví, že vyvěšená vlajka = svátek a obchody jsou zavřené.
 - Hádanka písmen: hlas řekne názvy 3 obrázků a zeptá se „Ve kterém slově slyšíš písmenko M?“ – odpověď klepnutím
   nebo pípnutím zboží. V obchodě (zboží = obrázky), nebo samostatná scéna s vlastní ikonou. Rozhodnout v dílně.
 - NFC nálepky (NTAG) jako „přiložení karty“ na terminálu – jen Android.
@@ -297,3 +303,4 @@ _(zatím nic)_
   hodiny nad dveřmi + cedulka „otevřeno od“ (učení hodin), volba obsluha 🧑‍🔧 / zákazník 🚗. Navigace 🔒 = zavřít.
   43/43 testů, typecheck OK, ověřeno v Chrome (špatný kód, kód z klávesnice, karta K000, čekání zákazníka,
   rozsvícení v otevírací době, vstup → stojan, 🔒 zpět).
+- 2026-11-17 (uživatel + Claude): Časové znamení před otevírací dobou (3 × 1 kHz). WISH: státní svátek – zavřeno.
