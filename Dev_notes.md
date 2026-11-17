@@ -143,3 +143,6 @@ _(zatím nic)_
   vygenerován test samostatných písmen ve 3 variantách SSML. Zdroj zvuků WAV, do hry komprimovaná kopie.
 - 2026-11-17 (uživatel + Claude): Samotná písmena – vybrána varianta 3 (pomaleji, hlasitěji, výš, důraz);
   README → Hlas a písmena doplněn (Jakub, SSML parametry, WAV → komprese do hry).
+- 2026-11-17 (uživatel): **Hlas = Speechtech** (licencovaný program na stolním PC) – písmena zřetelnější než Jakub,
+  problém jen „ch“ (čte c + h) → fráze bez „ch“, písmeno CH ve hře zatím ne. Jeden hlas pro celou hru.
+  Jakub zůstává jako záloha. README → Hlas a písmena přepsán. Zjistit přesný název hlasu Speechtechu.

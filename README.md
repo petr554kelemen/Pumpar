@@ -217,11 +217,15 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
 - **Hlas = předgenerované audio soubory.** Hra jen přehrává soubory – žádné TTS za běhu
   (české hlasy ve `speechSynthesis` na Linuxu chybí / zní špatně). Zdroj hlasu lze kdykoli vyměnit,
   i po jednotlivých frázích. Výběr hlasu: viz Dev_notes.md.
-- **Hlas: Microsoft Jakub** (Windows 11, OneCore), generování skriptem přes WinRT `SpeechSynthesizer` se SSML.
-  Balabolka / Speechtech Radka se nepoužívá (chybná výslovnost „ch“, „schv“).
-- **Samotná písmena** (bez slova zní u Jakuba ztlumeně): SSML
-  `<prosody rate="-35%" volume="+60%" pitch="+10%"><emphasis level="strong">bé!</emphasis></prosody>`
-  – ověřeno poslechem jako nejzřetelnější. Ostatní fráze normálně.
+- **Hlas: Speechtech** (licencovaný, na stolním PC; český hlas – pravděpodobně Radka) – zřetelnější písmena
+  i výslovnost než Microsoft Jakub. Jediná slabina: „ch“ čte jako c + h → **fráze bez „ch“**
+  (např. „Zaplaceno!“ místo „Platba schválena“). Písmeno CH ve hře zatím není (i ve škole přichází mezi posledními);
+  až bude potřeba, řešit uživatelským slovníkem Speechtechu.
+- **Jeden hlas pro celou hru** – hráč slyší písmena vždy stejně. Hlasy se nemíchají.
+- Generování: rodič uloží fráze ze Speechtechu do WAV podle seznamu frází (pojmenování souborů = klíč fráze).
+- Záloha: Microsoft Jakub (Windows 11, generuje se skriptem přes WinRT se SSML; samotná písmena
+  `<prosody rate="-35%" volume="+60%" pitch="+10%"><emphasis level="strong">bé!</emphasis></prosody>`).
+  Balabolka se nepoužívá (antivirus hlásil čtení souborů na ploše).
 - Zdrojové nahrávky WAV (bezztrátově), do hry komprimovaná kopie (MP3/OGG).
 - Hlas rodiče se nepoužívá. Google Překladač (neoficiální gTTS) se nepoužívá.
 - Seznam frází jako jediný zdroj pravdy (např. `voice-phrases.json`: `klic → text`).
