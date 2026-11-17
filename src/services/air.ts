@@ -8,31 +8,42 @@ export type Disk = (typeof DISKY)[number];
 export const CENA_DISKU: Readonly<Record<Disk, number>> = { modry: 2, cerveny: 3, zeleny: 5 };
 export const CENA_KONTROLY = 1;
 
-/** Kola: L/P = levé/pravé, P/Z = přední/zadní. */
-export const KOLA = ['LP', 'PP', 'LZ', 'PZ'] as const;
-export type KoloId = (typeof KOLA)[number];
+/** Kola auta: L/P = levé/pravé, P/Z = přední/zadní. Vozík (nápad hráče): LV/PV = levé/pravé kolo vozíku. */
+export const KOLA_AUTA = ['LP', 'PP', 'LZ', 'PZ'] as const;
+export const KOLA_VOZIKU = ['LV', 'PV'] as const;
+export type KoloId = (typeof KOLA_AUTA)[number] | (typeof KOLA_VOZIKU)[number];
+
+/** Pravděpodobnost, že auto přijede s vozíkem. */
+export const SANCE_VOZIKU = 0.35;
 
 export interface StavKola {
   podhustene: boolean;
   disk: Disk;
 }
 
-/** Nové auto: disky po nápravách (přední / zadní), u každého kola náhodně podhuštění. Vždy aspoň jedno podhuštěné. */
-export function noveAuto(rng: () => number = Math.random): Record<KoloId, StavKola> {
+export interface NoveAuto {
+  vozik: boolean;
+  kola: { id: KoloId; stav: StavKola }[];
+}
+
+/**
+ * Nové auto: disky po nápravách (přední / zadní / vozík), u každého kola náhodně podhuštění.
+ * Občas s vozíkem (jedna náprava). Vždy aspoň jedno podhuštěné kolo.
+ */
+export function noveAuto(rng: () => number = Math.random): NoveAuto {
   const disk = (): Disk => DISKY[Math.floor(rng() * DISKY.length)] ?? 'cerveny';
-  const predni = disk();
-  const zadni = disk();
-  const auto: Record<KoloId, StavKola> = {
-    LP: { podhustene: rng() < 0.5, disk: predni },
-    PP: { podhustene: rng() < 0.5, disk: predni },
-    LZ: { podhustene: rng() < 0.5, disk: zadni },
-    PZ: { podhustene: rng() < 0.5, disk: zadni },
+  const naprava = (ids: readonly KoloId[]): NoveAuto['kola'] => {
+    const d = disk();
+    return ids.map((id) => ({ id, stav: { podhustene: rng() < 0.5, disk: d } }));
   };
-  if (!KOLA.some((k) => auto[k].podhustene)) {
-    const k = KOLA[Math.floor(rng() * KOLA.length)] ?? 'LP';
-    auto[k].podhustene = true;
+  const kola = [...naprava(['LP', 'PP']), ...naprava(['LZ', 'PZ'])];
+  const vozik = rng() < SANCE_VOZIKU;
+  if (vozik) kola.push(...naprava(KOLA_VOZIKU));
+  if (!kola.some((k) => k.stav.podhustene)) {
+    const k = kola[Math.floor(rng() * kola.length)] ?? kola[0];
+    if (k) k.stav.podhustene = true;
   }
-  return auto;
+  return { vozik, kola };
 }
 
 /** Cena za jedno vybrané kolo: podhuštěné se dofoukne (podle disku), plné se jen zkontroluje (1). */

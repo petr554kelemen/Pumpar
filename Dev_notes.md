@@ -106,6 +106,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     **Na jedné nápravě stejná barva**, přední a zadní se mohou lišit. Nejdražší auto 4 × zelený = 20 = karta 20.
     S barevnými cenami **nápověda nejde vypnout** (hráč by neznal cenu barvy) – přepínač odstraněn. Verze
     „bez nápovědy“ případně později přes obrázkový **ceník u kompresoru** (disk + tečky), počítá sám.
+  - **Hráč vyzkoušel (2026-11-17):** po prvním autě pochopil, co se po něm chce – která kola dofoukat a že ho
+    kontrola plných kol „neobere“. Jeho připomínka: **vozík** – i ten má kola k dofouknutí.
+  - [x] **Vozík** (nápad hráče): náhodně ~35 % aut, za autem na oji, jedna náprava (LV/PV) s vlastní barvou disku.
+    Nejdražší auto s vozíkem = 6 × zelený = 30 > karta 20 → doplatit druhou kartou. 🚗➡️ přesunuto pod karty.
   - Později (grafika, ne pro návrh): při foukání **okénko PIP** se zvětšeným kolem (druhá kamera Phaseru
     zaměřená na foukané kolo) – vidět, jak se ploška zaobluje. Prototyp je zatím skica. Bez hlasu.
   - Hráč: **dvě obtížnosti** – *s nápovědou* (u vybraného kola 3 tečky, cena roste viditelně) a *bez nápovědy*
@@ -264,3 +268,5 @@ _(zatím nic)_
 - 2026-11-17 (uživatel + Claude): Vzduch – světlá plocha stání (beton) pod autem, aby černá kola a ploška
   splasklého kola byly na tmavém pozadí vidět.
 - 2026-11-17 (uživatel + Claude): Vzduch – odstraněn přepínač nápovědy (s barevnými cenami nedává smysl).
+- 2026-11-17 (hráč + Claude): Hráč vyzkoušel vzduch (logiku pochopil hned), přidán jeho nápad – vozík s vlastní
+  nápravou. 38/38 testů, ověřeno v Chrome.

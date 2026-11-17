@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { bus, type GameEvents } from '../services/eventBus.ts';
 import * as beep from '../services/beep.ts';
-import { type Disk, KOLA, type KoloId, type StavKola, cenaKola, cenaVyberu, noveAuto, zaplat } from '../services/air.ts';
+import { type Disk, type KoloId, type StavKola, cenaKola, cenaVyberu, noveAuto, zaplat } from '../services/air.ts';
 import { addNav, type SceneKey } from './nav.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
@@ -15,13 +15,18 @@ const BARVA_DISKU: Readonly<Record<Disk, { rafek: number; paprsky: number }>> = 
 };
 
 /** Plánek auta ze shora; kola v rozích nakreslená z boku (kulatá s ráfkem), aby bylo vidět splasknutí. */
-const AUTO = { x: 430, y: 400 };
+/** Střed plochy stání; auto s vozíkem stojí výš, aby se vozík vešel. */
+const AUTO = { x: 430, y: 395 };
+const Y_S_VOZIKEM = 305;
 const R_KOLA = 42;
+/** Pozice kol vůči středu karoserie; vozík je za autem na oji. */
 const KOLO_POZICE: Readonly<Record<KoloId, { x: number; y: number }>> = {
   LP: { x: -138, y: -105 },
   PP: { x: 138, y: -105 },
   LZ: { x: -138, y: 105 },
   PZ: { x: 138, y: 105 },
+  LV: { x: -128, y: 275 },
+  PV: { x: 128, y: 275 },
 };
 
 interface Kolo {
@@ -74,12 +79,13 @@ export class AirScene extends Phaser.Scene {
     addNav(this);
 
     // Světlá plocha stání (beton) – černé pneumatiky na ní jsou dobře vidět, i ploška splasklého kola.
-    this.add.rectangle(AUTO.x, AUTO.y, 560, 480, 0xb3bcc4).setStrokeStyle(4, 0xd5dbe0).setName('stani');
+    this.add.rectangle(AUTO.x, AUTO.y, 560, 610, 0xb3bcc4).setStrokeStyle(4, 0xd5dbe0).setName('stani');
     NOMINALY.forEach((h, i) => this.karty.push(this.vytvorKartu(h, 1010, 175 + i * 185)));
-    this.vytvorAuto(AUTO.y);
+    this.vytvorAuto(0);
+    this.auto.y = this.cilY;
 
     this.dalsiAuto = this.add
-      .text(AUTO.x, 680, '🚗 ➡️', { fontSize: '56px', backgroundColor: '#37404c', padding: { x: 18, y: 4 } })
+      .text(1010, 670, '🚗 ➡️', { fontSize: '56px', backgroundColor: '#37404c', padding: { x: 18, y: 4 } })
       .setOrigin(0.5)
       .setName('dalsi_auto')
       .setInteractive({ useHandCursor: true });
@@ -91,8 +97,14 @@ export class AirScene extends Phaser.Scene {
 
   // ---------- Auto ----------
 
+  /** Kam auto zajede (s vozíkem výš). */
+  private cilY = AUTO.y;
+
   private vytvorAuto(y: number): void {
+    const nove = noveAuto();
+    this.cilY = nove.vozik ? Y_S_VOZIKEM : AUTO.y;
     this.auto = this.add.container(AUTO.x, y).setName('auto');
+    if (nove.vozik) this.auto.add(this.kresliVozik());
     const g = this.add.graphics().setName('auto_karoserie');
     // Karoserie ze shora
     g.fillStyle(0xc0392b);
@@ -107,8 +119,19 @@ export class AirScene extends Phaser.Scene {
     g.fillCircle(55, -152, 10);
     this.auto.add(g);
 
-    const stav = noveAuto();
-    this.kola = KOLA.map((id) => this.vytvorKolo(id, stav[id]));
+    this.kola = nove.kola.map(({ id, stav }) => this.vytvorKolo(id, stav));
+  }
+
+  /** Vozík ze shora: oj a korba, kola LV/PV na jedné nápravě. */
+  private kresliVozik(): Phaser.GameObjects.Graphics {
+    const g = this.add.graphics().setName('vozik');
+    g.fillStyle(0x34495e);
+    g.fillRect(-6, 160, 12, 60); // oj
+    g.fillStyle(0x7f8c8d);
+    g.fillRoundedRect(-85, 210, 170, 135, 10); // korba
+    g.fillStyle(0x95a5a6);
+    g.fillRoundedRect(-73, 222, 146, 111, 6); // ložná plocha
+    return g;
   }
 
   private vytvorKolo(id: KoloId, { podhustene, disk }: StavKola): Kolo {
@@ -440,7 +463,7 @@ export class AirScene extends Phaser.Scene {
     this.dalsiAuto.setVisible(false);
     beep.tick(500, 0.1);
     const stare = this.auto;
-    this.tweens.add({ targets: stare, y: -400, duration: 900, ease: 'Quad.In', onComplete: () => stare.destroy() });
+    this.tweens.add({ targets: stare, y: -700, duration: 900, ease: 'Quad.In', onComplete: () => stare.destroy() });
 
     // Karty znovu plné, dočasná karta pryč.
     this.docasnaKarta?.obal.destroy();
@@ -454,7 +477,7 @@ export class AirScene extends Phaser.Scene {
       this.vytvorAuto(1100);
       this.tweens.add({
         targets: this.auto,
-        y: AUTO.y,
+        y: this.cilY,
         duration: 1000,
         ease: 'Quad.Out',
         onComplete: () => {

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { KOLA, cenaKola, cenaVyberu, noveAuto, zaplat } from '../src/services/air.ts';
+import { cenaKola, cenaVyberu, noveAuto, zaplat } from '../src/services/air.ts';
 
 test('Vzduch: cena dofouknutí podle disku – modrý 2, červený 3, zelený 5; kontrola 1', () => {
   assert.equal(cenaKola({ podhustene: true, disk: 'modry' }), 2);
@@ -20,19 +20,36 @@ test('Vzduch: nejdražší auto (4 prázdná zelená) = 20 → karta 20 stačí'
   assert.equal(cenaVyberu([zelene, zelene, zelene, zelene]), 20);
 });
 
-test('Vzduch: obě kola na nápravě mají stejný disk', () => {
+/** Náhoda z pevné řady čísel (pak stále `zbytek`). */
+function rada(cisla: number[], zbytek: number): () => number {
   let i = 0;
-  const hodnoty = [0.9, 0.1]; // přední zelený, zadní modrý
-  const auto = noveAuto(() => hodnoty[i++] ?? 0.3);
-  assert.equal(auto.LP.disk, 'zeleny');
-  assert.equal(auto.PP.disk, 'zeleny');
-  assert.equal(auto.LZ.disk, 'modry');
-  assert.equal(auto.PZ.disk, 'modry');
+  return () => cisla[i++] ?? zbytek;
+}
+
+test('Vzduch: obě kola na nápravě mají stejný disk', () => {
+  // přední: disk zelený, kola; zadní: disk modrý, kola; vozík ne (0.9)
+  const auto = noveAuto(rada([0.9, 0.1, 0.1, 0.1, 0.1, 0.1, 0.9], 0.3));
+  const disk = (id: string): string | undefined => auto.kola.find((k) => k.id === id)?.stav.disk;
+  assert.equal(disk('LP'), 'zeleny');
+  assert.equal(disk('PP'), 'zeleny');
+  assert.equal(disk('LZ'), 'modry');
+  assert.equal(disk('PZ'), 'modry');
+  assert.equal(auto.vozik, false);
+  assert.equal(auto.kola.length, 4);
+});
+
+test('Vzduch: auto s vozíkem má 6 kol, vozík vlastní disk', () => {
+  // přední, zadní, vozík ano (0.1), disk vozíku zelený (0.9)
+  const auto = noveAuto(rada([0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.9, 0.1, 0.1], 0.3));
+  assert.equal(auto.vozik, true);
+  assert.deepEqual(auto.kola.map((k) => k.id), ['LP', 'PP', 'LZ', 'PZ', 'LV', 'PV']);
+  assert.equal(auto.kola[4]?.stav.disk, 'zeleny');
+  assert.equal(auto.kola[5]?.stav.disk, 'zeleny');
 });
 
 test('Vzduch: nové auto má vždy aspoň jedno podhuštěné kolo', () => {
-  const auto = noveAuto(() => 0.9);
-  assert.equal(KOLA.filter((k) => auto[k].podhustene).length, 1);
-  const vsechna = noveAuto(() => 0.1);
-  assert.equal(KOLA.filter((k) => vsechna[k].podhustene).length, 4);
+  const plne = noveAuto(() => 0.9);
+  assert.equal(plne.kola.filter((k) => k.stav.podhustene).length, 1);
+  const prazdne = noveAuto(() => 0.1);
+  assert.ok(prazdne.kola.every((k) => k.stav.podhustene));
 });
