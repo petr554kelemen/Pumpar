@@ -218,9 +218,9 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
   (české hlasy ve `speechSynthesis` na Linuxu chybí / zní špatně). Zdroj hlasu lze kdykoli vyměnit,
   i po jednotlivých frázích. Výběr hlasu: viz Dev_notes.md.
 - **Hlas: Speechtech** (licencovaný, na stolním PC; český hlas – pravděpodobně Radka) – zřetelnější písmena
-  i výslovnost než Microsoft Jakub. Jediná slabina: „ch“ čte jako c + h → **fráze bez „ch“**
-  (např. „Zaplaceno!“ místo „Platba schválena“). Písmeno CH ve hře zatím není (i ve škole přichází mezi posledními);
-  až bude potřeba, řešit uživatelským slovníkem Speechtechu.
+  i výslovnost než Microsoft Jakub. Ve slovech „ch“ čte správně; jen samotné písmeno „CH“ rozloží na dvě.
+  → **Písmena se hlasu zadávají jejich názvem**, ne znakem: „em“, „bé“, „chá“ (ne „M“, „B“, „CH“).
+  Písmeno CH ve hře zatím není (i ve škole přichází mezi posledními).
 - **Jeden hlas pro celou hru** – hráč slyší písmena vždy stejně. Hlasy se nemíchají.
 - Generování: rodič uloží fráze ze Speechtechu do WAV podle seznamu frází (pojmenování souborů = klíč fráze).
 - Záloha: Microsoft Jakub (Windows 11, generuje se skriptem přes WinRT se SSML; samotná písmena
