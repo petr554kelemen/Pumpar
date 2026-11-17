@@ -57,6 +57,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   kolečka s QR, „vhodit“ do krabičky) vs. jen ve hře; kód (ne Z/Ž); cena a délka běhu. Nejdřív nanečisto.
   - Hráč určil: **vzduch = 3 tečky za jedno kolo** → 4 kola = 12 → „karta s 10 tečkami nestačí, musí 15 nebo 20“.
     Z toho plyne **vracení peněz** (15 − 12 = 3 zpět, graficky přesunem teček) a placení po kolech.
+  - Hráč: **nákup se přizpůsobí kartě** – s 10 tečkami objedná jen 1, 2 nebo 3 kola (3 / 6 / 9).
+    Ve hře: auto shora se 4 koly, klepnutím vybírá kola, u každého přibudou 3 tečky (cena roste viditelně) →
+    pípnout kartu → stačí = zaplaceno + vrácení, nestačí = odmítnuto (ubrat kolo / větší karta). Sčítá hra.
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
   Pořadí obtížnosti úkolů: hláska na **začátku** slova → na **konci** → **uprostřed** (nejtěžší, jen jako výzva).
 - [ ] **7 – Rozšíření z mapy:** příprava směny (drag & drop cen), uzávěrka a tržba, minihry za odměnu, QR kódy po bytě.
@@ -180,3 +183,4 @@ _(zatím nic)_
 - 2026-11-17 (uživatel): Hráč: peníze na starých platebních kartách, hodnoty 10/15/20, karty se kombinují
   → Plán fáze 5 (vracení). Šablona karty na tisk.html až po testu tisku.
   Upřesnění: „kombinovat“ = vybrat vhodnou kartu, ne sčítat → platí jedna karta, malá je odmítnuta.
+- 2026-11-17 (uživatel): Hráč: s menší kartou objedná méně kol (1–3) → výběr kol ve hře, cena roste tečkami.
