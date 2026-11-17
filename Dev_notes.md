@@ -50,7 +50,7 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [x] Laminovací kapsy: **A5**, více visaček s rozestupy, rozstříhat, děrovačka (návrh rozměrů v README → Tisk štítků).
   Archy samolepek A4 už nejsou potřeba (zboží = laminované visačky, SPZ/karty = D30).
 - [ ] Po příjezdu USB čtečky: ověřit Code128 i QR, nastavit jazyk klávesnice ve čtečce.
-- [ ] Vybrat hlas – poslechnout `hlas_test_vety.txt` (hlavně samotné „M.“, „Eř“, „Chá“). Pořadí zkoušení:
+- [x] Vybrat hlas – poslechnout `hlas_test_vety.txt` (hlavně samotné „M.“, „Eř“, „Chá“). Pořadí zkoušení:
   1. Balabolka (máme, český mluvčí; hromadně přes `balcon.exe`),
   2. Piper (open-source, offline, i na Linuxu, hlas `cs_CZ-jirka`),
   3. Microsoft Azure TTS (neurální Antonín/Vlasta, free kvóta),
@@ -65,7 +65,7 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     Balabolka na stolním PC = Speechtech **Radka** (SAPI5, starší): „ch“ čte jako c+h, „schválena“ jako
     „šválena“; antivirus navíc hlásil, že Balabolka čte soubory na ploše (čtení zablokováno) → **Balabolku
     nepoužívat, hlas = Jakub**. Test písmen (á, bé, dé… ve 3 variantách SSML: normál / pomaleji+hlasitěji /
-    + výš a důraz) ve Stažených souborech `hlas_test_pismena_jakub.wav` – čeká na výběr varianty.
+    + výš a důraz) ve Stažených souborech `hlas_test_pismena_jakub.wav` → **vybrána varianta 3** (zapsáno v README).
 - [ ] **Před prvním tiskem štítků** projít s hráčem kategorie, písmena, obrázky a slabiky SPZ
   (README → Formát kódů, Pravidla jsou zákon). Do té doby hráči hru na Pages neukazovat.
 - [ ] Obrázkový „Návod 1“ s pravidly hry (verzovaný – změna = nový návod s vyšším číslem).
@@ -141,3 +141,5 @@ _(zatím nic)_
   Kódy reagují jen na stránce 📟 (⛽ je zatím ignoruje). 24/24 testů, typecheck OK, ověřeno v Chrome.
 - 2026-11-17 (uživatel + Claude): Hlas: Jakub vybrán (Radka/Balabolka vyřazena, viz TODO Vybrat hlas),
   vygenerován test samostatných písmen ve 3 variantách SSML. Zdroj zvuků WAV, do hry komprimovaná kopie.
+- 2026-11-17 (uživatel + Claude): Samotná písmena – vybrána varianta 3 (pomaleji, hlasitěji, výš, důraz);
+  README → Hlas a písmena doplněn (Jakub, SSML parametry, WAV → komprese do hry).

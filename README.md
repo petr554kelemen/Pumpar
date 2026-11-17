@@ -217,6 +217,12 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
 - **Hlas = předgenerované audio soubory.** Hra jen přehrává soubory – žádné TTS za běhu
   (české hlasy ve `speechSynthesis` na Linuxu chybí / zní špatně). Zdroj hlasu lze kdykoli vyměnit,
   i po jednotlivých frázích. Výběr hlasu: viz Dev_notes.md.
+- **Hlas: Microsoft Jakub** (Windows 11, OneCore), generování skriptem přes WinRT `SpeechSynthesizer` se SSML.
+  Balabolka / Speechtech Radka se nepoužívá (chybná výslovnost „ch“, „schv“).
+- **Samotná písmena** (bez slova zní u Jakuba ztlumeně): SSML
+  `<prosody rate="-35%" volume="+60%" pitch="+10%"><emphasis level="strong">bé!</emphasis></prosody>`
+  – ověřeno poslechem jako nejzřetelnější. Ostatní fráze normálně.
+- Zdrojové nahrávky WAV (bezztrátově), do hry komprimovaná kopie (MP3/OGG).
 - Hlas rodiče se nepoužívá. Google Překladač (neoficiální gTTS) se nepoužívá.
 - Seznam frází jako jediný zdroj pravdy (např. `voice-phrases.json`: `klic → text`).
   Klíče bez diakritiky (`pismeno_M`, `pipni_zbozi`). Po přidání fráze znovu spustit generování.
