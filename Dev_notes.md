@@ -50,6 +50,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   Žeton se koupí v obchodě za peníze ze hry → pípnout u stroje → běží (ubývající čas graficky) → „hotovo“.
   Bez žetonu: „Potřebuješ žeton.“ **Do dílny ✏️:** jeden žeton na obojí, nebo dva; fyzické žetony (laminovaná
   kolečka s QR, „vhodit“ do krabičky) vs. jen ve hře; kód (ne Z/Ž); cena a délka běhu. Nejdřív nanečisto.
+  - Hráč určil: **vzduch = 3 tečky za jedno kolo** → 4 kola = 12 → „karta s 10 tečkami nestačí, musí 15 nebo 20“.
+    Z toho plyne **vracení peněz** (15 − 12 = 3 zpět, graficky přesunem teček) a placení po kolech.
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
   Pořadí obtížnosti úkolů: hláska na **začátku** slova → na **konci** → **uprostřed** (nejtěžší, jen jako výzva).
 - [ ] **7 – Rozšíření z mapy:** příprava směny (drag & drop cen), uzávěrka a tržba, minihry za odměnu, QR kódy po bytě.
@@ -168,3 +170,5 @@ _(zatím nic)_
 - 2026-11-17 (uživatel): Nápad hráče – služební karta odemyká benzínku (jinak zavřeno, zákaz) → Plán.
   README: „vedoucí pumpy“ → „vedoucí benzínky“ (slova hráče).
 - 2026-11-17 (uživatel): Nápad hráče – žeton k vysavači a na dofoukání vzduchu → Plán.
+- 2026-11-17 (uživatel): Hráč: vzduch 3 tečky za kolo (4 kola = 12, desítka nestačí) → vracení peněz. Bankovce
+  možná říká „karta s tečkami“ – ověřit pro hlasové fráze.
