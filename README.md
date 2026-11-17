@@ -218,6 +218,8 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
 - **Preferovaný kód: QR** (karty, visačky). Důvody: snáší čtení z úhlu (telefon si podle rohových
   čtverců dopočítá perspektivu, u čárového kódu to nejde), poškození i odlesky. Code128 jen tam, kde je
   málo místa na výšku (D30). Test rozhodne hlavně o **nejmenší spolehlivé velikosti QR**.
+- **Code39 se nepoužívá** – nemá povinný kontrolní znak, chybné čtení projde jako jiný znak (zkušenost rodiče:
+  více chyb než Code128, který má kontrolní součet vždy).
 - **Termotisk (D30) bledne/černá na slunci a v teple** – jen tam, kde je potřeba snadné odlepení a štítek
   nebude na slunci. Laserový toner pod laminací vydrží.
 - **Visačky – tisk a laminace:**
