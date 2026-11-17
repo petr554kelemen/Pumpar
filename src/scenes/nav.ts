@@ -2,12 +2,14 @@
 
 import type Phaser from 'phaser';
 
-export type SceneKey = 'Station' | 'Air' | 'ScanTest';
+export type SceneKey = 'Lock' | 'Station' | 'Air' | 'ScanTest';
 
+// 🔒 = zavřít benzínku (konec směny) → zpět k zamčeným dveřím. Zamčená scéna sama navigaci nemá.
 const SCENES: ReadonlyArray<{ key: SceneKey; ikona: string }> = [
   { key: 'Station', ikona: '⛽' },
   { key: 'Air', ikona: '🛞' },
   { key: 'ScanTest', ikona: '📟' },
+  { key: 'Lock', ikona: '🔒' },
 ];
 
 export function addNav(scene: Phaser.Scene): void {

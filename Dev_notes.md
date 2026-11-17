@@ -15,6 +15,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - **Dofukování kol 🛞 – ukázka pro hráče v dílně ✏️** (prototyp, ne schválené pravidlo): ukázat, nechat vyzkoušet,
   zapsat jeho připomínky; co „orazítkuje“, platí.
   Hráč dál hraje starou verzi, novou uvidí až hotovou (Pravidla jsou zákon, bod 1).
+- **Odemykání benzínky 🔒 + hodiny – ukázka hráči v dílně ✏️** (prototyp hotový, viz Plán → Otevírání benzínky):
+  volba obsluha/zákazník, kód nebo karta, čekání na otevírací dobu podle hodin. Zapsat jeho připomínky.
 - Fáze 1: vytisknout testovací list (https://petr554kelemen.github.io/Pumpar/tisk.html), zalaminovat,
   ověřit čtení (telefon hned, čtečka po příjezdu) → zvolit typ a velikost kódu. Paralelně D30 test SPZ.
   - D30 výsledek 1 (2026-11-17): štítek 12 × 40, **QR H 4 body/modul** (≈ 11,5 mm, tichá zóna jen 1 modul):
@@ -85,6 +87,20 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   (karta = „PIN v kapse“, viz README Zásady návrhu).
   **Do dílny ✏️:** kód (zvolí hráč, jiný než PIN karty 1234), počet číslic, vzhled služební karty, zavírání tlačítkem nebo kódem,
   jak vypadá „zavřeno“ (🚫 / závora / 🔒). Nejdřív nanečisto.
+  - [x] **Prototyp (scéna `LockScene`, logika `src/services/lock.ts`) – výchozí scéna hry.** Vlevo budova
+    (tmavá, 🚫, 🔒), vpravo terminál u dveří: displej s hvězdičkami, klávesnice 1–9 / C / 0 / ✅ (i klávesnice
+    počítače + Enter), čtečka karty. Návrh: **kód dveří 1111, služební karta `K000`** (konstanty – do dílny ✏️).
+    Špatně = ❌ + zatřesení; správně = rozsvítí se nápis, výloha a dveře, 🔓, pak stojan ⛽.
+    Navigace má nově 🔒 = zavřít benzínku (konec směny) → zpět ke dveřím.
+  - [x] **Hodiny – učení času (nápad rodiče):** nad dveřmi ručičkové hodiny se skutečným časem (čísla 1–12,
+    červená vteřinovka), na dveřích cedulka „OTEVŘENO OD“ s malými hodinami + čas číslem. Otevírací doba =
+    za ~2 minuty od příchodu (zaokrouhleno na celou minutu). V otevírací době cedulka zezelená + cink.
+  - [x] **Dva režimy (nápad rodiče) – volba na začátku scény** (dvě velké karty, bez textu):
+    🧑‍🔧 **obsluha** (🔑 💳) odemyká sama kódem / kartou **kdykoli**; 🚗 **zákazník** kód nemá – klepnutí na dveře
+    před otevírací dobou = zámek cukne, hodiny se zahoupou; v otevírací době se benzínka sama rozsvítí, klepnutím
+    na dveře zákazník vejde (zatím → stojan). Pozor: hráč rozlišuje benzinář/pumpař – ve frázích „benzinář“.
+  - **Do dílny ✏️:** co dělá zákazník uvnitř (obchod?), délka čekání (2 min), zda obsluha musí taky čekat
+    na otevírací dobu (cedulku otočit sama?), počet pokusů kódu.
 - [ ] **Žetony – vysavač a vzduch (nápad hráče):** vysavač (V) i dofoukání vzduchu jedou jen na žeton.
   Žeton se koupí v obchodě za peníze ze hry → pípnout u stroje → běží (ubývající čas graficky) → „hotovo“.
   Bez žetonu: „Potřebuješ žeton.“ **Do dílny ✏️:** jeden žeton na obojí, nebo dva; fyzické žetony (laminovaná
@@ -277,3 +293,7 @@ _(zatím nic)_
 - 2026-11-17 (hráč + Claude): Hráč vyzkoušel vzduch (logiku pochopil hned), přidán jeho nápad – vozík s vlastní
   nápravou. 38/38 testů, ověřeno v Chrome.
 - 2026-11-17 (uživatel): D30 test – QR 4 b/modul na 12 × 40 telefon přečetl s menšími problémy; čeká na čtečku.
+- 2026-11-17 (uživatel + Claude): Odemykání benzínky – scéna `LockScene` (výchozí): kód / služební karta,
+  hodiny nad dveřmi + cedulka „otevřeno od“ (učení hodin), volba obsluha 🧑‍🔧 / zákazník 🚗. Navigace 🔒 = zavřít.
+  43/43 testů, typecheck OK, ověřeno v Chrome (špatný kód, kód z klávesnice, karta K000, čekání zákazníka,
+  rozsvícení v otevírací době, vstup → stojan, 🔒 zpět).
