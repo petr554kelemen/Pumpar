@@ -55,6 +55,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     způsob volby, rychlá pistole od začátku nebo až po zvládnutí pomalé. Nanečisto: konvička vs. kelímek, čárka.
   - Starou verzi (`public/stara-verze.html`) neměnit – hráč její pravidla zná (viz Pravidla jsou zákon).
 - [ ] **6 – Platební terminál:** telefon ukáže částku → sken karty `K…` → PIN → „Platba schválena“ + účtenka.
+  - **PIN (hráč si PINy pamatuje a zadává, i 6místné):** každá karta svůj PIN, vymyslí si ho hráč v dílně ✏️.
+    Klávesnice s číslicemi na telefonu, zadání jako hvězdičky. Špatně = ❌ „Špatný PIN“; po 3 pokusech blokace?
+    (odblokuje rodič kódem `9…` = „banka“) – rozhodne dílna. Zůstatek až po správném PINu?
+  - **Herní PIN nesmí být shodný se skutečným** (je uložen v prohlížeči nechráněně) – vymyslet nový.
 - [ ] **Hlas (průběžně od fáze 0):** služba `voice`, seznam frází, generování souborů; první fráze pro pípnutí a placení.
 - [ ] **Garáž (s fází 4):** přiřazení SPZ → autíčko ve hře (vzhled, jméno), měnitelné rodičem/hráčem;
   pípnutí SPZ = auto přijede ke stojanu (+ úkol „natankuj …“).
@@ -210,3 +214,4 @@ _(zatím nic)_
   penězi 1/2/3/5/10 (sčítání) → Plán fáze 5, nahrazuje karty s hodnotou 10/15/20.
 - 2026-11-17 (uživatel): Bonus za rychlost tankování (riziko × jistota) → Plán fáze 5, odměna za přesnost.
 - 2026-11-17 (uživatel): Stará verze už ukazuje prázdné tečky = zbývá → zachovat stejný obraz u karty i mincí.
+- 2026-11-17 (uživatel): Platba kartou chráněná PINem (hráč PINy zná a zadává) → Plán fáze 6.
