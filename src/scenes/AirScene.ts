@@ -32,12 +32,14 @@ interface Kolo {
 
 interface Karta {
   hodnota: number;
+  /** Kolik teček na kartě ještě zbývá (u jednoho auta lze platit vícekrát). */
+  zbyva: number;
   obal: Phaser.GameObjects.Container;
   pozadi: Phaser.GameObjects.Rectangle;
   tecky: Phaser.GameObjects.Arc[];
 }
 
-type Stav = 'vyber' | 'placeni' | 'hotovo';
+type Stav = 'vyber' | 'placeni' | 'odjezd';
 
 // Nápověda (3 tečky u vybraného kola) – přepíná rodič; pamatuje se mezi auty.
 let napovedaZapnuta = true;
@@ -72,9 +74,8 @@ export class AirScene extends Phaser.Scene {
       .text(AUTO.x, 680, '🚗 ➡️', { fontSize: '56px', backgroundColor: '#37404c', padding: { x: 18, y: 4 } })
       .setOrigin(0.5)
       .setName('dalsi_auto')
-      .setVisible(false)
       .setInteractive({ useHandCursor: true });
-    this.dalsiAuto.on('pointerdown', () => this.odjed());
+    this.dalsiAuto.on('pointerdown', () => this.zkusOdjet());
 
     // Přepínač nápovědy – nenápadně pro rodiče.
     this.napovedaTlacitko = this.add
@@ -227,7 +228,7 @@ export class AirScene extends Phaser.Scene {
     }
     const obal = this.add.container(x, y, [pozadi, cislo, ...tecky]).setName(`karta_${hodnota}`);
     pozadi.setInteractive({ useHandCursor: true });
-    const karta: Karta = { hodnota, obal, pozadi, tecky };
+    const karta: Karta = { hodnota, zbyva: hodnota, obal, pozadi, tecky };
     pozadi.on('pointerdown', () => this.plat(karta));
     return karta;
   }
@@ -259,7 +260,7 @@ export class AirScene extends Phaser.Scene {
       return;
     }
 
-    const platba = zaplat(karta.hodnota, cenaKol(vybrana.length));
+    const platba = zaplat(karta.zbyva, cenaKol(vybrana.length));
     if (!platba.ok) {
       this.odmitni(karta);
       return;
@@ -274,8 +275,10 @@ export class AirScene extends Phaser.Scene {
 
     // Tečky z karty odletí ke kolům (odečítání viditelně): 3 na každé kolo.
     const cena = cenaKol(vybrana.length);
+    const prvni = karta.hodnota - karta.zbyva; // dřív utracené tečky jsou na začátku
+    karta.zbyva -= cena;
     for (let i = 0; i < cena; i++) {
-      const zdroj = karta.tecky[i];
+      const zdroj = karta.tecky[prvni + i];
       const kolo = vybrana[Math.floor(i / CENA_KOLA)];
       if (!zdroj || !kolo) continue;
       const start = { x: karta.obal.x + zdroj.x, y: karta.obal.y + zdroj.y };
@@ -357,15 +360,54 @@ export class AirScene extends Phaser.Scene {
     this.time.addEvent({ delay: 90, repeat: 13, callback: () => beep.tick(2400 + Math.random() * 600, 0.02) });
   }
 
+  /** Po nafouknutí: zbývají-li prázdná kola, dá se doplatit; jinak oslava. */
   private hotovo(): void {
-    this.stav = 'hotovo';
+    this.stav = 'vyber';
+    if (this.kola.some((k) => k.podhustene)) {
+      beep.tick(700, 0.08);
+      return;
+    }
     beep.win();
-    this.dalsiAuto.setVisible(true);
     this.tweens.add({ targets: this.dalsiAuto, scale: { from: 0.6, to: 1 }, duration: 300, ease: 'Back.Out' });
   }
 
+  /** S prázdným kolem se nejezdí: nad prázdnými koly zabliká ❗ a auto zůstane. */
+  private zkusOdjet(): void {
+    if (this.stav !== 'vyber') return;
+    const prazdna = this.kola.filter((k) => k.podhustene);
+    if (prazdna.length === 0) {
+      this.odjed();
+      return;
+    }
+    beep.error();
+    this.tweens.add({
+      targets: this.auto,
+      x: { from: AUTO.x - 8, to: AUTO.x + 8 },
+      duration: 70,
+      yoyo: true,
+      repeat: 3,
+      onComplete: () => this.auto.setX(AUTO.x),
+    });
+    for (const k of prazdna) {
+      const p = KOLO_POZICE[k.id];
+      const vykricnik = this.add
+        .text(p.x, p.y - R_KOLA - 38, '❗', { fontSize: '64px', padding: { x: 8, y: 14 } })
+        .setOrigin(0.5)
+        .setName(`varovani_${k.id}`);
+      this.auto.add(vykricnik);
+      this.tweens.add({
+        targets: vykricnik,
+        alpha: { from: 1, to: 0.1 },
+        duration: 220,
+        yoyo: true,
+        repeat: 3,
+        onComplete: () => vykricnik.destroy(),
+      });
+    }
+  }
+
   private odjed(): void {
-    if (this.stav !== 'hotovo') return;
+    this.stav = 'odjezd';
     this.dalsiAuto.setVisible(false);
     beep.tick(500, 0.1);
     const stare = this.auto;
@@ -374,7 +416,10 @@ export class AirScene extends Phaser.Scene {
     // Karty znovu plné, dočasná karta pryč.
     this.docasnaKarta?.obal.destroy();
     this.docasnaKarta = null;
-    this.karty.forEach((k) => k.tecky.forEach((t) => t.setFillStyle(ZLUTA, 1)));
+    this.karty.forEach((k) => {
+      k.zbyva = k.hodnota;
+      k.tecky.forEach((t) => t.setFillStyle(ZLUTA, 1));
+    });
 
     this.time.delayedCall(700, () => {
       this.vytvorAuto(1100);
@@ -385,6 +430,7 @@ export class AirScene extends Phaser.Scene {
         ease: 'Quad.Out',
         onComplete: () => {
           this.stav = 'vyber';
+          this.dalsiAuto.setVisible(true);
         },
       });
     });

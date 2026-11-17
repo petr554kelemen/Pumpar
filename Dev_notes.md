@@ -97,7 +97,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     v rozích **z boku** (kulatá s ráfkem jako 🛞; splasklé má **dole plošku** a vyboulené boky – přání rodiče),
     náhodně 1–4 kola splasklá, klepnutím výběr (žlutý rámeček, s nápovědou 3 tečky), karty 10/15/20 klepnutím nebo pípnutím `B…`
     (jiná hodnota = dočasná karta), malá = ❌ + zatřesení, jinak tečky odletí ke kolům (na kartě prázdná kolečka),
-    kola se postupně nafouknou + cink, 🚗➡️ další auto. Nápovědu přepíná rodič (💡 vlevo dole). Bez hlasu.
+    kola se postupně nafouknou + cink, 🚗➡️ další auto. **S prázdným kolem se nejezdí:** 🚗➡️ při prázdném kole
+    = nad ním bliká ❗ + chybový zvuk, auto zůstane. Doplatit lze další kartou; karta si pamatuje zůstatek
+    (prázdná kolečka) do odjezdu auta. Nápovědu přepíná rodič (💡 vlevo dole). Bez hlasu.
   - Hráč: **dvě obtížnosti** – *s nápovědou* (u vybraného kola 3 tečky, cena roste viditelně) a *bez nápovědy*
     (ví, že kolo = 3 tečky, spočítá si sám a vybere kartu; hra jen potvrdí/odmítne). Přepíná rodič / nový návod.
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
@@ -244,3 +246,5 @@ _(zatím nic)_
   ověřeno v Chrome (výběr kol, odmítnutí B001, platba kartou 20, foukání, další auto).
 - 2026-11-17 (uživatel + Claude): Rozhodnutí – hra není responzivní (notebook, FIT); telefon = vlastní stránky na výšku.
 - 2026-11-17 (Claude): Vzduch – kola překreslena z boku (ráfek, splasklé s ploškou dole), ověřeno v Chrome.
+- 2026-11-17 (uživatel + Claude): Vzduch – s prázdným kolem nelze odjet (bliká ❗), doplacení další kartou,
+  zůstatek karty v rámci auta. Ověřeno v Chrome.
