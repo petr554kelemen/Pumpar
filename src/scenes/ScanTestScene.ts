@@ -29,7 +29,7 @@ export class ScanTestScene extends Phaser.Scene {
 
     // Popisek jen pro rodiče.
     this.add
-      .text(width / 2, 40, 'Zkouška čtečky – napiš kód a Enter (např. P001, B020, K001, LA01, KE03)', {
+      .text(width / 2, 40, 'Zkouška čtečky – pípni, nebo napiš kód a Enter (např. P001, B020, K001, LA01, KE03)', {
         fontFamily: FONT,
         fontSize: '22px',
         color: '#95a5a6',
@@ -41,8 +41,17 @@ export class ScanTestScene extends Phaser.Scene {
     this.vysledek = this.add.container(width / 2, height / 2).setName('vysledek');
     this.ukazCekani();
 
-    const unsubscribe = bus.on('scan', (data) => this.onScan(data));
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, unsubscribe);
+    // Ladění: co právě přichází z klávesnice/čtečky (jen pro rodiče, nenápadně dole).
+    const psani = this.add
+      .text(width / 2, height - 30, '', { fontFamily: FONT, fontSize: '24px', color: '#95a5a6' })
+      .setName('psani')
+      .setOrigin(0.5);
+
+    const odhlasit = [
+      bus.on('scan', (data) => this.onScan(data)),
+      bus.on('psani', ({ text }) => psani.setText(text ? `⌨ ${text}` : '')),
+    ];
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => odhlasit.forEach((f) => f()));
   }
 
   private ukazCekani(): void {

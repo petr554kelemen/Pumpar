@@ -12,6 +12,8 @@ export interface GameEvents {
   pip: Record<string, never>;
   /** Naskenovaný kód (fáze 2+). */
   scan: { kod: string; info: CodeInfo; zdroj: ScanSource };
+  /** Rozepsaný kód z klávesnice/čtečky (po každé klávese) – jen pro ladicí zobrazení. */
+  psani: { text: string };
 }
 
 type Handler<T> = (payload: T) => void;

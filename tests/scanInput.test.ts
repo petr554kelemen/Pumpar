@@ -2,7 +2,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { parseCode } from '../src/services/codes.ts';
-import { normalizeChar, KeyCollector } from '../src/services/scanInput.ts';
+import { normalizeChar, KeyCollector, keyFromEvent } from '../src/services/scanInput.ts';
 
 const type = (collector: KeyCollector, text: string[], start = 0, step = 20) => {
   let t = start;
@@ -119,4 +119,22 @@ test('KeyCollector: Escape smaže rozepsaný kód', () => {
   const c = new KeyCollector();
   const { result } = type(c, ['P', '0', 'Escape', 'K', '0', '0', '1', 'Enter']);
   assert.equal(result, 'K001');
+});
+
+test('keyFromEvent: numerická klávesnice funguje i bez NumLocku', () => {
+  assert.equal(keyFromEvent('Insert', 'Numpad0'), '0');
+  assert.equal(keyFromEvent('End', 'Numpad1'), '1');
+  assert.equal(keyFromEvent('7', 'Numpad7'), '7');
+  assert.equal(keyFromEvent('Enter', 'NumpadEnter'), 'Enter');
+  assert.equal(normalizeChar(keyFromEvent('+', 'NumpadAdd')), null); // ne „1“
+  assert.equal(keyFromEvent('é', 'Digit0'), 'é'); // horní řada beze změny
+});
+
+test('KeyCollector: rozepsaný kód je vidět, po Enteru zmizí', () => {
+  const c = new KeyCollector();
+  c.push('P', 0);
+  c.push('é', 10);
+  assert.equal(c.rozepsano, 'P0');
+  c.push('Enter', 20);
+  assert.equal(c.rozepsano, '');
 });

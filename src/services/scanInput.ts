@@ -22,6 +22,19 @@ export function normalizeChar(key: string): string | null {
   return null;
 }
 
+/**
+ * Sjednotí klávesu z události: numerická klávesnice se bere podle fyzické klávesy (code),
+ * takže číslice projdou i při vypnutém NumLocku (jinak přijde „Insert“, „End“…)
+ * a „+“ z numerické klávesnice se nezamění za „1“ z českého rozložení.
+ */
+export function keyFromEvent(key: string, code: string): string {
+  const numpad = /^Numpad(\d)$/.exec(code);
+  if (numpad?.[1]) return numpad[1];
+  if (code === 'NumpadEnter') return 'Enter';
+  if (code.startsWith('Numpad')) return '';
+  return key;
+}
+
 export interface KeyCollectorOptions {
   /** Pauza mezi znaky (ms), po které se rozepsaný kód zahodí. */
   resetMs?: number;
@@ -47,6 +60,11 @@ export class KeyCollector {
     this.resetMs = resetMs;
     this.repeatMs = repeatMs;
     this.maxLength = maxLength;
+  }
+
+  /** Rozepsaný (zatím neukončený) kód – pro ladicí zobrazení. */
+  get rozepsano(): string {
+    return this.buffer;
   }
 
   /** Zpracuje klávesu. Vrátí hotový kód, nebo null. */
@@ -83,7 +101,8 @@ export function startKeyboardScanner(bus: EventBus<GameEvents>, target: Window =
     if (e.ctrlKey || e.altKey || e.metaKey) return;
     if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
 
-    const kod = collector.push(e.key, performance.now());
+    const kod = collector.push(keyFromEvent(e.key, e.code), performance.now());
+    bus.emit('psani', { text: collector.rozepsano });
     if (kod) bus.emit('scan', { kod, info: parseCode(kod), zdroj: 'klavesnice' });
   };
 

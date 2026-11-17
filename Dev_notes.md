@@ -69,7 +69,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 _(zatím nic)_
 
 ## FIX
-_(zatím nic)_
+- 2026-11-17: Číslice z numerické klávesnice se zahazovaly při vypnutém NumLocku (přišlo „Insert“, „End“…)
+  a numerické „+“ se měnilo na „1“ (české rozložení). Nově `keyFromEvent` bere numerickou klávesnici
+  podle fyzické klávesy (`e.code`).
 
 ## WISH
 - NFC nálepky (NTAG) jako „přiložení karty“ na terminálu – jen Android.
@@ -129,3 +131,6 @@ _(zatím nic)_
 - 2026-11-17 (uživatel + Claude): Rozhodnutí o kódech: **QR (oprava H) preferovaný** – karty a visačky laserem;
   QR lépe snáší úhel (telefon), poškození a odlesk; termotisk D30 bledne na slunci → jen autíčka (odlepitelnost),
   případně i autíčka visačkou s QR. Do testu přidat čtení z úhlu 30°/45°. README → Tisk štítků upraven.
+- 2026-11-17 (Claude): Zkouška čtečky: numerická klávesnice funguje i bez NumLocku (viz FIX), dole na stránce 📟
+  ladicí řádek „⌨ …“ s rozepsaným kódem (událost `psani`), nápověda „pípni, nebo napiš kód a Enter“.
+  Kódy reagují jen na stránce 📟 (⛽ je zatím ignoruje). 24/24 testů, typecheck OK, ověřeno v Chrome.
