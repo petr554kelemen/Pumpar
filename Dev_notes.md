@@ -79,6 +79,8 @@ _(zatím nic)_
   podle fyzické klávesy (`e.code`).
 
 ## WISH
+- Hádanka písmen: hlas řekne názvy 3 obrázků a zeptá se „Ve kterém slově slyšíš písmenko M?“ – odpověď klepnutím
+  nebo pípnutím zboží. V obchodě (zboží = obrázky), nebo samostatná scéna s vlastní ikonou. Rozhodnout v dílně.
 - NFC nálepky (NTAG) jako „přiložení karty“ na terminálu – jen Android.
 - Phomemo D30 pro drobné štítky, které si hráč tiskne sám.
 - Úrovně obtížnosti: tečky → tečky + číslice → slova.
