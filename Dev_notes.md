@@ -42,6 +42,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] **Hlas (průběžně od fáze 0):** služba `voice`, seznam frází, generování souborů; první fráze pro pípnutí a placení.
 - [ ] **Garáž (s fází 4):** přiřazení SPZ → autíčko ve hře (vzhled, jméno), měnitelné rodičem/hráčem;
   pípnutí SPZ = auto přijede ke stojanu (+ úkol „natankuj …“).
+- [ ] **Otevírání benzínky (s fází 4, nápad hráče):** bez benzináře je benzínka zavřená – zákaz, auta netankují.
+  Benzinář pípne **služební kartu** → otevřeno (světla, závora, hlas „Benzínka je otevřená!“); stejnou kartou
+  na konci směny zavře (později uzávěrka/tržba z fáze 7). **Do dílny ✏️:** vzhled a kód karty (nesmí se plést
+  s platební K), kolik karet (hráč / rodič), jak vypadá „zavřeno“ (🚫 / závora / 🔒). Nejdřív nanečisto.
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
   Pořadí obtížnosti úkolů: hláska na **začátku** slova → na **konci** → **uprostřed** (nejtěžší, jen jako výzva).
 - [ ] **7 – Rozšíření z mapy:** příprava směny (drag & drop cen), uzávěrka a tržba, minihry za odměnu, QR kódy po bytě.
@@ -157,3 +161,5 @@ _(zatím nic)_
   → README Cílový hráč, plán Písmena (pořadí obtížnosti).
 - 2026-11-17 (uživatel): Hráč rozlišuje „pumpa / pumpař“ a „benzínka / benzinář“ (pumpa je vedle benzínky)
   → README Zásady návrhu: ve frázích jeho slova. Pozor na „P jako pumpa“ v testovacích větách – ověřit s hráčem.
+- 2026-11-17 (uživatel): Nápad hráče – služební karta odemyká benzínku (jinak zavřeno, zákaz) → Plán.
+  README: „vedoucí pumpy“ → „vedoucí benzínky“ (slova hráče).

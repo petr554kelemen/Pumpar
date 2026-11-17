@@ -88,7 +88,7 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
    Pravidlo, které sám vytvořil a schválil, bude hájit.
 3. **Měnitelnost je součástí pravidel od začátku.** Co se má měnit, musí to mít v pravidlech od prvního dne:
    - „Auta se dají přeparkovat“ (přiřazení SPZ → auto),
-   - „Ceny ráno nastavuje vedoucí pumpy“ (příprava směny),
+   - „Ceny ráno nastavuje vedoucí benzínky“ (příprava směny),
    - **obrázkový návod s číslem verze** („Návod 1“, „Návod 2“…) – změna = nový návod s vyšším číslem,
      který starý nahradí. Platí nejnovější návod.
 4. **Nápad nejdřív vyzkoušet nanečisto, bez kódu.** Rodič zadá úkol ústně / na papíře a sleduje, zda hráče baví
@@ -188,7 +188,7 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
 | **Rodičovské kódy** (`9001`) | list pro rodiče | laser, papír | hráč je nemá mít po ruce |
 
 - **Ceny se na štítky netisknou.** Visačka nese jen co to je (písmeno kategorie, obrázek, kód).
-  Kolik to stojí, určuje ceník ve hře (nastavuje „vedoucí pumpy“ v dílně ✏️) – změna ceny = žádný nový tisk.
+  Kolik to stojí, určuje ceník ve hře (nastavuje „vedoucí benzínky“ v dílně ✏️) – změna ceny = žádný nový tisk.
 - **O značení rozhoduje hráč.** Hra nekontroluje, na čem visačka visí. Pomůcka: **obrázkový seznam
   „kam co“** (jako pexeso – obrázek na visačce = obrázek na seznamu), žádný text.
 - **Hlas popisuje, nepřikazuje** („Es jako sladkosti“), aby hráče neomezoval v rozhodování.
