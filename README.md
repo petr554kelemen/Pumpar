@@ -221,6 +221,8 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
   i výslovnost než Microsoft Jakub. Ve slovech „ch“ čte správně; jen samotné písmeno „CH“ rozloží na dvě.
   → **Písmena se hlasu zadávají jejich názvem**, ne znakem: „em“, „bé“, „chá“ (ne „M“, „B“, „CH“),
   i uprostřed věty: „Chá. Chá jako chleba.“ (ověřeno poslechem).
+  Ve Speechtechu je navíc výjimka (uživatelský slovník): samotné „ch“ → „chá“ (hráč si v programu sám píše
+  písmena a slova a nechává si je číst).
   Písmeno CH ve hře zatím není (i ve škole přichází mezi posledními).
 - **Jeden hlas pro celou hru** – hráč slyší písmena vždy stejně. Hlasy se nemíchají.
 - Generování: rodič uloží fráze ze Speechtechu do WAV podle seznamu frází (pojmenování souborů = klíč fráze).

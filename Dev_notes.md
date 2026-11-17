@@ -150,3 +150,5 @@ _(zatím nic)_
   Jakub zůstává jako záloha. README → Hlas a písmena přepsán. Zjistit přesný název hlasu Speechtechu.
 - 2026-11-17 (uživatel): Upřesnění Speechtech: „ch“ ve slovech OK, jen samotné „CH“ rozdělí → písmena zadávat
   názvem („chá“). Omezení „fráze bez ch“ zrušeno. Ověřeno: „Chá. Chá jako chleba.“ zní přirozeně.
+- 2026-11-17 (uživatel): Ve Speechtechu přidána výjimka samotné „ch“ → „chá“. Hráč program používá i sám
+  (napíše/opíše písmeno či slovo a nechá si ho přečíst).
