@@ -99,7 +99,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     (jiná hodnota = dočasná karta), malá = ❌ + zatřesení, jinak tečky odletí ke kolům (na kartě prázdná kolečka),
     kola se postupně nafouknou + cink, 🚗➡️ další auto. **S prázdným kolem se nejezdí:** 🚗➡️ při prázdném kole
     = nad ním bliká ❗ + chybový zvuk, auto zůstane. Doplatit lze další kartou; karta si pamatuje zůstatek
-    (prázdná kolečka) do odjezdu auta. Nápovědu přepíná rodič (💡 vlevo dole). Bez hlasu.
+    (prázdná kolečka) do odjezdu auta.
+  - Později (grafika, ne pro návrh): při foukání **okénko PIP** se zvětšeným kolem (druhá kamera Phaseru
+    zaměřená na foukané kolo) – vidět, jak se ploška zaobluje. Prototyp je zatím skica. Nápovědu přepíná rodič (💡 vlevo dole). Bez hlasu.
   - Hráč: **dvě obtížnosti** – *s nápovědou* (u vybraného kola 3 tečky, cena roste viditelně) a *bez nápovědy*
     (ví, že kolo = 3 tečky, spočítá si sám a vybere kartu; hra jen potvrdí/odmítne). Přepíná rodič / nový návod.
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
