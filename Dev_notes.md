@@ -66,8 +66,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] **Otevírání benzínky (s fází 4, nápad hráče):** bez benzináře je benzínka zavřená – zákaz, auta netankují.
   **Odemyká se kódem u dveří** (hráč má kódový zámek i na pokladničce; karta by se ztrácela, používá se jen ráno):
   u zamčených dveří 🔒 číselná klávesnice → kód → otevřeno (světla, hlas „Benzínka je otevřená!“). Na konci směny
-  zavřít (později uzávěrka/tržba z fáze 7). Služební karta jen jako záložní varianta.
-  **Do dílny ✏️:** kód (zvolí hráč, jiný než PIN karty 1234), počet číslic, zavírání tlačítkem nebo kódem,
+  zavřít (později uzávěrka/tržba z fáze 7). **Platí obě cesty:** kód na klávesnici **nebo** pípnutí služební karty
+  (karta = „PIN v kapse“, viz README Zásady návrhu).
+  **Do dílny ✏️:** kód (zvolí hráč, jiný než PIN karty 1234), počet číslic, vzhled služební karty, zavírání tlačítkem nebo kódem,
   jak vypadá „zavřeno“ (🚫 / závora / 🔒). Nejdřív nanečisto.
 - [ ] **Žetony – vysavač a vzduch (nápad hráče):** vysavač (V) i dofoukání vzduchu jedou jen na žeton.
   Žeton se koupí v obchodě za peníze ze hry → pípnout u stroje → běží (ubývající čas graficky) → „hotovo“.
@@ -221,3 +222,4 @@ _(zatím nic)_
 - 2026-11-17 (uživatel): PIN univerzální pro všechny karty.
 - 2026-11-17 (uživatel): Herní PIN = 1234 (při zadávání jen hvězdičky).
 - 2026-11-17 (uživatel): Benzínka se odemyká kódem u dveří (jako hráčova pokladnička), ne kartou.
+- 2026-11-17 (uživatel): Zásada „kde jsou dvě cesty, platí obě“ → README; dveře benzínky: kód nebo karta.

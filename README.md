@@ -69,6 +69,8 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
   porovnávání (stačí karta?), rozsahy (předvolba, terč přesnosti), sčítání (cena roste po kolech),
   násobilka (kolo = 3 tečky → 3, 6, 9, 12), **odečítání**: tečky z karty viditelně odletí jedna po druhé
   k věci, kterou platí, a zbytek se vrátí do peněženky (ve staré verzi tečky jen mizely – nebylo to odečítání).
+- **Kde jsou dvě cesty, platí obě.** Kódy ze čtečky jsou zábava, ale nemusí být všude povinné: např. dveře
+  benzínky odemkne zadaný kód **nebo** pípnutá karta (karta = „PIN v kapse“). Hráč volí, co má po ruce.
 - **Slova hráče, ne naše.** Ve frázích používat jeho pojmenování: **benzínka, benzinář** – „pumpa / pumpař“
   je pro něj něco jiného (pumpa stojí „hned vedle benzínky“). Název projektu „Pumpar“ je jen interní.
   Nové pojmy ověřit s hráčem (viz Pravidla, bod 4).
