@@ -43,6 +43,7 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] **Garáž (s fází 4):** přiřazení SPZ → autíčko ve hře (vzhled, jméno), měnitelné rodičem/hráčem;
   pípnutí SPZ = auto přijede ke stojanu (+ úkol „natankuj …“).
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
+  Pořadí obtížnosti úkolů: hláska na **začátku** slova → na **konci** → **uprostřed** (nejtěžší, jen jako výzva).
 - [ ] **7 – Rozšíření z mapy:** příprava směny (drag & drop cen), uzávěrka a tržba, minihry za odměnu, QR kódy po bytě.
 
 ## TODO
@@ -152,3 +153,5 @@ _(zatím nic)_
   názvem („chá“). Omezení „fráze bez ch“ zrušeno. Ověřeno: „Chá. Chá jako chleba.“ zní přirozeně.
 - 2026-11-17 (uživatel): Ve Speechtechu přidána výjimka samotné „ch“ → „chá“. Hráč program používá i sám
   (napíše/opíše písmeno či slovo a nechá si ho přečíst).
+- 2026-11-17 (uživatel): Pozorování: hráč určí hlásku na začátku i na konci slova, uprostřed je nejtěžší
+  → README Cílový hráč, plán Písmena (pořadí obtížnosti).

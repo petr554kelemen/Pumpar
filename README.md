@@ -59,6 +59,8 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 - symbol **X / ❌ chápe jako „chyba“**.
 - **striktně dodržuje jednou nastavená pravidla** – co jednou uvidí nebo dostane vytištěné, je pro něj
   zákon („tak to ten pán napsal“) a pozdější změny odmítá. Má-li návod, použije ho jako důkaz.
+- **písmena ve slově:** hlásku na **začátku a na konci** slova určí správně, **uprostřed** je pro něj nejtěžší.
+  Opisuje slova a v programu Speechtech si sám nechává číst písmena i slova.
 
 ## Zásady návrhu
 - **Žádný text jako jediný nositel informace.** Vše má ikonu/emoji, barvu a zvuk; text je jen pro rodiče.
