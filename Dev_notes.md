@@ -20,6 +20,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   - D30 výsledek 1 (2026-11-17): štítek 12 × 40, **QR H 4 body/modul** (≈ 11,5 mm, tichá zóna jen 1 modul):
     telefon načetl **s menšími problémy** (malý kód = blízko = ostření; úzký okraj). Zkusit i QR 3 body
     (tichá zóna 2) a hlavně **čtečku** – ta rozhodne.
+  - D30 neumí tisk od kraje do kraje (bílý okraj = tichá zóna navíc), ale aplikace mohla náš obrázek zmenšit.
+    **Varianta: QR generovat přímo v aplikaci Phomemo** (obsah jen `KE01`) – vykreslí ho nativně pro tiskárnu.
+    Porovnat čtení s naším PNG; zjistit, zda aplikace umí opravu chyb H. Hráč by pak mohl tisknout sám podle předlohy.
 
 ## Plán (fáze)
 - [x] **0 – Kostra:** git, Node LTS v26, Phaser 4.2.1 + Vite 8 lokálně, `src/services/` a `src/scenes/`,
