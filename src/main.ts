@@ -3,6 +3,7 @@ import { bus } from './services/eventBus.ts';
 import { startKeyboardScanner } from './services/scanInput.ts';
 import { ScanTestScene } from './scenes/ScanTestScene.ts';
 import { StationScene } from './scenes/StationScene.ts';
+import { AirScene } from './scenes/AirScene.ts';
 
 // Vstupní bod hry. Scény jen zobrazují; logika a hardware jsou ve službách (src/services).
 
@@ -20,5 +21,5 @@ new Phaser.Game({
     height: 720,
   },
   // První scéna je výchozí: výdejní stojan.
-  scene: [StationScene, ScanTestScene],
+  scene: [StationScene, AirScene, ScanTestScene],
 });

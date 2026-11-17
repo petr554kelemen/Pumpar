@@ -2,10 +2,11 @@
 
 import type Phaser from 'phaser';
 
-export type SceneKey = 'Station' | 'ScanTest';
+export type SceneKey = 'Station' | 'Air' | 'ScanTest';
 
 const SCENES: ReadonlyArray<{ key: SceneKey; ikona: string }> = [
   { key: 'Station', ikona: '⛽' },
+  { key: 'Air', ikona: '🛞' },
   { key: 'ScanTest', ikona: '📟' },
 ];
 

@@ -12,6 +12,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 ## Další krok
 - Pořadí fází: 0 ✅ → 2 ✅ → **1** a **4** souběžně → 3 (čísla fází se nemění).
 - Fáze 4: stojan převeden (rodič ho vyzkouší proti staré verzi) → další: obchod (zboží pípáním do košíku).
+- **Dofukování kol 🛞 – ukázka pro hráče v dílně ✏️** (prototyp, ne schválené pravidlo): ukázat, nechat vyzkoušet,
+  zapsat jeho připomínky; co „orazítkuje“, platí.
   Hráč dál hraje starou verzi, novou uvidí až hotovou (Pravidla jsou zákon, bod 1).
 - Fáze 1: vytisknout testovací list (https://petr554kelemen.github.io/Pumpar/tisk.html), zalaminovat,
   ověřit čtení (telefon hned, čtečka po příjezdu) → zvolit typ a velikost kódu. Paralelně D30 test SPZ.
@@ -91,6 +93,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     rozplácnuté/vyboulené, plné úzké a rovné. Hráč sám pozná, která kola potřebují vzduch; při foukání se kolo
     postupně zúží + „cink“. Nestačí-li karta, auto odjede s některým kolem splasklým. Objekty `kolo_LP`,
     `kolo_PP`, `kolo_LZ`, `kolo_PZ` (levé/pravé, přední/zadní) – JSON pro Phaser Editor na požádání.
+  - [x] **Prototyp (scéna `AirScene`, ikona 🛞, logika `src/services/air.ts`):** auto-plánek, náhodně 1–4 kola
+    splasklá, klepnutím výběr (žlutý rámeček, s nápovědou 3 tečky), karty 10/15/20 klepnutím nebo pípnutím `B…`
+    (jiná hodnota = dočasná karta), malá = ❌ + zatřesení, jinak tečky odletí ke kolům (na kartě prázdná kolečka),
+    kola se postupně nafouknou + cink, 🚗➡️ další auto. Nápovědu přepíná rodič (💡 vlevo dole). Bez hlasu.
   - Hráč: **dvě obtížnosti** – *s nápovědou* (u vybraného kola 3 tečky, cena roste viditelně) a *bez nápovědy*
     (ví, že kolo = 3 tečky, spočítá si sám a vybere kartu; hra jen potvrdí/odmítne). Přepíná rodič / nový návod.
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
@@ -233,3 +239,5 @@ _(zatím nic)_
 - 2026-11-17 (Claude): Fáze 4 – stojan převeden ze staré verze do Phaseru (pravidla beze změny, bez obchodu),
   výchozí scéna je teď stojan ⛽. Událost `pip` (fáze 0) odstraněna. 32/32 testů, typecheck OK, ověřeno v Chrome
   (předvolba 5 L, přetečení, zadání 1.25, tankování myší i šipkami).
+- 2026-11-17 (Claude): Prototyp dofukování kol (scéna 🛞) pro ukázku hráči v dílně. 35/35 testů, typecheck OK,
+  ověřeno v Chrome (výběr kol, odmítnutí B001, platba kartou 20, foukání, další auto).
