@@ -60,6 +60,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   - Hráč: **nákup se přizpůsobí kartě** – s 10 tečkami objedná jen 1, 2 nebo 3 kola (3 / 6 / 9).
     Ve hře: auto shora se 4 koly, klepnutím vybírá kola, u každého přibudou 3 tečky (cena roste viditelně) →
     pípnout kartu → stačí = zaplaceno + vrácení, nestačí = odmítnuto (ubrat kolo / větší karta). Sčítá hra.
+  - Hráč: **tlak bez čísel – obrázkem.** Auto z ptačí perspektivy, podhuštěná kola rozplácnutá do stran
+    („jako přejetá žába“), plná úzká a rovná. Hráč sám pozná, která kola potřebují vzduch; při foukání se kolo
+    postupně zúží + „cink“. Nestačí-li karta, auto odjede s některým kolem splasklým. Objekty `kolo_LP`,
+    `kolo_PP`, `kolo_LZ`, `kolo_PZ` (levé/pravé, přední/zadní) – JSON pro Phaser Editor na požádání.
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
   Pořadí obtížnosti úkolů: hláska na **začátku** slova → na **konci** → **uprostřed** (nejtěžší, jen jako výzva).
 - [ ] **7 – Rozšíření z mapy:** příprava směny (drag & drop cen), uzávěrka a tržba, minihry za odměnu, QR kódy po bytě.
@@ -184,3 +188,4 @@ _(zatím nic)_
   → Plán fáze 5 (vracení). Šablona karty na tisk.html až po testu tisku.
   Upřesnění: „kombinovat“ = vybrat vhodnou kartu, ne sčítat → platí jedna karta, malá je odmítnuta.
 - 2026-11-17 (uživatel): Hráč: s menší kartou objedná méně kol (1–3) → výběr kol ve hře, cena roste tečkami.
+- 2026-11-17 (uživatel): Hráč: tlak v pneumatikách obrázkem – podhuštěná kola shora rozplácnutá („přejetá žába“).
