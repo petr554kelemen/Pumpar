@@ -38,6 +38,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   - 💵 **Penězi (těžší):** bankovky/mince **1, 2, 3, 5, 10** (`B001`, `B002`, `B003`, `B005`, `B010`).
     Pípá postupně, hra plní „nádobu“ teček nákupu (sčítání vidět), přeplatek se vrací tečkami.
   - Nahrazuje předchozí návrh „karty s hodnotou 10/15/20“.
+  - **Zachovat zobrazení ze staré verze:** hráč už skládá částku – vidí **prázdné tečky = kolik zbývá** a porovná
+    je s cenou výrobku. Karta i mince používají stejný obraz → pro hráče se prakticky nic nemění.
   - **Do dílny ✏️:** počáteční zůstatek karty a jak se dobíjí (výplata za tankování?), vzhled mincí
     (laminovaná kolečka s QR, tečky, barva podle hodnoty), kolik kusů od každé hodnoty, PIN/terminál (fáze 6).
   **Odměna za přesnost tankování** (návrh do dílny ✏️ s hráčem):
@@ -207,3 +209,4 @@ _(zatím nic)_
 - 2026-11-17 (uživatel): Platba jako v samoobslužné pokladně: kartou se zůstatkem (porovnání, odečítání) nebo
   penězi 1/2/3/5/10 (sčítání) → Plán fáze 5, nahrazuje karty s hodnotou 10/15/20.
 - 2026-11-17 (uživatel): Bonus za rychlost tankování (riziko × jistota) → Plán fáze 5, odměna za přesnost.
+- 2026-11-17 (uživatel): Stará verze už ukazuje prázdné tečky = zbývá → zachovat stejný obraz u karty i mincí.
