@@ -50,9 +50,6 @@ interface Karta {
 
 type Stav = 'vyber' | 'placeni' | 'odjezd';
 
-// Nápověda (3 tečky u vybraného kola) – přepíná rodič; pamatuje se mezi auty.
-let napovedaZapnuta = true;
-
 // Dofukování kol (nápad hráče): auto jako plánek ze shora, kola z boku – splasklé má dole plošku.
 // Cena dofouknutí podle barvy disku (modrý 2, červený 3, zelený 5), kontrola plného kola 1.
 // Hráč vybere kola, zaplatí jednou kartou (10/15/20 klepnutím, nebo pípnutím bankovky B…).
@@ -64,7 +61,6 @@ export class AirScene extends Phaser.Scene {
   private karty: Karta[] = [];
   private docasnaKarta: Karta | null = null;
   private dalsiAuto!: Phaser.GameObjects.Text;
-  private napovedaTlacitko!: Phaser.GameObjects.Text;
 
   constructor() {
     super('Air' satisfies SceneKey);
@@ -88,18 +84,6 @@ export class AirScene extends Phaser.Scene {
       .setName('dalsi_auto')
       .setInteractive({ useHandCursor: true });
     this.dalsiAuto.on('pointerdown', () => this.zkusOdjet());
-
-    // Přepínač nápovědy – nenápadně pro rodiče.
-    this.napovedaTlacitko = this.add
-      .text(20, 690, '', { fontFamily: FONT, fontSize: '18px', color: '#95a5a6' })
-      .setOrigin(0, 0.5)
-      .setName('napoveda_prepinac')
-      .setInteractive({ useHandCursor: true });
-    this.napovedaTlacitko.on('pointerdown', () => {
-      napovedaZapnuta = !napovedaZapnuta;
-      this.ukazNapovedu();
-    });
-    this.ukazNapovedu();
 
     const odhlasit = bus.on('scan', (d) => this.onScan(d));
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, odhlasit);
@@ -203,11 +187,11 @@ export class AirScene extends Phaser.Scene {
     this.prekresliNapovedu(k);
   }
 
-  /** Tečky ceny vedle vybraného kola – 3 za dofouknutí, 1 za kontrolu (jen se zapnutou nápovědou). */
+  /** Tečky ceny vedle vybraného kola – podle barvy disku, 1 za kontrolu. Vždy zobrazené (barvy mají různé ceny). */
   private prekresliNapovedu(k: Kolo): void {
     k.napoveda.forEach((t) => t.destroy());
     k.napoveda = [];
-    if (!k.vybrane || !napovedaZapnuta) return;
+    if (!k.vybrane) return;
     const p = KOLO_POZICE[k.id];
     const smer = Math.sign(p.x);
     const pocet = cenaKola(k);
@@ -220,11 +204,6 @@ export class AirScene extends Phaser.Scene {
       this.tweens.add({ targets: t, scale: { from: 0, to: 1 }, duration: 180, delay: i * 60, ease: 'Back.Out' });
       k.napoveda.push(t);
     }
-  }
-
-  private ukazNapovedu(): void {
-    this.napovedaTlacitko.setText(napovedaZapnuta ? '💡 nápověda: zapnuto' : '💡 nápověda: vypnuto');
-    this.kola.forEach((k) => this.prekresliNapovedu(k));
   }
 
   // ---------- Karty ----------

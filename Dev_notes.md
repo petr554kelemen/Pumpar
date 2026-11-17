@@ -97,15 +97,17 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     v rozích **z boku** (kulatá s ráfkem jako 🛞; splasklé má **dole plošku** a vyboulené boky – přání rodiče),
     náhodně 1–4 kola splasklá, klepnutím výběr (žlutý rámeček, s nápovědou 3 tečky), karty 10/15/20 klepnutím nebo pípnutím `B…`
     (jiná hodnota = dočasná karta), malá = ❌ + zatřesení, jinak tečky odletí ke kolům (na kartě prázdná kolečka),
-    kola se postupně nafouknou + cink, 🚗➡️ další auto. **S prázdným kolem se nejezdí:** 🚗➡️ při prázdném kole
+    kola se postupně nafouknou + cink, 🚗➡️ další auto. Nápověda (tečky ceny u kola) je **vždy zapnutá**. **S prázdným kolem se nejezdí:** 🚗➡️ při prázdném kole
     = nad ním bliká ❗ + chybový zvuk, auto zůstane. Doplatit lze další kartou; karta si pamatuje zůstatek
     (prázdná kolečka) do odjezdu auta.
   - **Kontrola plného kola = 1 tečka** (návrh rodiče): plné kolo jde vybrat taky (nápověda 1 tečka),
     po zaplacení krátká kontrola + ✅; dofouknuté kolo dostane ✅ taky. Mix cen (3 + 3 + 1 + 1) = sčítání.
   - **Barevné disky** (návrh rodiče): dofouknutí 🔵 modrý 2 · 🔴 červený 3 · 🟢 zelený 5 teček, kontrola vždy 1.
     **Na jedné nápravě stejná barva**, přední a zadní se mohou lišit. Nejdražší auto 4 × zelený = 20 = karta 20.
+    S barevnými cenami **nápověda nejde vypnout** (hráč by neznal cenu barvy) – přepínač odstraněn. Verze
+    „bez nápovědy“ případně později přes obrázkový **ceník u kompresoru** (disk + tečky), počítá sám.
   - Později (grafika, ne pro návrh): při foukání **okénko PIP** se zvětšeným kolem (druhá kamera Phaseru
-    zaměřená na foukané kolo) – vidět, jak se ploška zaobluje. Prototyp je zatím skica. Nápovědu přepíná rodič (💡 vlevo dole). Bez hlasu.
+    zaměřená na foukané kolo) – vidět, jak se ploška zaobluje. Prototyp je zatím skica. Bez hlasu.
   - Hráč: **dvě obtížnosti** – *s nápovědou* (u vybraného kola 3 tečky, cena roste viditelně) a *bez nápovědy*
     (ví, že kolo = 3 tečky, spočítá si sám a vybere kartu; hra jen potvrdí/odmítne). Přepíná rodič / nový návod.
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
@@ -261,3 +263,4 @@ _(zatím nic)_
   ověřeno v Chrome.
 - 2026-11-17 (uživatel + Claude): Vzduch – světlá plocha stání (beton) pod autem, aby černá kola a ploška
   splasklého kola byly na tmavém pozadí vidět.
+- 2026-11-17 (uživatel + Claude): Vzduch – odstraněn přepínač nápovědy (s barevnými cenami nedává smysl).
