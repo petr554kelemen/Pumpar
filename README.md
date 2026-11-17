@@ -65,6 +65,10 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 ## Zásady návrhu
 - **Žádný text jako jediný nositel informace.** Vše má ikonu/emoji, barvu a zvuk; text je jen pro rodiče.
 - **Hlasové pokyny** („Pípni zboží“, „Přilož kartu“, „Máš dost peněz“) – viz Hlas a písmena.
+- **Matematika skrytá ve hře** – každé počítání má být vidět jako pohyb teček, ne jako číslo:
+  porovnávání (stačí karta?), rozsahy (předvolba, terč přesnosti), sčítání (cena roste po kolech),
+  násobilka (kolo = 3 tečky → 3, 6, 9, 12), **odečítání**: tečky z karty viditelně odletí jedna po druhé
+  k věci, kterou platí, a zbytek se vrátí do peněženky (ve staré verzi tečky jen mizely – nebylo to odečítání).
 - **Slova hráče, ne naše.** Ve frázích používat jeho pojmenování: **benzínka, benzinář** – „pumpa / pumpař“
   je pro něj něco jiného (pumpa stojí „hned vedle benzínky“). Název projektu „Pumpar“ je jen interní.
   Nové pojmy ověřit s hráčem (viz Pravidla, bod 4).

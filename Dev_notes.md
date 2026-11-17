@@ -193,3 +193,5 @@ _(zatím nic)_
 - 2026-11-17 (uživatel): Hráč: s menší kartou objedná méně kol (1–3) → výběr kol ve hře, cena roste tečkami.
 - 2026-11-17 (uživatel): Hráč: tlak v pneumatikách obrázkem – auto jako plánek pro pojišťovnu, kola vytočená ven („přejetá žába“).
 - 2026-11-17 (uživatel): Vzduch ve dvou obtížnostech – s nápovědou teček a bez nápovědy (počítá sám).
+- 2026-11-17 (uživatel + Claude): README Zásady návrhu – „Matematika skrytá ve hře“ (porovnávání, rozsahy,
+  sčítání, násobilka, odečítání jako viditelné odlétání teček).
