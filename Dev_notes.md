@@ -61,6 +61,11 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     (WinRT `SpeechSynthesizer`, PowerShell) – **pokud Jakub obstojí, Balabolka není potřeba**, soubory lze
     generovat skriptem v projektu. Balabolka je na stolním PC uživatele (ne na vývojovém NB) – porovnat s Jakubem, zjistit název jejího
     českého hlasu. Čeká na poslech.
+  - 2026-11-17: Poslech: **Jakub OK** (CH správně), jen samotná písmena bez slova zní ztlumeně, nejdou poznat.
+    Balabolka na stolním PC = Speechtech **Radka** (SAPI5, starší): „ch“ čte jako c+h, „schválena“ jako
+    „šválena“; antivirus navíc hlásil, že Balabolka čte soubory na ploše (čtení zablokováno) → **Balabolku
+    nepoužívat, hlas = Jakub**. Test písmen (á, bé, dé… ve 3 variantách SSML: normál / pomaleji+hlasitěji /
+    + výš a důraz) ve Stažených souborech `hlas_test_pismena_jakub.wav` – čeká na výběr varianty.
 - [ ] **Před prvním tiskem štítků** projít s hráčem kategorie, písmena, obrázky a slabiky SPZ
   (README → Formát kódů, Pravidla jsou zákon). Do té doby hráči hru na Pages neukazovat.
 - [ ] Obrázkový „Návod 1“ s pravidly hry (verzovaný – změna = nový návod s vyšším číslem).
@@ -134,3 +139,5 @@ _(zatím nic)_
 - 2026-11-17 (Claude): Zkouška čtečky: numerická klávesnice funguje i bez NumLocku (viz FIX), dole na stránce 📟
   ladicí řádek „⌨ …“ s rozepsaným kódem (událost `psani`), nápověda „pípni, nebo napiš kód a Enter“.
   Kódy reagují jen na stránce 📟 (⛽ je zatím ignoruje). 24/24 testů, typecheck OK, ověřeno v Chrome.
+- 2026-11-17 (uživatel + Claude): Hlas: Jakub vybrán (Radka/Balabolka vyřazena, viz TODO Vybrat hlas),
+  vygenerován test samostatných písmen ve 3 variantách SSML. Zdroj zvuků WAV, do hry komprimovaná kopie.
