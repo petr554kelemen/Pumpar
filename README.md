@@ -88,6 +88,9 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
    - „Ceny ráno nastavuje vedoucí pumpy“ (příprava směny),
    - **obrázkový návod s číslem verze** („Návod 1“, „Návod 2“…) – změna = nový návod s vyšším číslem,
      který starý nahradí. Platí nejnovější návod.
+4. **Nápad nejdřív vyzkoušet nanečisto, bez kódu.** Rodič zadá úkol ústně / na papíře a sleduje, zda hráče baví
+   a kde je hranice obtížnosti. Teprve pak se vyvíjí. (Příklad: hádanka písmen → baví ho, hláska uprostřed
+   slova je nejtěžší.)
 
 ## Technické řešení
 - **Hra běží na notebooku hráče s Linuxem** (Chrome/Chromium) – **jen hraní**, otevírá se z GitHub Pages
