@@ -46,6 +46,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   Benzinář pípne **služební kartu** → otevřeno (světla, závora, hlas „Benzínka je otevřená!“); stejnou kartou
   na konci směny zavře (později uzávěrka/tržba z fáze 7). **Do dílny ✏️:** vzhled a kód karty (nesmí se plést
   s platební K), kolik karet (hráč / rodič), jak vypadá „zavřeno“ (🚫 / závora / 🔒). Nejdřív nanečisto.
+- [ ] **Žetony – vysavač a vzduch (nápad hráče):** vysavač (V) i dofoukání vzduchu jedou jen na žeton.
+  Žeton se koupí v obchodě za peníze ze hry → pípnout u stroje → běží (ubývající čas graficky) → „hotovo“.
+  Bez žetonu: „Potřebuješ žeton.“ **Do dílny ✏️:** jeden žeton na obojí, nebo dva; fyzické žetony (laminovaná
+  kolečka s QR, „vhodit“ do krabičky) vs. jen ve hře; kód (ne Z/Ž); cena a délka běhu. Nejdřív nanečisto.
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
   Pořadí obtížnosti úkolů: hláska na **začátku** slova → na **konci** → **uprostřed** (nejtěžší, jen jako výzva).
 - [ ] **7 – Rozšíření z mapy:** příprava směny (drag & drop cen), uzávěrka a tržba, minihry za odměnu, QR kódy po bytě.
@@ -163,3 +167,4 @@ _(zatím nic)_
   → README Zásady návrhu: ve frázích jeho slova. Pozor na „P jako pumpa“ v testovacích větách – ověřit s hráčem.
 - 2026-11-17 (uživatel): Nápad hráče – služební karta odemyká benzínku (jinak zavřeno, zákaz) → Plán.
   README: „vedoucí pumpy“ → „vedoucí benzínky“ (slova hráče).
+- 2026-11-17 (uživatel): Nápad hráče – žeton k vysavači a na dofoukání vzduchu → Plán.
