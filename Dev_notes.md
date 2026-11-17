@@ -183,6 +183,8 @@ _(zatím nic)_
   podle fyzické klávesy (`e.code`).
 
 ## WISH
+- **Minihra na čekání – mini pexeso** (nápad rodiče; hráč pexeso umí): malé (ne 8 × 8, třeba 3 × 4), obrázky
+  z benzínky (⛽ 🛞 🚗 💳 🧃 …). Hraje se, než benzínka otevře (viz Plán → Otevírání benzínky → Čekání zákazníka).
 - **Státní svátek – zavřeno** (nápad rodiče): občas (náhodně / podle kalendáře) je svátek → na dveřích
   vlaječka ČR 🇨🇿, benzínka se neotevře. Zákazník odjede autem a za 2–3 minuty přijede znovu, pak hra pokračuje
   normálně. Hráč už ví, že vyvěšená vlajka = svátek a obchody jsou zavřené.
