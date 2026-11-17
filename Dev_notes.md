@@ -47,6 +47,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     přesně 5 teček + 🏆 · do 0,1 L 4 · do 0,5 L 3 · do 1 L 2 · do 2 L 1 · dál 0.
   - Přesnost zobrazit graficky (terč / ukazatel s pásmy zelená–žlutá–červená + ručička), ne číslem.
   - Odměna jde do peněženky → peníze na obchod si hráč vydělá u stojanu.
+  - Hráč: **riziko vs. jistota – rychlost tankování.** 🐢 pomalu = snazší trefa, menší bonus; 🐇 rychle =
+    těžší trefa, větší bonus. Návrh: rychlost **násobí** odměnu za přesnost (rychle + vedle = pořád 0 → nevznikne
+    nový podfuk). Volba: dvě pistole (🐢/🐇) nebo délka držení. **Do dílny ✏️:** velikost bonusu (×2 / +2),
+    způsob volby, rychlá pistole od začátku nebo až po zvládnutí pomalé. Nanečisto: konvička vs. kelímek, čárka.
   - Starou verzi (`public/stara-verze.html`) neměnit – hráč její pravidla zná (viz Pravidla jsou zákon).
 - [ ] **6 – Platební terminál:** telefon ukáže částku → sken karty `K…` → PIN → „Platba schválena“ + účtenka.
 - [ ] **Hlas (průběžně od fáze 0):** služba `voice`, seznam frází, generování souborů; první fráze pro pípnutí a placení.
@@ -202,3 +206,4 @@ _(zatím nic)_
   sčítání, násobilka, odečítání jako viditelné odlétání teček).
 - 2026-11-17 (uživatel): Platba jako v samoobslužné pokladně: kartou se zůstatkem (porovnání, odečítání) nebo
   penězi 1/2/3/5/10 (sčítání) → Plán fáze 5, nahrazuje karty s hodnotou 10/15/20.
+- 2026-11-17 (uživatel): Bonus za rychlost tankování (riziko × jistota) → Plán fáze 5, odměna za přesnost.
