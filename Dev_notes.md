@@ -155,3 +155,5 @@ _(zatím nic)_
   (napíše/opíše písmeno či slovo a nechá si ho přečíst).
 - 2026-11-17 (uživatel): Pozorování: hráč určí hlásku na začátku i na konci slova, uprostřed je nejtěžší
   → README Cílový hráč, plán Písmena (pořadí obtížnosti).
+- 2026-11-17 (uživatel): Hráč rozlišuje „pumpa / pumpař“ a „benzínka / benzinář“ (pumpa je vedle benzínky)
+  → README Zásady návrhu: ve frázích jeho slova. Pozor na „P jako pumpa“ v testovacích větách – ověřit s hráčem.

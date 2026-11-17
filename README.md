@@ -65,6 +65,9 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 ## Zásady návrhu
 - **Žádný text jako jediný nositel informace.** Vše má ikonu/emoji, barvu a zvuk; text je jen pro rodiče.
 - **Hlasové pokyny** („Pípni zboží“, „Přilož kartu“, „Máš dost peněz“) – viz Hlas a písmena.
+- **Slova hráče, ne naše.** Ve frázích používat jeho pojmenování: **benzínka, benzinář** – „pumpa / pumpař“
+  je pro něj něco jiného (pumpa stojí „hned vedle benzínky“). Název projektu „Pumpar“ je jen interní.
+  Nové pojmy ověřit s hráčem (viz Pravidla, bod 4).
 - **Cíl navíc: naučit některá písmena.**
 - **Čísla vždy dvakrát:** číslice + stejný počet teček (učí se poznávat číslice).
 - **Rozsah do 30:** ceny, bankovky i útrata se drží do 30 teček.
