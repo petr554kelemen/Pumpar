@@ -1,12 +1,18 @@
 import Phaser from 'phaser';
 import { bus, type GameEvents } from '../services/eventBus.ts';
 import * as beep from '../services/beep.ts';
-import { KOLA, type KoloId, cenaKola, cenaVyberu, noveAuto, zaplat } from '../services/air.ts';
+import { type Disk, KOLA, type KoloId, type StavKola, cenaKola, cenaVyberu, noveAuto, zaplat } from '../services/air.ts';
 import { addNav, type SceneKey } from './nav.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
 const NOMINALY = [10, 15, 20] as const;
 const ZLUTA = 0xf1c40f;
+/** Barvy disků (cena podle barvy – viz air.ts): ráfek a paprsky. */
+const BARVA_DISKU: Readonly<Record<Disk, { rafek: number; paprsky: number }>> = {
+  modry: { rafek: 0x3498db, paprsky: 0x1b4f72 },
+  cerveny: { rafek: 0xe74c3c, paprsky: 0x78281f },
+  zeleny: { rafek: 0x2ecc71, paprsky: 0x145a32 },
+};
 
 /** Plánek auta ze shora; kola v rozích nakreslená z boku (kulatá s ráfkem), aby bylo vidět splasknutí. */
 const AUTO = { x: 430, y: 400 };
@@ -24,6 +30,7 @@ interface Kolo {
   g: Phaser.GameObjects.Graphics;
   ramecek: Phaser.GameObjects.Graphics;
   podhustene: boolean;
+  disk: Disk;
   vybrane: boolean;
   /** Zaplacené a hotové (dofouknuté nebo zkontrolované) – ukazuje ✅. */
   zkontrolovane: boolean;
@@ -47,6 +54,7 @@ type Stav = 'vyber' | 'placeni' | 'odjezd';
 let napovedaZapnuta = true;
 
 // Dofukování kol (nápad hráče): auto jako plánek ze shora, kola z boku – splasklé má dole plošku.
+// Cena dofouknutí podle barvy disku (modrý 2, červený 3, zelený 5), kontrola plného kola 1.
 // Hráč vybere kola, zaplatí jednou kartou (10/15/20 klepnutím, nebo pípnutím bankovky B…).
 // Málo teček = odmítnuto. Tečky z karty odletí ke kolům, zbytek zůstane na kartě.
 export class AirScene extends Phaser.Scene {
@@ -117,7 +125,7 @@ export class AirScene extends Phaser.Scene {
     this.kola = KOLA.map((id) => this.vytvorKolo(id, stav[id]));
   }
 
-  private vytvorKolo(id: KoloId, podhustene: boolean): Kolo {
+  private vytvorKolo(id: KoloId, { podhustene, disk }: StavKola): Kolo {
     const p = KOLO_POZICE[id];
     const g = this.add.graphics();
     const ramecek = this.add.graphics();
@@ -129,6 +137,7 @@ export class AirScene extends Phaser.Scene {
       g,
       ramecek,
       podhustene,
+      disk,
       vybrane: false,
       zkontrolovane: false,
       plnost: podhustene ? 0 : 1,
@@ -160,9 +169,10 @@ export class AirScene extends Phaser.Scene {
     g.fillPoints(body, true);
     // Ráfek s paprsky (jako 🛞); u splasklého kola klesne k zemi.
     const ry = (1 - t) * R * 0.05;
-    g.fillStyle(0xaab7c4);
+    const barva = BARVA_DISKU[k.disk];
+    g.fillStyle(barva.rafek);
     g.fillCircle(0, ry, R * 0.52);
-    g.lineStyle(5, 0x5d6d7e);
+    g.lineStyle(5, barva.paprsky);
     for (let i = 0; i < 5; i++) {
       const rad = Phaser.Math.DegToRad(-90 + i * 72);
       g.lineBetween(0, ry, Math.cos(rad) * R * 0.46, ry + Math.sin(rad) * R * 0.46);
@@ -198,7 +208,7 @@ export class AirScene extends Phaser.Scene {
     if (!k.vybrane || !napovedaZapnuta) return;
     const p = KOLO_POZICE[k.id];
     const smer = Math.sign(p.x);
-    const pocet = cenaKola(k.podhustene);
+    const pocet = cenaKola(k);
     for (let i = 0; i < pocet; i++) {
       const t = this.add
         .circle(p.x + smer * (R_KOLA * 1.5 + 22), p.y + (i - (pocet - 1) / 2) * 26, 10, ZLUTA)
@@ -270,7 +280,7 @@ export class AirScene extends Phaser.Scene {
       return;
     }
 
-    const cena = cenaVyberu(vybrana.map((k) => k.podhustene));
+    const cena = cenaVyberu(vybrana);
     const platba = zaplat(karta.zbyva, cena);
     if (!platba.ok) {
       this.odmitni(karta);
@@ -285,7 +295,7 @@ export class AirScene extends Phaser.Scene {
     });
 
     // Tečky z karty odletí ke kolům (odečítání viditelně): 3 k dofukovanému, 1 ke kontrolovanému.
-    const cile = vybrana.flatMap((k) => Array.from({ length: cenaKola(k.podhustene) }, () => k));
+    const cile = vybrana.flatMap((k) => Array.from({ length: cenaKola(k) }, () => k));
     const prvni = karta.hodnota - karta.zbyva; // dřív utracené tečky jsou na začátku
     karta.zbyva -= cena;
     for (let i = 0; i < cena; i++) {

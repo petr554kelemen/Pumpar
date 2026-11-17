@@ -102,6 +102,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     (prázdná kolečka) do odjezdu auta.
   - **Kontrola plného kola = 1 tečka** (návrh rodiče): plné kolo jde vybrat taky (nápověda 1 tečka),
     po zaplacení krátká kontrola + ✅; dofouknuté kolo dostane ✅ taky. Mix cen (3 + 3 + 1 + 1) = sčítání.
+  - **Barevné disky** (návrh rodiče): dofouknutí 🔵 modrý 2 · 🔴 červený 3 · 🟢 zelený 5 teček, kontrola vždy 1.
+    **Na jedné nápravě stejná barva**, přední a zadní se mohou lišit. Nejdražší auto 4 × zelený = 20 = karta 20.
   - Později (grafika, ne pro návrh): při foukání **okénko PIP** se zvětšeným kolem (druhá kamera Phaseru
     zaměřená na foukané kolo) – vidět, jak se ploška zaobluje. Prototyp je zatím skica. Nápovědu přepíná rodič (💡 vlevo dole). Bez hlasu.
   - Hráč: **dvě obtížnosti** – *s nápovědou* (u vybraného kola 3 tečky, cena roste viditelně) a *bez nápovědy*
@@ -255,3 +257,5 @@ _(zatím nic)_
 - 2026-11-17 (uživatel + Claude): Vzduch – odstraněny nápravy, kola blíž ke karoserii.
 - 2026-11-17 (uživatel + Claude): Vzduch – kontrola plného kola za 1 tečku, hotová kola ✅. 36/36 testů, ověřeno
   v Chrome (2 prázdná + 2 plná = 8 teček z karty 20).
+- 2026-11-17 (uživatel + Claude): Vzduch – barevné disky po nápravách (modrý 2, červený 3, zelený 5). 37/37 testů,
+  ověřeno v Chrome.
