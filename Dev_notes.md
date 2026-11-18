@@ -25,6 +25,12 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   - D30 neumí tisk od kraje do kraje (bílý okraj = tichá zóna navíc), ale aplikace mohla náš obrázek zmenšit.
     **Varianta: QR generovat přímo v aplikaci Phomemo** (obsah jen `KE01`) – vykreslí ho nativně pro tiskárnu.
     Porovnat čtení s naším PNG; zjistit, zda aplikace umí opravu chyb H. Hráč by pak mohl tisknout sám podle předlohy.
+  - D30 výsledek 2 (2026-11-18, čtečka): vytištěné štítky přečetla bez problémů, QR na 12 × 40 s obtížemi
+    → **D30 = Code128** (README → Tisk štítků). Hra kódy rozlišuje jen podle obsahu, ne podle druhu.
+- **Karty:** vytisknout https://petr554kelemen.github.io/Pumpar/karty.html, nalepit na karty podle barev,
+  ověřit čtení čtečkou (vzduch: pípnutí karty, dveře: `K000`).
+- **Výsledky obsluhy** (Plán): herní den ✅ → další: přidělení služební karty (pípnout → LA / KE), deník směny,
+  výsledky do uzávěrky (scéna `UzaverkaScene` je připravená).
 
 ## Plán (fáze)
 - [x] **0 – Kostra:** git, Node LTS v26, Phaser 4.2.1 + Vite 8 lokálně, `src/services/` a `src/scenes/`,
@@ -32,9 +38,13 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   Pozn.: na PC jsou k dispozici i TBarCode (TEC-IT), ImageMagick, Python 3.13 – zatím nepotřeba.
 - [ ] **1 – Katalog + tisk:** `catalog` (kód → název, obrázek, cena – ceny jen ve hře), technické testy tisku:
   - **D30:** ✅ `tisk.html` sekce D30 – PNG 1:1 v bodech (12 × 30 / 12 × 40 mm), Code128 2–3 body/modul,
-    QR H 3–4 body/modul → ☐ vytisknout z aplikace Phomemo, ověřit čtení čtečkou i telefonem,
+    QR H 3–4 body/modul → ✅ vytištěno, čtečka: Code128 OK, QR 12 × 40 s obtížemi → **D30 = Code128**
+    (telefon: potíže taky jen s QR 12 × 40),
   - **laser:** ✅ testovací list `tisk.html` (25 visaček: Code128 0,2–0,33 mm, QR 10–20 mm, ostatní druhy kódů)
     → ☐ vytisknout, vystříhat, zalaminovat, ověřit čtení čtečkou i telefonem, zvolit velikost,
+  - ✅ **štítky na staré platební karty** (`karty.html`): 1 × 20, 2 × 15, 4 × 10 (`B020`/`B015`/`B010`) + služební
+    karta `K000`; **jen QR H 20 mm** (hodnotu hráč pozná podle barvy karty), štítek 26 × 29 mm
+    → ☐ vytisknout, nalepit, ověřit čtení,
   - ☐ bankovky, obrázkový seznam „kam co“, katalog (až po dílně s hráčem).
   Herní visačky/štítky až po odsouhlasení s hráčem (dílna ✏️ → razítko ✅).
 - [x] **2 – Vstup kódů:** klávesnice/USB čtečka (kód + Enter), převod CZ znaků na číslice, testovací scéna „Pípni něco“.
@@ -92,9 +102,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     počítače + Enter), čtečka karty. Návrh: **kód dveří 1111, služební karta `K000`** (konstanty – do dílny ✏️).
     Špatně = ❌ + zatřesení; správně = rozsvítí se nápis, výloha a dveře, 🔓, pak stojan ⛽.
     Navigace má nově 🔒 = zavřít benzínku (konec směny) → zpět ke dveřím.
-  - [x] **Hodiny – učení času (nápad rodiče):** nad dveřmi ručičkové hodiny se skutečným časem (čísla 1–12,
-    červená vteřinovka), na dveřích cedulka „OTEVŘENO OD“ s malými hodinami + čas číslem. Otevírací doba =
-    za ~2 minuty od příchodu (zaokrouhleno na celou minutu). V otevírací době cedulka zezelená.
+  - [x] **Hodiny – učení času (nápad rodiče):** nad dveřmi ručičkové hodiny s **herním časem** (čísla 1–12,
+    červená vteřinovka), na dveřích cedulka „OTEVŘENO OD“ s malými hodinami + čas číslem. Otevírací doba
+    herního dne (6:00–8:00), hodiny začínají 2 minuty před ní. V otevírací době cedulka zezelená.
     **Časové znamení** (nostalgie rodiče – rozhlas): 3 pípnutí 1 kHz, poslední delší přesně v otevírací dobu.
     Později s hlasem: „Bylo právě šest / sedm / osm hodin.“ (stačí ranní hodiny – hráč chodí do školky;
     hodí se, až bude otevírací doba na celou hodinu).
@@ -145,6 +155,46 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     zaměřená na foukané kolo) – vidět, jak se ploška zaobluje. Prototyp je zatím skica. Bez hlasu.
   - Hráč: **dvě obtížnosti** – *s nápovědou* (u vybraného kola 3 tečky, cena roste viditelně) a *bez nápovědy*
     (ví, že kolo = 3 tečky, spočítá si sám a vybere kartu; hra jen potvrdí/odmítne). Přepíná rodič / nový návod.
+- [ ] **Výsledky obsluhy – uzávěrka (nápad rodiče, část fáze 7):** kolik aut obsloužil a kolik zboží prodal
+  **tatka (KE)** a **malej (LA)**. **Body patří tomu, kdo obsluhoval**, ne majiteli auta (malej obslouží
+  i auto KE a je to platný bod za práci).
+  - **Kdo obsluhuje = kdo odemkl.** Každý má **vlastní služební kartu / kód dveří** → hra ví, kdo je ve službě.
+    Střídání během směny = pípnout svou kartu (převzetí služby). Obsluhu ukazuje ikonka v rohu (🧑‍🔧 LA / KE).
+  - **Služební kartu přiděluje malej** (komu dá roli benzináře). Karta tedy není napevno svázaná s osobou –
+    stejně jako SPZ ≠ autíčko: kód karty říká jen „služební karta č. …“, **komu patří, je měnitelné přiřazení**
+    (malej ho nastaví ve hře; body jdou osobě, které karta v tu chvíli patří).
+  - **Postup na začátku směny (odsouhlaseno rodičem):** 1. přidělení – pípnout služební kartu → klepnout
+    na obrázek osoby (LA / KE) → 2. teprve pak odemknout benzínku (kartou / kódem) → 3. hra začíná.
+  - **Herní den (rodič, 2026-11-18):** hodiny už neukazují skutečný čas + 2 min (vycházely „složité“ časy jako 15:47),
+    ale **herní čas** s časy, které malej zná: **otevírá se v 6:00, 6:30, 7:00, 7:30 nebo 8:00**, zavírá ve **20:00
+    nebo 21:00**. Jedna směna ≈ **20 minut** skutečného času, pak hlášení „Pokladny se budou uzavírat,
+    ukončete nákup“ → zavřeno → **uzávěrka** (výsledky obsluhy za den). Hraje se dál = **nový den**.
+    **Během dne běží na displeji odpočet 20 minut** (stačí i malý – malej si ho najde). Hra má tempo: kdo
+    obslouží víc aut / zákazníků, než odpočet doběhne. Návrh zobrazení: ubývající výseč (jako kuchyňská
+    minutka) + zbývající minuty číslem. Herní hodiny jsou vidět ráno u dveří (otevírací doba) a při zavírání.
+  - [x] **Herní den – hotovo** (`src/services/den.ts`, testy): otevírací doba náhodně 6:00/6:30/7:00/7:30/8:00,
+    zavírací 20:00/21:00. Odemčení obsluhou / vstup zákazníka spustí směnu 20 min. **Odpočet** vpravo nahoře
+    ve všech scénách s navigací (zelená výseč + minuty číslem). **2 minuty před koncem** gong (ding-dong-ding)
+    + 📢🛒, výseč a číslo oranžově. Konec = scéna `UzaverkaScene`: noc 🌙, zhasnutá benzínka 🔒, velké hodiny
+    se zavírací dobou, sestupný gong; ☀️➡️ = nový den → zamčené dveře. 🔒 v navigaci = zavřít dřív → konec dne.
+    Kreslení hodin sdílené v `src/scenes/hodiny.ts`. Hlas hlášení až se službou `voice`; výsledky do uzávěrky
+    přijdou s deníkem směny.
+  - **Proti šizení (rodič):** s odpočtem bude malej volit, co se víc vyplatí – a hledat zkratky („do nádrže jen
+    crkne“ a jde sbírat body do obchodu). **Tankování platí za bod jen od poloviny nádrže výš.**
+    **Plná nádrž = předvolba** (nastaví ji hráč nebo 🎲), polovina = předvolba / 2 – nová data nejsou potřeba.
+    ✅ **Bargraf plnění** u stojanu (`nadrz_pruh`, výpočet `stavNadrze` v `pump.ts`) **nahradil pruh rychlosti**
+    (rychlost nic neříkala, je vidět na číslech): natankováno / předvolba, do poloviny oranžová (bod se ještě
+    nepočítá), od poloviny zelená (bod platí), bílá ryska v polovině, přetečení celý červený. Body zatím nejsou.
+    Doplnit: každé pravidlo bodů projít s otázkou „jak to obejde?“ (obchod: pípat dokola nejlevnější zboží?).
+    Alternativa / doplněk: body = **tržba v tečkách** místo počtu aut – crknutí = málo teček samo od sebe.
+  - **Deník směny** (nová služba, localStorage): záznam o každé práci – kdo obsluhoval, co (tankování, vzduch,
+    prodej), SPZ auta (nepovinná – bez pípnutí „neznámé auto“, bod platí), tečky, datum.
+  - **Uzávěrka pro hráče (bez textu):** dva řádky 🧑‍🔧 LA / KE, ikonka za každé obsloužené auto, kategorie
+    prodaného zboží (🧃 🍭 …), tečky tržby → porovnání „kdo víc“ obrázkem. **Pro rodiče** tabulka s historií po dnech
+    (samostatná stránka jako `tisk.html`).
+  - Pořadí: deník + přihlášení obsluhy + uzávěrka nad stojanem a vzduchem hned; zboží až s obchodem.
+  - **Do dílny ✏️:** kódy/karty obsluhy (dnes jediná `K000` / 1111), vzhled uzávěrky, zda se počítají auta
+    nebo jednotlivé práce (tankování + vzduch u jednoho auta = 1 nebo 2 body), mazání výsledků (kód `9…`).
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
   Pořadí obtížnosti úkolů: hláska na **začátku** slova → na **konci** → **uprostřed** (nejtěžší, jen jako výzva).
 - [ ] **7 – Rozšíření z mapy:** příprava směny (drag & drop cen), uzávěrka a tržba, minihry za odměnu, QR kódy po bytě.
@@ -312,3 +362,19 @@ _(zatím nic)_
   43/43 testů, typecheck OK, ověřeno v Chrome (špatný kód, kód z klávesnice, karta K000, čekání zákazníka,
   rozsvícení v otevírací době, vstup → stojan, 🔒 zpět).
 - 2026-11-17 (uživatel + Claude): Časové znamení před otevírací dobou (3 × 1 kHz). WISH: státní svátek – zavřeno.
+- 2026-11-18 (uživatel + Claude): Čtečka přečetla vytištěné štítky bez problémů, QR na D30 12 × 40 s obtížemi
+  → rozhodnutí D30 = Code128 (README). Hra je na druhu kódu nezávislá už teď (rozhoduje obsah) – kód beze změny.
+  SPZ: velká autíčka = štítek D30 přímo na autě, malá = laminovaná visačka s QR **u auta** (na zakřiveném
+  malém autě by se štítek zdeformoval a čtečka by ho nepřečetla).
+- 2026-11-18 (uživatel + Claude): Návrh „Výsledky obsluhy – uzávěrka“ (Plán): body podle toho, kdo obsluhoval
+  (vlastní služební karta / kód), ne podle SPZ auta. Zatím jen plán.
+- 2026-11-18 (uživatel + Claude): Stojan – pruh rychlosti nahrazen bargrafem plnění nádrže (plná = předvolba,
+  od poloviny zelená = bod se bude počítat, přetečení červená). Stará verze beze změny. 44/44 testů, typecheck OK,
+  ověřeno v Chrome (3,08 L oranžová, 6,23 L zelená, 11,69 L červená).
+- 2026-11-18 (uživatel + Claude): Herní den – otevírací doby 6:00–8:00, odpočet směny 20 min v navigaci,
+  hlášení 2 min před koncem (gong + 📢🛒), konec dne (`UzaverkaScene`, ☀️ = nový den). 47/47 testů, typecheck OK,
+  ověřeno v Chrome (posunutým časem): obsluha i zákazník, odpočet, hlášení, konec dne 21:00, nový den 7:00, vzduch.
+- 2026-11-18 (uživatel + Claude): Štítky na staré platební karty (hráč nachystal 8 karet): `karty.html` – karty
+  s pevnou hodnotou (kód bankovky, fungují ve hře hned u vzduchu) 1 × 20, 2 × 15, 4 × 10 (hráč bere vždy největší)
+  + služební karta `K000`. Karty se zůstatkem `K001`… až s peněženkou. 49/49 testů, ověřeno v Chrome (náhled listu).
+  Upřesnění rodiče: na štítku stačí QR – hodnotu hráč pozná podle barvy karty → štítek zmenšen na 26 × 29 mm.

@@ -24,11 +24,14 @@ https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-ver
   - `eventBus.ts` – sběrnice událostí; **všechny události a jejich data v rozhraní `GameEvents`**,
   - `codes.ts` – rozpoznání kódů (`parseCode` → `CodeInfo`, tabulka kategorií `CATEGORIES`),
   - `scanInput.ts` – vstup kódů z klávesnice / USB čtečky (převod CZ rozložení, ochrana proti dvojímu čtení),
-  - `beep.ts` – jednoduché zvuky.
-- `src/scenes/` – Phaser scény: `ScanTestScene.ts` („Pípni něco“, výchozí), `StationScene.ts` (zkušební stojan),
-  `nav.ts` (přepínání scén ikonami ⛽ 📟 vlevo nahoře).
+  - `beep.ts` – jednoduché zvuky,
+  - `pump.ts` (stojan), `air.ts` (vzduch), `lock.ts` (zámek benzínky), `den.ts` (herní den, odpočet směny).
+- `src/scenes/` – Phaser scény: `LockScene.ts` (zamčená benzínka, výchozí), `StationScene.ts` (stojan),
+  `AirScene.ts` (vzduch), `ScanTestScene.ts` („Pípni něco“), `UzaverkaScene.ts` (konec dne),
+  `nav.ts` (přepínání scén ikonami vlevo nahoře + odpočet směny vpravo), `hodiny.ts` (kreslení hodin).
 - `tests/` – testy služeb (`npm test`).
 - `tisk.html`, `src/tisk/` – stránka pro tisk visaček (jen pro rodiče); `layout.ts` = rozvržení listu (mm).
+- `karty.html`, `src/tisk/karty.ts` – štítky na staré platební karty (sada karet s tečkami + služební karta).
 - `public/stara-verze.html` – původní funkční verze (jeden soubor, čisté HTML/JS, bez Phaseru – stojan,
   obchod se 6 produkty, bankovky 15/20/25 teček). Zůstává hratelná, dokud ji nová verze nenahradí.
 - `public/` – soubory kopírované do buildu beze změny (později zvuky, obrázky).
@@ -66,6 +69,9 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 
 ## Zásady návrhu
 - **Žádný text jako jediný nositel informace.** Vše má ikonu/emoji, barvu a zvuk; text je jen pro rodiče.
+- **Herní den, ne skutečný čas.** Hodiny ve hře ukazují časy, které hráč zná: otevírá se v 6:00–8:00
+  (po půlhodinách), zavírá ve 20:00 / 21:00. Směna = **odpočet 20 minut** skutečného času (výseč jako kuchyňská
+  minutka) → hráč má tempo. Před koncem hlášení „pokladny se budou uzavírat“, pak konec dne; dál = nový den.
 - **Hlasové pokyny** („Pípni zboží“, „Přilož kartu“, „Máš dost peněz“) – viz Hlas a písmena.
 - **Matematika skrytá ve hře** – každé počítání má být vidět jako pohyb teček, ne jako číslo:
   porovnávání (stačí karta?), rozsahy (předvolba, terč přesnosti), sčítání (cena roste po kolech),
@@ -192,11 +198,18 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
 |---|---|---|---|
 | **Zboží** (`P001`, `S001`…) | **laminovaná visačka**, hráč ji přiváže/uváže na zboží | laser (papír) + laminace + dírka | hráč sám rozhoduje, co čím označí |
 | **SPZ** (`LA01`, `KE01`) na kartě | prošlá platební karta | **laser + QR H** (laminovaný / přelepený štítek) | místo na velký QR, odolné slunci |
-| **SPZ** na autíčku | autíčko | D30 termoštítek (jde z plastu dolů) – nebo malá visačka/přívěsek s QR | termotisk bledne na slunci |
-| **Herní karta** (`K001`) | prošlá platební karta | **laser + QR H** | |
+| **SPZ** na velkém autíčku | autíčko | D30 termoštítek, Code128 (jde z plastu dolů) | termotisk bledne na slunci |
+| **SPZ** u malého autíčka | visačka **u auta** (ne na něm) | laser + QR H + laminace | štítek by se na malém autě zdeformoval a čtečka ho nepřečte |
+| **Karty s tečkami** (`B010`, `B015`, `B020`) | prošlá platební karta | **laser + QR H**, štítek 26 × 29 mm přelepený páskou | `karty.html`; sada 1 × 20, 2 × 15, 4 × 10 |
+| **Služební karta** (`K000`) 🔑 | prošlá platební karta | **laser + QR H** | odemyká benzínku, `karty.html` |
+| **Herní karta se zůstatkem** (`K001`…) | prošlá platební karta | **laser + QR H** | později (fáze 5 – peněženka) |
 | **Bankovky** (`B020`) | kód přímo na papírové bankovce | laser, papír | bez samolepek |
 | **Rodičovské kódy** (`9001`) | list pro rodiče | laser, papír | hráč je nemá mít po ruce |
 
+- **Karty s tečkami = pevná hodnota** (rozhodnutí 2026-11-18): kód bankovky `Bxxx` (číslo = tečky), na štítku
+  **jen QR** (+ drobný kód pro rodiče) – **hodnotu hráč pozná podle barvy karty**. Karta neubývá – platí se jednou
+  kartou, malá je odmítnuta.
+  Karty se zůstatkem (`K001`…) přibudou později jako další druh, tyto platnost neztratí.
 - **Ceny se na štítky netisknou.** Visačka nese jen co to je (písmeno kategorie, obrázek, kód).
   Kolik to stojí, určuje ceník ve hře (nastavuje „vedoucí benzínky“ v dílně ✏️) – změna ceny = žádný nový tisk.
 - **O značení rozhoduje hráč.** Hra nekontroluje, na čem visačka visí. Pomůcka: **obrázkový seznam
@@ -218,6 +231,10 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
 - **Preferovaný kód: QR** (karty, visačky). Důvody: snáší čtení z úhlu (telefon si podle rohových
   čtverců dopočítá perspektivu, u čárového kódu to nejde), poškození i odlesky. Code128 jen tam, kde je
   málo místa na výšku (D30). Test rozhodne hlavně o **nejmenší spolehlivé velikosti QR**.
+- **D30 (12 × 30 / 12 × 40) = Code128** (test 2026-11-18: čtečka přečetla Code128 bez problémů,
+  QR H na 12 × 40 jen s obtížemi – je na tak malý štítek příliš malý).
+- **Hře je jedno, z jakého druhu kódu text přijde** (Code128, QR, ruční psaní) – rozhoduje jen obsah
+  podle Formátu kódů. Stejný kód proto může být na jedné věci jako QR a na jiné jako Code128.
 - **Code39 se nepoužívá** – nemá povinný kontrolní znak, chybné čtení projde jako jiný znak (zkušenost rodiče:
   více chyb než Code128, který má kontrolní součet vždy).
 - **Termotisk (D30) bledne/černá na slunci a v teple** – jen tam, kde je potřeba snadné odlepení a štítek
