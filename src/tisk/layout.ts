@@ -13,10 +13,10 @@ export const VISACKA = {
 } as const;
 
 /**
- * Štítek na starou platební kartu (85,6 × 54 mm) – o kousek menší, aby nepřesahoval přes zaoblené rohy.
+ * Štítek na starou platební kartu: jen QR + drobný kód pro rodiče (hodnotu hráč pozná podle barvy karty).
  * Tiskne se 2 × 4 na A4 těsně vedle sebe (jeden střih oddělí dva štítky).
  */
-export const KARTA_STITEK = { sirka: 82, vyska: 50 } as const;
+export const KARTA_STITEK = { sirka: 26, vyska: 29 } as const;
 
 /** Minimální okraj listu – většina tiskáren netiskne úplně ke kraji. */
 export const MIN_OKRAJ = 6;

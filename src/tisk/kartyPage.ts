@@ -1,50 +1,16 @@
 // Stránka pro tisk štítků na staré platební karty (jen pro rodiče). Sada v karty.ts.
-// Černobíle pro laser: velké číslo + tečky (jako karty ve hře) + QR s opravou chyb H.
+// Jen QR s opravou chyb H + drobný kód pod ním (aby rodič věděl, na kterou kartu který štítek patří).
+// Hodnotu karty hráč pozná podle její barvy.
 
 import { toString as qrSvg } from 'qrcode';
 import { QR_KARTA_MM, SADA_KARET, type StitekKarty } from './karty.ts';
 import { KARTA_STITEK, rozlozeniListu } from './layout.ts';
-
-/** Tečky po pěti v řádku – stejně jako na kartách ve hře. */
-function tecky(hodnota: number): HTMLElement {
-  const el = document.createElement('div');
-  el.className = 'karta-tecky';
-  for (let i = 0; i < hodnota; i++) el.append(document.createElement('span'));
-  return el;
-}
-
-/** Klíč jako černý piktogram s výraznými obrysy (barevné emoji by vyšlo šedé). */
-function klic(): HTMLElement {
-  const el = document.createElement('div');
-  el.className = 'karta-klic';
-  el.innerHTML = `<svg viewBox="0 0 100 50" xmlns="http://www.w3.org/2000/svg">
-    <circle cx="22" cy="25" r="17" fill="none" stroke="#000" stroke-width="7"/>
-    <circle cx="22" cy="25" r="5" fill="#000"/>
-    <rect x="38" y="21" width="58" height="8" fill="#000"/>
-    <rect x="72" y="29" width="7" height="12" fill="#000"/>
-    <rect x="86" y="29" width="7" height="16" fill="#000"/>
-  </svg>`;
-  return el;
-}
 
 async function vytvorStitek(k: StitekKarty, x: number, y: number): Promise<HTMLElement> {
   const el = document.createElement('div');
   el.className = 'karta-stitek';
   Object.assign(el.style, { left: `${x}mm`, top: `${y}mm`, width: `${KARTA_STITEK.sirka}mm`, height: `${KARTA_STITEK.vyska}mm` });
 
-  const vlevo = document.createElement('div');
-  vlevo.className = 'karta-vlevo';
-  if (k.druh === 'penize') {
-    const cislo = document.createElement('div');
-    cislo.className = 'karta-cislo';
-    cislo.textContent = String(k.hodnota);
-    vlevo.append(cislo, tecky(k.hodnota));
-  } else {
-    vlevo.append(klic());
-  }
-
-  const vpravo = document.createElement('div');
-  vpravo.className = 'karta-vpravo';
   const qr = document.createElement('div');
   qr.className = 'qr';
   qr.style.width = qr.style.height = `${QR_KARTA_MM}mm`;
@@ -52,9 +18,7 @@ async function vytvorStitek(k: StitekKarty, x: number, y: number): Promise<HTMLE
   const kod = document.createElement('div');
   kod.className = 'popis';
   kod.textContent = k.kod;
-  vpravo.append(qr, kod);
-
-  el.append(vlevo, vpravo);
+  el.append(qr, kod);
   return el;
 }
 

@@ -1,6 +1,7 @@
 // Sada štítků na staré platební karty (rozhodnutí rodiče 2026-11-18, karty nachystal hráč).
 // Karty s pevnou hodnotou = kód bankovky `Bxxx` (číslo = hodnota v tečkách) – ve hře fungují hned
 // (vzduch: pípnutí vybere kartu se stejnou hodnotou). Hráč bere vždy největší → většina karet jsou desítky.
+// Na štítku je jen QR – hodnotu hráč pozná podle barvy karty (rozhodnutí rodiče).
 // Karty se zůstatkem (`K001`…) přijdou později s peněženkou (fáze 5). Bez závislosti na prohlížeči.
 
 import { SLUZEBNI_KARTA } from '../services/lock.ts';
