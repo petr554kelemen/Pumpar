@@ -40,3 +40,9 @@ export function error(): void {
   tick(180, 0.25);
   setTimeout(() => tick(140, 0.3), 150);
 }
+
+/** Gong jako hlášení v obchodě (ding-dong-ding). Sestupně = zavřeno. */
+export function gong(sestupne = false): void {
+  const tony = [523.25, 659.25, 783.99];
+  (sestupne ? tony.reverse() : tony).forEach((n, i) => setTimeout(() => tick(n, 0.6), i * 380));
+}

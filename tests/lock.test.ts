@@ -6,21 +6,9 @@ import {
   MAX_CISLIC,
   SLUZEBNI_KARTA,
   formatCas,
-  jeOtevreno,
   odemyka,
-  otviraciDoba,
   uhlyRucicek,
 } from '../src/services/lock.ts';
-
-test('Hodiny: otevírací doba = za 2 minuty, zaokrouhleno nahoru na celou minutu', () => {
-  const od = otviraciDoba(new Date(2026, 10, 17, 10, 30, 40));
-  assert.equal(formatCas(od), '10:33');
-  assert.equal(od.getSeconds(), 0);
-  assert.equal(formatCas(otviraciDoba(new Date(2026, 10, 17, 10, 30, 0))), '10:32');
-  assert.equal(formatCas(otviraciDoba(new Date(2026, 10, 17, 23, 59, 30))), '0:02');
-  assert.equal(jeOtevreno(new Date(2026, 10, 17, 10, 32, 59), od), false);
-  assert.equal(jeOtevreno(new Date(2026, 10, 17, 10, 33, 0), od), true);
-});
 
 test('Hodiny: formát a úhly ručiček', () => {
   assert.equal(formatCas(new Date(2026, 0, 1, 9, 5)), '9:05');

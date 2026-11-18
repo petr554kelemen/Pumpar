@@ -16,20 +16,6 @@ export const MAX_CISLIC = 6;
  */
 export type Role = 'obsluha' | 'zakaznik';
 
-/** Za kolik minut od příchodu se otevírá (hodiny nad dveřmi – učení času; čekání nesmí být dlouhé). */
-export const MINUT_DO_OTEVRENI = 2;
-
-/** Otevírací doba: nejméně `minut` od teď, zaokrouhleno nahoru na celou minutu. */
-export function otviraciDoba(ted: Date, minut = MINUT_DO_OTEVRENI): Date {
-  const d = new Date(ted.getTime() + minut * 60_000);
-  if (d.getSeconds() > 0 || d.getMilliseconds() > 0) d.setMinutes(d.getMinutes() + 1, 0, 0);
-  return d;
-}
-
-export function jeOtevreno(ted: Date, od: Date): boolean {
-  return ted.getTime() >= od.getTime();
-}
-
 /** „9:05“ – hodiny bez nuly, minuty vždy dvě číslice. */
 export function formatCas(d: Date): string {
   return `${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`;

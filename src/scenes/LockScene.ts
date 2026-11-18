@@ -1,15 +1,9 @@
 import Phaser from 'phaser';
 import * as beep from '../services/beep.ts';
 import { bus } from '../services/eventBus.ts';
-import {
-  KodovaKlavesnice,
-  type Role,
-  formatCas,
-  jeOtevreno,
-  odemyka,
-  otviraciDoba,
-  uhlyRucicek,
-} from '../services/lock.ts';
+import { den } from '../services/den.ts';
+import { KodovaKlavesnice, type Role, formatCas, odemyka } from '../services/lock.ts';
+import { cifernik, kresliRucicky, velkeHodiny } from './hodiny.ts';
 import type { SceneKey } from './nav.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
@@ -41,6 +35,7 @@ const PO_ODEMCENI: SceneKey = 'Station';
 // Zamčená benzínka (nápad hráče): bez benzináře je zavřeno. Na začátku volba, kdo přichází (lock.ts → Role):
 // 🧑‍🔧 obsluha odemyká kódem na klávesnici u dveří (hvězdičky, ✅ / Enter) nebo služební kartou – kdykoli;
 // 🚗 zákazník čeká na otevírací dobu (hodiny nad dveřmi + cedulka „otevřeno od“ = učení hodin), pak klepne na dveře.
+// Hodiny ukazují herní čas (den.ts): otevírá se v 6:00–8:00, odemčením / vstupem začíná 20minutová směna.
 // Prototyp do dílny ✏️ – kód a karta viz lock.ts.
 export class LockScene extends Phaser.Scene {
   private klavesnice!: KodovaKlavesnice;
@@ -61,7 +56,7 @@ export class LockScene extends Phaser.Scene {
   private hodiny!: Phaser.GameObjects.Container;
   private rucicky!: Phaser.GameObjects.Graphics;
   private cedulka!: Phaser.GameObjects.Rectangle;
-  /** Otevírací doba (za ~2 minuty od příchodu). */
+  /** Otevírací doba herního dne (6:00–8:00). */
   private od!: Date;
   private otviraciDoba = false;
 
@@ -72,7 +67,7 @@ export class LockScene extends Phaser.Scene {
   create(): void {
     this.klavesnice = new KodovaKlavesnice();
     this.oteviram = false;
-    this.od = otviraciDoba(new Date());
+    this.od = den().otevirackaJakoCas;
     this.otviraciDoba = false;
     this.role = null;
 
@@ -84,7 +79,7 @@ export class LockScene extends Phaser.Scene {
     this.tik();
     this.time.addEvent({ delay: 250, loop: true, callback: () => this.tik() });
     // Časové znamení před otevírací dobou (nostalgie rodiče – rozhlas): 3 pípnutí, poslední delší přesně v čas.
-    const doOtevreni = this.od.getTime() - Date.now();
+    const doOtevreni = den().otevreniV - Date.now();
     [2000, 1000, 0].forEach((pred) => {
       if (doOtevreni - pred > 0) this.time.delayedCall(doOtevreni - pred, () => beep.casoveZnameni(pred === 0));
     });
@@ -158,18 +153,17 @@ export class LockScene extends Phaser.Scene {
     this.zakaz = this.add.text(515, 535, '🚫', { fontSize: '90px', padding: { x: 10, y: 10 } }).setOrigin(0.5).setName('zakaz');
     this.zamek = this.add.text(588, 615, '🔒', { fontSize: '36px', padding: { x: 6, y: 6 } }).setOrigin(0.5).setName('zamek');
 
-    // Hodiny nad dveřmi (skutečný čas) – učení hodin.
-    this.rucicky = this.add.graphics();
-    this.hodiny = this.add
-      .container(HODINY.x, HODINY.y, [this.cifernik(HODINY.r), ...this.cislaHodin(HODINY.r), this.rucicky])
-      .setName('hodiny');
+    // Hodiny nad dveřmi (herní čas – den.ts) – učení hodin.
+    const hodiny = velkeHodiny(this, HODINY.x, HODINY.y, HODINY.r);
+    this.hodiny = hodiny.obal.setName('hodiny');
+    this.rucicky = hodiny.rucicky;
 
     // Cedulka na dveřích: OTEVŘENO OD + stejné hodiny v malém + čas číslem.
     this.cedulka = this.add.rectangle(428, 320, 174, 130, 0xffffff).setOrigin(0).setStrokeStyle(4, 0x8a96a3).setName('cedulka');
     this.add.text(515, 336, 'OTEVŘENO OD', { fontFamily: FONT, fontSize: '17px', fontStyle: 'bold', color: '#1e242b' }).setOrigin(0.5);
     const maleRucicky = this.add.graphics();
-    this.kresliRucicky(maleRucicky, 38, this.od, false);
-    this.add.container(472, 400, [this.cifernik(38), maleRucicky]).setName('cedulka_hodiny');
+    kresliRucicky(maleRucicky, 38, this.od, false);
+    this.add.container(472, 400, [cifernik(this, 38), maleRucicky]).setName('cedulka_hodiny');
     this.add
       .text(560, 400, formatCas(this.od), { fontFamily: FONT, fontSize: '30px', fontStyle: 'bold', color: '#1e242b' })
       .setOrigin(0.5)
@@ -178,55 +172,11 @@ export class LockScene extends Phaser.Scene {
 
   // ---------- Hodiny ----------
 
-  /** Čísla 1–12 (jen velké hodiny), souřadnice vůči středu. */
-  private cislaHodin(r: number): Phaser.GameObjects.Text[] {
-    return Array.from({ length: 12 }, (_, i) => {
-      const h = i + 1;
-      const a = Phaser.Math.DegToRad(h * 30 - 90);
-      return this.add
-        .text(Math.cos(a) * r * 0.72, Math.sin(a) * r * 0.72, String(h), {
-          fontFamily: FONT,
-          fontSize: h % 3 === 0 ? '17px' : '13px',
-          fontStyle: 'bold',
-          color: '#1e242b',
-        })
-        .setOrigin(0.5);
-    });
-  }
-
-  /** Ciferník se střední čárkou u každé hodiny (střed 0,0). */
-  private cifernik(r: number): Phaser.GameObjects.Graphics {
-    const g = this.add.graphics();
-    g.fillStyle(0xffffff).fillCircle(0, 0, r);
-    g.lineStyle(Math.max(3, r * 0.07), 0x1e242b).strokeCircle(0, 0, r);
-    for (let i = 0; i < 12; i++) {
-      const a = Phaser.Math.DegToRad(i * 30 - 90);
-      const vnitrni = i % 3 === 0 ? 0.84 : 0.9;
-      g.lineStyle(i % 3 === 0 ? 3 : 2, 0x1e242b);
-      g.lineBetween(Math.cos(a) * r * vnitrni, Math.sin(a) * r * vnitrni, Math.cos(a) * r * 0.96, Math.sin(a) * r * 0.96);
-    }
-    return g;
-  }
-
-  /** Ručičky (malé hodiny bez vteřinovky), střed 0,0. */
-  private kresliRucicky(g: Phaser.GameObjects.Graphics, r: number, d: Date, velke: boolean): void {
-    g.clear();
-    const u = uhlyRucicek(d);
-    const rucicka = (uhel: number, delka: number, sirka: number, barva: number): void => {
-      const a = Phaser.Math.DegToRad(uhel - 90);
-      g.lineStyle(sirka, barva).lineBetween(0, 0, Math.cos(a) * r * delka, Math.sin(a) * r * delka);
-    };
-    rucicka(u.hodinova, 0.5, velke ? 7 : 5, 0x1e242b);
-    rucicka(u.minutova, 0.8, velke ? 4 : 3, 0x1e242b);
-    if (velke) rucicka(u.vterinova, 0.85, 2, BARVA.cervena);
-    g.fillStyle(0x1e242b).fillCircle(0, 0, velke ? 5 : 3);
-  }
-
   /** Každou čtvrtvteřinu: posunout ručičky; v otevírací době rozsvítit cedulku. */
   private tik(): void {
-    const ted = new Date();
-    this.kresliRucicky(this.rucicky, HODINY.r, ted, true);
-    if (!this.otviraciDoba && jeOtevreno(ted, this.od)) {
+    const ted = Date.now();
+    kresliRucicky(this.rucicky, HODINY.r, den().cas(ted), true);
+    if (!this.otviraciDoba && den().jeOtviraciDoba(ted)) {
       this.otviraciDoba = true;
       this.cedulka.setFillStyle(BARVA.cedulkaOtevreno);
       this.tweens.add({ targets: this.cedulka, alpha: 0.5, duration: 200, yoyo: true, repeat: 2 });
@@ -330,6 +280,7 @@ export class LockScene extends Phaser.Scene {
     if (this.role !== 'zakaznik' || this.oteviram) return;
     if (this.otviraciDoba) {
       this.oteviram = true;
+      den().otevri(Date.now());
       beep.win();
       this.tweens.add({ targets: this.zakaznik, x: 515, y: 560, scale: 0.4, alpha: 0, duration: 900, ease: 'Sine.easeIn' });
       this.time.delayedCall(1300, () => this.scene.start(PO_ODEMCENI));
@@ -361,6 +312,7 @@ export class LockScene extends Phaser.Scene {
 
   private otevri(): void {
     this.oteviram = true;
+    den().otevri(Date.now());
     beep.win();
     this.lcd.setFillStyle(BARVA.lcd);
     this.displej.setText('✅').setPadding(4);
