@@ -7,10 +7,11 @@ export default defineConfig({
   build: {
     chunkSizeWarningLimit: 1600, // samotný Phaser má ~1,3 MB – varování je zbytečné
     rolldownOptions: {
-      // Více stránek: hra + tisk visaček (pro rodiče).
+      // Více stránek: hra + tisk visaček a štítků na karty (pro rodiče).
       input: {
         hra: resolve(import.meta.dirname, 'index.html'),
         tisk: resolve(import.meta.dirname, 'tisk.html'),
+        karty: resolve(import.meta.dirname, 'karty.html'),
       },
     },
   },

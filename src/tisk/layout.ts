@@ -12,6 +12,12 @@ export const VISACKA = {
   zonaDirky: 10,
 } as const;
 
+/**
+ * Štítek na starou platební kartu (85,6 × 54 mm) – o kousek menší, aby nepřesahoval přes zaoblené rohy.
+ * Tiskne se 2 × 4 na A4 těsně vedle sebe (jeden střih oddělí dva štítky).
+ */
+export const KARTA_STITEK = { sirka: 82, vyska: 50 } as const;
+
 /** Minimální okraj listu – většina tiskáren netiskne úplně ke kraji. */
 export const MIN_OKRAJ = 6;
 
@@ -29,9 +35,13 @@ export interface Rozlozeni {
   okrajY: number;
 }
 
-export function rozlozeniListu(sloupce = 5, radky = 5): Rozlozeni {
-  const sirkaMrizky = sloupce * VISACKA.sirka;
-  const vyskaMrizky = radky * VISACKA.vyska;
+export function rozlozeniListu(
+  sloupce = 5,
+  radky = 5,
+  rozmer: { sirka: number; vyska: number } = VISACKA,
+): Rozlozeni {
+  const sirkaMrizky = sloupce * rozmer.sirka;
+  const vyskaMrizky = radky * rozmer.vyska;
   const okrajX = (LIST.sirka - sirkaMrizky) / 2;
   const okrajY = (LIST.vyska - vyskaMrizky) / 2;
 
@@ -42,7 +52,7 @@ export function rozlozeniListu(sloupce = 5, radky = 5): Rozlozeni {
   const pozice: Pozice[] = [];
   for (let r = 0; r < radky; r++) {
     for (let s = 0; s < sloupce; s++) {
-      pozice.push({ x: okrajX + s * VISACKA.sirka, y: okrajY + r * VISACKA.vyska });
+      pozice.push({ x: okrajX + s * rozmer.sirka, y: okrajY + r * rozmer.vyska });
     }
   }
   return { sloupce, radky, pozice, okrajX, okrajY };

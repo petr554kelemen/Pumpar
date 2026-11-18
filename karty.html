@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tisk karet</title>
+  <link rel="stylesheet" href="/src/tisk/tisk.css">
+</head>
+<body>
+  <header class="ovladani">
+    <h1>Štítky na staré platební karty</h1>
+    <p>
+      Jen pro rodiče. Sada: 1 × 20, 2 × 15, 4 × 10 teček + služební karta 🔑 na odemykání benzínky.
+      Tisknout na A4 <b>ve skutečné velikosti (100 %)</b>, okraje „žádné“, záhlaví a zápatí vypnout.
+      Kontrola: měřítko dole musí mít přesně 50 mm.
+    </p>
+    <p>
+      Štítek 82 × 50 mm (karta 85,6 × 54) – vystřihnout po čarách, nalepit na kartu (lepicí tyčinka / oboustranná
+      páska) a přelepit průhlednou širokou páskou (ochrana proti otěru). Laminátor ne – karta je plastová.
+    </p>
+    <button type="button" id="tisknout">🖨️ Tisknout</button>
+  </header>
+  <main id="stranky"></main>
+  <script type="module" src="/src/tisk/kartyPage.ts"></script>
+</body>
+</html>
