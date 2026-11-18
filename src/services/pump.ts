@@ -71,6 +71,18 @@ export type Vysledek =
   | { druh: 'malo'; chybi: number }
   | { druh: 'preteklo'; navic: number };
 
+/** Od jaké části plné nádrže (= předvolby) se tankování počítá jako bod za práci (proti „crknutí“). */
+export const PLATNE_OD = 0.5;
+
+export type PasmoNadrze = 'nepocita' | 'pocita' | 'preteklo';
+
+/** Bargraf plnění: podíl 0–1 z předvolby (plná nádrž) a barevné pásmo. */
+export function stavNadrze(natankovano: number, cil: number): { podil: number; pasmo: PasmoNadrze } {
+  if (cil <= 0) return { podil: 0, pasmo: 'nepocita' };
+  if (natankovano > cil) return { podil: 1, pasmo: 'preteklo' };
+  return { podil: natankovano / cil, pasmo: natankovano * 2 >= cil ? 'pocita' : 'nepocita' };
+}
+
 export class Stojan {
   natankovano = 0;
 

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Predvolba, Stojan, formatLitry, tecky } from '../src/services/pump.ts';
+import { Predvolba, Stojan, formatLitry, stavNadrze, tecky } from '../src/services/pump.ts';
 
 test('Předvolba: výchozí 10.00 L', () => {
   assert.equal(new Predvolba().setiny, 1000);
@@ -68,4 +68,15 @@ test('Stojan: cvaknutí rychle 5× a pomalu 20× na litr', () => {
 test('tečky = zaokrouhlené litry', () => {
   assert.equal(tecky(1049), 10);
   assert.equal(tecky(1050), 11);
+});
+
+test('stavNadrze: bod se počítá od poloviny předvolby, přetečení zvlášť', () => {
+  assert.deepEqual(stavNadrze(0, 1000), { podil: 0, pasmo: 'nepocita' });
+  assert.deepEqual(stavNadrze(499, 1000), { podil: 0.499, pasmo: 'nepocita' });
+  assert.deepEqual(stavNadrze(500, 1000), { podil: 0.5, pasmo: 'pocita' });
+  assert.deepEqual(stavNadrze(1000, 1000), { podil: 1, pasmo: 'pocita' });
+  assert.deepEqual(stavNadrze(1001, 1000), { podil: 1, pasmo: 'preteklo' });
+  assert.deepEqual(stavNadrze(51, 101), { podil: 51 / 101, pasmo: 'pocita' }); // lichý cíl: 0,51 ≥ 0,505
+  assert.deepEqual(stavNadrze(50, 101).pasmo, 'nepocita');
+  assert.deepEqual(stavNadrze(0, 0), { podil: 0, pasmo: 'nepocita' });
 });

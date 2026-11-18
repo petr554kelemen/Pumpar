@@ -9,6 +9,7 @@ import {
   Stojan,
   type Vysledek,
   formatLitry,
+  stavNadrze,
   tecky,
 } from '../services/pump.ts';
 import { addNav, type SceneKey } from './nav.ts';
@@ -28,6 +29,9 @@ const BARVA = {
   cervena: 0xe74c3c,
   zluta: 0xf1c40f,
 } as const;
+
+/** Šířka bargrafu plnění nádrže (px). */
+const NADRZ_SIRKA = 300;
 
 interface Tlacitko {
   obal: Phaser.GameObjects.Container;
@@ -49,7 +53,7 @@ export class StationScene extends Phaser.Scene {
   private zbyvaText!: Phaser.GameObjects.Text;
   private pistole!: Phaser.GameObjects.Text;
   private prutokText!: Phaser.GameObjects.Text;
-  private prutokPruh!: Phaser.GameObjects.Rectangle;
+  private nadrzPruh!: Phaser.GameObjects.Rectangle;
   private tlacitkoRychle!: Tlacitko;
   private tlacitkoPomalu!: Tlacitko;
   private vysledek!: Phaser.GameObjects.Container;
@@ -153,7 +157,8 @@ export class StationScene extends Phaser.Scene {
     this.natankovanoText = this.lcdCislo(x + w - 30, y + 95).setName('natankovano_displej');
     this.cenaText = this.lcdPopisek(x + w - 30, y + 140, '', '20px').setOrigin(1, 0.5).setName('cena');
 
-    // Pistole + průtok
+    // Pistole + bargraf plnění nádrže (plná nádrž = předvolba). Do poloviny se tankování nepočítá
+    // jako bod za práci (oranžová), od poloviny ano (zelená), přetečení červeně. Nahradil pruh rychlosti.
     const ny = y + 185;
     this.add.rectangle(x + 15, ny, w - 30, 80, 0x232a32).setOrigin(0);
     this.pistole = this.add
@@ -163,8 +168,9 @@ export class StationScene extends Phaser.Scene {
     this.prutokText = this.add
       .text(x + 110, ny + 22, '', { fontFamily: FONT, fontSize: '20px', fontStyle: 'bold', color: '#ecf0f1' })
       .setName('prutok_text');
-    this.add.rectangle(x + 110, ny + 50, 300, 12, 0x111111).setOrigin(0, 0.5);
-    this.prutokPruh = this.add.rectangle(x + 110, ny + 50, 0, 12, BARVA.zelena).setOrigin(0, 0.5).setName('prutok_pruh');
+    this.add.rectangle(x + 110, ny + 55, NADRZ_SIRKA, 20, 0x111111).setOrigin(0, 0.5).setName('nadrz');
+    this.nadrzPruh = this.add.rectangle(x + 110, ny + 55, 0, 20, BARVA.oranzova).setOrigin(0, 0.5).setName('nadrz_pruh');
+    this.add.rectangle(x + 110 + NADRZ_SIRKA / 2, ny + 55, 4, 30, 0xffffff).setName('nadrz_ryska');
     this.add
       .text(x + w - 30, ny + 40, 'Klávesnice:\n⬆️ Rychle | ⬇️ Pomalu', {
         fontFamily: FONT,
@@ -238,8 +244,6 @@ export class StationScene extends Phaser.Scene {
     const rychle = rezim === 'rychle';
     (rychle ? this.tlacitkoRychle : this.tlacitkoPomalu).obal.setScale(0.96);
     this.prutokText.setText(rychle ? 'Plný proud paliva...' : 'Jemné dotočení...');
-    this.prutokPruh.width = rychle ? 300 : 84;
-    this.prutokPruh.fillColor = rychle ? BARVA.zelena : BARVA.oranzova;
     this.tweens.add({ targets: this.pistole, angle: { from: -6, to: 6 }, duration: 120, yoyo: true, repeat: -1 });
 
     this.casovac = this.time.addEvent({
@@ -263,7 +267,6 @@ export class StationScene extends Phaser.Scene {
     this.tweens.killTweensOf(this.pistole);
     this.pistole.setAngle(0);
     this.prutokText.setText('Pistole zastavena');
-    this.prutokPruh.width = 0;
 
     if (vyhodnotit) this.ukazVysledek(this.stojan.vyhodnot(this.predvolba.setiny));
   }
@@ -318,6 +321,9 @@ export class StationScene extends Phaser.Scene {
 
     this.natankovanoText.setText(formatLitry(ted));
     this.cenaText.setText(`${((ted / 100) * CENA_LITRU_KC).toFixed(2)} Kč  |  (${tecky(ted)} teček)`);
+    const nadrz = stavNadrze(ted, cil);
+    this.nadrzPruh.width = NADRZ_SIRKA * nadrz.podil;
+    this.nadrzPruh.fillColor = { nepocita: BARVA.oranzova, pocita: BARVA.zelena, preteklo: BARVA.cervena }[nadrz.pasmo];
     this.zbyvaText.setText(ted > cil ? `PŘESAH: +${formatLitry(ted - cil)} L` : `ZBÝVÁ: ${formatLitry(cil - ted)} L`);
   }
 
