@@ -4,6 +4,7 @@ import * as beep from '../services/beep.ts';
 import { den } from '../services/den.ts';
 import { denik } from '../services/denik.ts';
 import { ZBOZI, type Zbozi, najdiZbozi, utrata, vejdeSe } from '../services/katalog.ts';
+import { SLUZEBNI_KARTA } from '../services/lock.ts';
 import { PENEZNI_KARTY, type PenezniKarta, penezenka } from '../services/penezenka.ts';
 import { teckyZaBenzin, ucet } from '../services/ucet.ts';
 import { addNav, type SceneKey } from './nav.ts';
@@ -43,7 +44,9 @@ type Stav = 'nakup' | 'placeni';
 // zůstatek, tečky z karty odletí do košíku a nákup se zapíše do deníku; jinak ❌ a hráč ubere zboží nebo
 // zkusí jinou kartu. Karty drží zůstatek po celý herní den.
 // Přišel-li hráč od stojanu („🛒 Jít platit“), je v košíku napřed benzín ⛽ (modré tečky, nedá se vrátit)
-// a po zaplacení se hra vrátí ke stojanu.
+// a po zaplacení se hra vrátí ke stojanu. Bez zaplacení se odejít nedá (rodič: „to se nedělá“) – navigace je
+// zamčená, hráč ubere zboží, aby nákup zaplatil. Nestačí-li na samotný benzín žádná karta, obsluha ho stornuje
+// služební kartou K000 (jinak K000 v obchodě neplatí).
 export class ShopScene extends Phaser.Scene {
   private stav: Stav = 'nakup';
   private kosik: Zbozi[] = [];
@@ -67,7 +70,7 @@ export class ShopScene extends Phaser.Scene {
     this.karty = [];
     this.benzinSetin = ucet().benzin ?? 0;
     this.benzin = this.benzinSetin > 0 ? teckyZaBenzin(this.benzinSetin) : 0;
-    addNav(this);
+    addNav(this, { zamceno: () => this.benzin > 0, priPokusu: () => this.nezaplaceno() });
 
     ZBOZI.forEach((z, i) => this.vytvorPolicko(z, i));
 
@@ -125,6 +128,7 @@ export class ShopScene extends Phaser.Scene {
       case 'karta': {
         const k = this.karty.find((kn) => kn.karta.kod === info.kod);
         if (k) this.zaplat(k);
+        else if (info.kod === SLUZEBNI_KARTA && this.lzeStornovat()) this.stornoBenzinu();
         else this.chyba(KARTY.x, 360); // služební nebo neznámá karta neplatí
         return;
       }
@@ -326,6 +330,28 @@ export class ShopScene extends Phaser.Scene {
       this.prekresliKartu(kn);
       this.hotovo();
     });
+  }
+
+  /** Pokus odejít s nezaplaceným benzínem: chyba a zatřesení ⛽ v košíku (napřed zaplatit). */
+  private nezaplaceno(): void {
+    beep.error();
+    const benzin = this.children.getByName('v_kosiku_benzin');
+    if (benzin) this.tweens.add({ targets: benzin, scale: { from: 1.6, to: 1 }, duration: 400, ease: 'Back.Out' });
+    this.tweens.add({ targets: this.kosikIkona, scale: { from: 1.3, to: 1 }, duration: 300 });
+  }
+
+  /** Storno benzínu jen tehdy, když ho nezaplatí žádná karta (karty jsou za den vyčerpané). */
+  private lzeStornovat(): boolean {
+    if (this.benzin === 0) return false;
+    return PENEZNI_KARTY.every((k) => (penezenka().zustatek(k.kod) ?? 0) < this.benzin);
+  }
+
+  private stornoBenzinu(): void {
+    if (this.stav !== 'nakup') return;
+    this.stav = 'placeni';
+    beep.tick(500, 0.1);
+    ucet().benzin = null;
+    this.scene.start('Station' satisfies SceneKey);
   }
 
   private hotovo(): void {

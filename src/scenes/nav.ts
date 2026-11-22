@@ -15,7 +15,15 @@ const SCENES: ReadonlyArray<{ key: SceneKey; ikona: string }> = [
   { key: 'Uzaverka', ikona: '🔒' },
 ];
 
-export function addNav(scene: Phaser.Scene): void {
+/** Zámek navigace: dokud platí, ze scény se odejít nedá (obchod s nezaplaceným benzínem). */
+export interface ZamekNavigace {
+  zamceno: () => boolean;
+  /** Hráč zkusil odejít – scéna mu ukáže proč ne. */
+  priPokusu: () => void;
+}
+
+export function addNav(scene: Phaser.Scene, zamek?: ZamekNavigace): void {
+  const zamceno = zamek?.zamceno() ?? false;
   SCENES.forEach(({ key, ikona }, i) => {
     const aktivni = scene.scene.key === key;
     const tlacitko = scene.add
@@ -25,11 +33,15 @@ export function addNav(scene: Phaser.Scene): void {
         padding: { x: 6, y: 4 },
       })
       .setName(`nav_${key}`)
-      .setAlpha(aktivni ? 1 : 0.55)
+      .setAlpha(aktivni ? 1 : zamceno ? 0.2 : 0.55)
       .setInteractive({ useHandCursor: true });
 
     if (aktivni) return;
     tlacitko.on('pointerdown', () => {
+      if (zamek?.zamceno()) {
+        zamek.priPokusu();
+        return;
+      }
       if (key === 'Uzaverka') den().ukonci();
       scene.scene.start(key);
     });
