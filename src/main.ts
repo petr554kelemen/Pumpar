@@ -4,6 +4,7 @@ import { startKeyboardScanner } from './services/scanInput.ts';
 import { ScanTestScene } from './scenes/ScanTestScene.ts';
 import { StationScene } from './scenes/StationScene.ts';
 import { AirScene } from './scenes/AirScene.ts';
+import { ShopScene } from './scenes/ShopScene.ts';
 import { LockScene } from './scenes/LockScene.ts';
 import { UzaverkaScene } from './scenes/UzaverkaScene.ts';
 
@@ -23,5 +24,5 @@ new Phaser.Game({
     height: 720,
   },
   // První scéna je výchozí: zamčená benzínka (odemkne kód nebo služební karta) → stojan.
-  scene: [LockScene, StationScene, AirScene, ScanTestScene, UzaverkaScene],
+  scene: [LockScene, StationScene, AirScene, ShopScene, ScanTestScene, UzaverkaScene],
 });

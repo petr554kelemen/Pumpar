@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { bus, type GameEvents } from '../services/eventBus.ts';
 import * as beep from '../services/beep.ts';
 import { type Disk, type KoloId, type StavKola, cenaKola, cenaVyberu, noveAuto, zaplat } from '../services/air.ts';
+import { najdiKartu, penezenka } from '../services/penezenka.ts';
 import { addNav, type SceneKey } from './nav.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
@@ -46,6 +47,8 @@ interface Kolo {
 
 interface Karta {
   hodnota: number;
+  /** Peněžní karta `K…` se zůstatkem na celý den (platba se odečte i v peněžence); karty 10/15/20 na obrazovce ne. */
+  kod?: string;
   /** Kolik teček na kartě ještě zbývá (u jednoho auta lze platit vícekrát). */
   zbyva: number;
   obal: Phaser.GameObjects.Container;
@@ -258,16 +261,29 @@ export class AirScene extends Phaser.Scene {
   }
 
   private onScan({ info }: GameEvents['scan']): void {
-    if (info.druh !== 'bankovka' || this.stav !== 'vyber') return;
+    if (this.stav !== 'vyber') return;
+    if (info.druh === 'karta') {
+      // Peněžní karta se zůstatkem (K001…): dočasná karta ukáže dnešní zůstatek.
+      const penezni = najdiKartu(info.kod);
+      const zbyva = penezni && penezenka().zustatek(penezni.kod);
+      if (penezni && zbyva !== undefined) this.plat(this.vytvorDocasnouKartu(penezni.hodnota, penezni.kod, zbyva));
+      return;
+    }
+    if (info.druh !== 'bankovka') return;
     // Pípnutá bankovka: použije se karta na obrazovce se stejnou hodnotou, jinak dočasná karta.
     const karta = this.karty.find((k) => k.hodnota === info.hodnota) ?? this.vytvorDocasnouKartu(info.hodnota);
     this.plat(karta);
   }
 
-  private vytvorDocasnouKartu(hodnota: number): Karta {
+  private vytvorDocasnouKartu(hodnota: number, kod?: string, zbyva = hodnota): Karta {
     this.docasnaKarta?.obal.destroy();
     const karta = this.vytvorKartu(hodnota, 1010, 360);
     karta.obal.setDepth(10);
+    if (kod) {
+      karta.kod = kod;
+      karta.zbyva = zbyva;
+      karta.tecky.forEach((t, i) => i < hodnota - zbyva && t.setFillStyle(ZLUTA, 0));
+    }
     this.docasnaKarta = karta;
     return karta;
   }
@@ -291,6 +307,7 @@ export class AirScene extends Phaser.Scene {
       return;
     }
 
+    if (karta.kod) penezenka().zaplat(karta.kod, cena);
     this.stav = 'placeni';
     beep.tick(880, 0.1);
     vybrana.forEach((k) => {
