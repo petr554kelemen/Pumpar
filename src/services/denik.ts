@@ -10,7 +10,9 @@ export interface ZaznamProdeje {
   den: number;
   /** Kódy prodaného zboží (s opakováním). */
   zbozi: string[];
-  /** Útrata v tečkách. */
+  /** Natankovaný benzín na účtu (setiny litru), pokud se platil spolu s nákupem. */
+  benzin?: number;
+  /** Útrata v tečkách (zboží + benzín). */
   tecky: number;
   /** Kód karty, kterou se platilo. */
   karta: string;

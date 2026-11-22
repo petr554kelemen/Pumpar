@@ -4,6 +4,8 @@ import { MAX_UTRATA, ZBOZI, chybyKatalogu, najdiZbozi, utrata, vejdeSe } from '.
 import { Penezenka, PENEZNI_KARTY, penezenka } from '../src/services/penezenka.ts';
 import { Denik, KLIC_DENIKU, type Uloziste } from '../src/services/denik.ts';
 import { novyDen } from '../src/services/den.ts';
+import { Predvolba } from '../src/services/pump.ts';
+import { MAX_BENZIN_TECEK, lzeJitPlatit, teckyZaBenzin, ucet } from '../src/services/ucet.ts';
 
 test('Katalog: kódy jsou platné zboží, neopakují se, ceny 1–30', () => {
   assert.deepEqual(chybyKatalogu(), []);
@@ -68,4 +70,38 @@ test('Deník: prodeje se přidávají za sebe, poškozená data nevadí', () => 
   u.data.set(KLIC_DENIKU, '{rozbité');
   assert.deepEqual(d.zaznamy(), []);
   assert.deepEqual(new Denik(null).zaznamy(), []);
+});
+
+test('Katalog: benzín na účtu se počítá do útraty i do limitu 30', () => {
+  const auto = najdiZbozi('A001');
+  assert.ok(auto);
+  assert.equal(utrata([auto], 12), 21);
+  assert.equal(vejdeSe([auto], auto, 12), true); // 30
+  assert.equal(vejdeSe([auto], auto, 13), false); // 31
+});
+
+test('Účet: platit se jde od 0,80 L do hodnoty největší karty', () => {
+  assert.equal(MAX_BENZIN_TECEK, 20);
+  assert.equal(lzeJitPlatit(79), false);
+  assert.equal(lzeJitPlatit(80), true);
+  assert.equal(teckyZaBenzin(80), 1);
+  assert.equal(lzeJitPlatit(2049), true); // 20 teček
+  assert.equal(lzeJitPlatit(2050), false); // 21 teček
+});
+
+test('Účet: benzín čeká na zaplacení, nový den účet vyprázdní', () => {
+  ucet().benzin = 640;
+  ucet().rezimObchodu = true;
+  assert.equal(ucet().benzin, 640);
+  novyDen();
+  assert.equal(ucet().benzin, null);
+  assert.equal(ucet().rezimObchodu, false);
+});
+
+test('Stojan: náhodná předvolba „+ Obchod“ jsou celé litry 4–14', () => {
+  const p = new Predvolba();
+  p.nahodnaSObchodem(() => 0);
+  assert.equal(p.setiny, 400);
+  p.nahodnaSObchodem(() => 0.999);
+  assert.equal(p.setiny, 1400);
 });

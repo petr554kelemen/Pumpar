@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import * as beep from '../services/beep.ts';
 import {
   CENA_LITRU_KC,
+  PREDVOLBY_S_OBCHODEM,
   Predvolba,
   RYCHLE_PREDVOLBY,
   RYCHLOST,
@@ -12,6 +13,7 @@ import {
   stavNadrze,
   tecky,
 } from '../services/pump.ts';
+import { MAX_BENZIN_TECEK, lzeJitPlatit, teckyZaBenzin, ucet } from '../services/ucet.ts';
 import { addNav, type SceneKey } from './nav.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
@@ -30,16 +32,25 @@ const BARVA = {
   zluta: 0xf1c40f,
 } as const;
 
+/** Zelená tlačítka napojení na obchod (stará verze). */
+const BARVA_OBCHOD = 0x1e8449;
+
 /** Šířka bargrafu plnění nádrže (px). */
 const NADRZ_SIRKA = 300;
+
+/** Data scény: po zaplacení benzínu v obchodě se hráč vrací ke stojanu. */
+export interface StationData {
+  poPlatbe?: boolean;
+}
 
 interface Tlacitko {
   obal: Phaser.GameObjects.Container;
   pozadi: Phaser.GameObjects.Rectangle;
 }
 
-// Fáze 4 (začátek): výdejní stojan převedený ze staré verze – předvolba, rychlé/pomalé tankování,
-// vyhodnocení. Obchod zatím ne (přijde s placením). Pravidla beze změny – hráč je zná.
+// Fáze 4: výdejní stojan převedený ze staré verze – předvolba, rychlé/pomalé tankování, vyhodnocení.
+// Napojení na obchod jako ve staré verzi: zelené předvolby „🛒 + Obchod“ a po tankování „🛒 Jít platit“ –
+// benzín jde na účet (ucet.ts) a zaplatí se v obchodě spolu se zbožím. Pravidla beze změny – hráč je zná.
 export class StationScene extends Phaser.Scene {
   private predvolba!: Predvolba;
   private stojan!: Stojan;
@@ -60,23 +71,43 @@ export class StationScene extends Phaser.Scene {
   private vysledekPozadi!: Phaser.GameObjects.Rectangle;
   private vysledekTitulek!: Phaser.GameObjects.Text;
   private vysledekPopis!: Phaser.GameObjects.Text;
+  private jitPlatit!: Tlacitko;
+  private jitPlatitText!: Phaser.GameObjects.Text;
+  private znackaObchodu!: Phaser.GameObjects.Text;
 
   constructor() {
     super('Station' satisfies SceneKey);
   }
 
-  create(): void {
+  create(data: StationData = {}): void {
     // Stav se nastavuje při každém spuštění scény (návrat z jiné scény začíná od nuly).
     this.predvolba = new Predvolba();
     this.stojan = new Stojan();
     this.rezim = null;
     this.casovac = null;
+    // Po zaplacení v režimu „+ Obchod“ hned další kolo s náhodnou předvolbou (stará verze).
+    if (data.poPlatbe && ucet().rezimObchodu) this.predvolba.nahodnaSObchodem();
 
     addNav(this);
     this.vytvorLevyPanel();
     this.vytvorPravyPanel();
+    this.znackaObchodu = this.add
+      .text(660, 50, '⛽ ➡️ 🛒', { fontSize: '44px', backgroundColor: '#1e8449', padding: { x: 14, y: 6 } })
+      .setOrigin(0.5)
+      .setName('znacka_obchodu');
     this.ovladaniKlavesnici();
     this.prekresli();
+  }
+
+  /** Předvolba z tlačítka: obyčejná (bez obchodu) nebo zelená „+ Obchod“. */
+  private nastavPredvolbu(litry: number | null, sObchodem: boolean): void {
+    beep.tick(820, 0.05);
+    this.zastav(false);
+    ucet().rezimObchodu = sObchodem;
+    if (litry !== null) this.predvolba.nastavLitry(litry);
+    else if (sObchodem) this.predvolba.nahodnaSObchodem();
+    else this.predvolba.nahodna();
+    this.vynuluj(false);
   }
 
   // ---------- Levý panel: předvolba ----------
@@ -94,29 +125,37 @@ export class StationScene extends Phaser.Scene {
     this.predvolbaPopis = this.lcdPopisek(x + w - 30, y + 140, '', '20px').setOrigin(1, 0.5).setName('predvolba_cena');
 
     // Rychlé předvolby
-    const py = y + 200;
+    const py = y + 180;
     const sirka = (w - 30 - 3 * 12) / 4;
     [...RYCHLE_PREDVOLBY, null].forEach((litry, i) => {
       const bx = x + 15 + i * (sirka + 12);
       const popis = litry === null ? '🎲 Náhoda' : `${litry} L`;
       const nazev = litry === null ? 'predvolba_nahoda' : `predvolba_${litry}L`;
-      this.tlacitko(bx, py, sirka, 56, popis, BARVA.predvolba, '#ffffff', '24px', nazev).pozadi.on('pointerdown', () => {
-        beep.tick(820, 0.05);
-        this.zastav(false);
-        if (litry === null) this.predvolba.nahodna();
-        else this.predvolba.nastavLitry(litry);
-        this.vynuluj(false);
-      });
+      this.tlacitko(bx, py, sirka, 52, popis, BARVA.predvolba, '#ffffff', '24px', nazev).pozadi.on('pointerdown', () =>
+        this.nastavPredvolbu(litry, false),
+      );
+    });
+
+    // Zelené předvolby s nákupem v obchodě (stará verze: 6 L, 10 L, náhoda 4–14 L).
+    const oy = py + 62;
+    const osirka = (w - 30 - 2 * 12) / 3;
+    [...PREDVOLBY_S_OBCHODEM, null].forEach((litry, i) => {
+      const bx = x + 15 + i * (osirka + 12);
+      const popis = litry === null ? '🛒 🎲' : `🛒 ${litry} L`;
+      const nazev = litry === null ? 'predvolba_obchod_nahoda' : `predvolba_obchod_${litry}L`;
+      this.tlacitko(bx, oy, osirka, 52, popis, BARVA_OBCHOD, '#ffffff', '24px', nazev).pozadi.on('pointerdown', () =>
+        this.nastavPredvolbu(litry, true),
+      );
     });
 
     // Číselná klávesnice
-    const ky = y + 275;
+    const ky = oy + 70;
     const kw = (w - 30 - 2 * 12) / 3;
-    const kh = 70;
+    const kh = 62;
     const klavesy = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', 'VYNULOVAT'];
     klavesy.forEach((k, i) => {
       const bx = x + 15 + (i % 3) * (kw + 12);
-      const by = ky + Math.floor(i / 3) * (kh + 10);
+      const by = ky + Math.floor(i / 3) * (kh + 8);
       const barva = k === 'C' ? BARVA.cervena : k === 'VYNULOVAT' ? BARVA.zelena : BARVA.klavesa;
       const text = k === 'C' || k === 'VYNULOVAT' ? '#ffffff' : '#2c3e50';
       const nazev = k === 'VYNULOVAT' ? 'klavesa_vynulovat' : `klavesa_${k}`;
@@ -195,10 +234,15 @@ export class StationScene extends Phaser.Scene {
     this.vysledekPopis = this.add
       .text((w - 30) / 2, 66, '', { fontFamily: FONT, fontSize: '18px', color: '#ffffff' })
       .setOrigin(0.5);
-    const nove = this.tlacitko((w - 30) / 2 - 130, 90, 260, 40, '🔄 Nové tankování', 0x34495e, '#ffffff', '20px', 'nove_tankovani');
+    const nove = this.tlacitko(20, 90, 250, 40, '🔄 Nové tankování', 0x34495e, '#ffffff', '20px', 'nove_tankovani');
     nove.pozadi.on('pointerdown', () => this.vynuluj(true));
+    // Jít platit do obchodu (stará verze: od 0,80 L; teď do hodnoty největší karty).
+    this.jitPlatit = this.tlacitko(w - 30 - 270, 84, 250, 52, '', BARVA_OBCHOD, '#ffffff', '24px', 'jit_platit');
+    this.jitPlatitText = this.jitPlatit.obal.getAt(1) as Phaser.GameObjects.Text;
+    this.jitPlatit.pozadi.setStrokeStyle(3, 0xffffff);
+    this.jitPlatit.pozadi.on('pointerdown', () => this.jdiPlatit());
     this.vysledek = this.add
-      .container(x + 15, vy, [this.vysledekPozadi, this.vysledekTitulek, this.vysledekPopis, nove.obal])
+      .container(x + 15, vy, [this.vysledekPozadi, this.vysledekTitulek, this.vysledekPopis, nove.obal, this.jitPlatit.obal])
       .setName('vysledek')
       .setVisible(false);
   }
@@ -271,6 +315,15 @@ export class StationScene extends Phaser.Scene {
     if (vyhodnotit) this.ukazVysledek(this.stojan.vyhodnot(this.predvolba.setiny));
   }
 
+  /** Benzín na účet a do obchodu – zaplatí se kartou spolu se zbožím. */
+  private jdiPlatit(): void {
+    const natankovano = this.stojan.natankovano;
+    if (this.rezim || !lzeJitPlatit(natankovano)) return;
+    beep.tick(880, 0.08);
+    ucet().benzin = natankovano;
+    this.scene.start('Shop' satisfies SceneKey);
+  }
+
   private vynuluj(sezvukem: boolean): void {
     if (sezvukem) beep.tick(500, 0.05);
     this.zastav(false);
@@ -306,6 +359,9 @@ export class StationScene extends Phaser.Scene {
         throw new Error(`Neošetřený výsledek: ${JSON.stringify(neosetreno)}`);
       }
     }
+    const platit = lzeJitPlatit(this.stojan.natankovano);
+    this.jitPlatit.obal.setVisible(platit);
+    if (platit) this.jitPlatitText.setText(`🛒 Jít platit (${teckyZaBenzin(this.stojan.natankovano)})`);
     this.vysledek.setVisible(true);
     this.tweens.add({ targets: this.vysledek, alpha: { from: 0, to: 1 }, duration: 200 });
   }
@@ -317,7 +373,10 @@ export class StationScene extends Phaser.Scene {
     const ted = this.stojan.natankovano;
     this.predvolbaText.setText(formatLitry(cil));
     const cilTecky = Math.max(1, tecky(cil));
-    this.predvolbaPopis.setText(cilTecky <= 22 ? `Cena v obchodě: ${cilTecky} zlatých teček` : 'Velké tankování (bez obchodu)');
+    this.predvolbaPopis.setText(
+      cilTecky <= MAX_BENZIN_TECEK ? `Cena v obchodě: ${cilTecky} teček` : 'Velké tankování (bez obchodu)',
+    );
+    this.znackaObchodu.setVisible(ucet().rezimObchodu);
 
     this.natankovanoText.setText(formatLitry(ted));
     this.cenaText.setText(`${((ted / 100) * CENA_LITRU_KC).toFixed(2)} Kč  |  (${tecky(ted)} teček)`);

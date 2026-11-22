@@ -1,4 +1,4 @@
-// Logika výdejního stojanu (převzato ze staré verze, bez obchodu). Bez závislosti na Phaseru – testovatelné.
+// Logika výdejního stojanu (převzato ze staré verze; napojení na obchod viz ucet.ts). Bez závislosti na Phaseru – testovatelné.
 // Litry se počítají v setinách jako celá čísla (10,00 L = 1000), aby nevznikaly chyby zaokrouhlení.
 
 export type RezimTankovani = 'rychle' | 'pomalu';
@@ -64,7 +64,15 @@ export class Predvolba {
     this.cislice = String(cele * 100 + setiny);
     this.nove = true;
   }
+
+  /** Náhodná předvolba „+ Obchod“: celé litry 4–14, aby zbylo na nákup (stará verze). */
+  nahodnaSObchodem(rng: () => number = Math.random): void {
+    this.nastavLitry(Math.floor(rng() * 11) + 4);
+  }
 }
+
+/** Zelené předvolby „+ Obchod“ (stará verze): po tankování se jde platit do obchodu. */
+export const PREDVOLBY_S_OBCHODEM = [6, 10] as const;
 
 export type Vysledek =
   | { druh: 'presne' }

@@ -30,13 +30,14 @@ export function najdiZbozi(kod: string): Zbozi | undefined {
   return ZBOZI.find((z) => z.kod === k);
 }
 
-export function utrata(kosik: readonly Zbozi[]): number {
-  return kosik.reduce((soucet, z) => soucet + z.cena, 0);
+/** Útrata = součet cen zboží + případný benzín na účtu (tečky). */
+export function utrata(kosik: readonly Zbozi[], benzin = 0): number {
+  return kosik.reduce((soucet, z) => soucet + z.cena, benzin);
 }
 
-/** Vejde se výrobek ještě do košíku (útrata do 30)? */
-export function vejdeSe(kosik: readonly Zbozi[], z: Zbozi): boolean {
-  return utrata(kosik) + z.cena <= MAX_UTRATA;
+/** Vejde se výrobek ještě do košíku (útrata včetně benzínu do 30)? */
+export function vejdeSe(kosik: readonly Zbozi[], z: Zbozi, benzin = 0): boolean {
+  return utrata(kosik, benzin) + z.cena <= MAX_UTRATA;
 }
 
 /** Kontrola katalogu: každý kód je platné zboží podle Formátu kódů a kódy se neopakují. */
