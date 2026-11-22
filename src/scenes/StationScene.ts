@@ -14,6 +14,7 @@ import {
   tecky,
 } from '../services/pump.ts';
 import { MAX_BENZIN_TECEK, lzeJitPlatit, teckyZaBenzin, ucet } from '../services/ucet.ts';
+import { prehledKaret } from './kartyPanel.ts';
 import { addNav, type SceneKey } from './nav.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
@@ -91,8 +92,10 @@ export class StationScene extends Phaser.Scene {
     addNav(this);
     this.vytvorLevyPanel();
     this.vytvorPravyPanel();
+    // Kolik zbývá na nákupy: zůstatky karet nahoře – hráč vidí, kolik teček může natankovat a zaplatit.
+    prehledKaret(this, 470, 50);
     this.znackaObchodu = this.add
-      .text(660, 50, '⛽ ➡️ 🛒', { fontSize: '44px', backgroundColor: '#1e8449', padding: { x: 14, y: 6 } })
+      .text(150, 200, '⛽➡️🛒', { fontSize: '36px', backgroundColor: '#1e8449', padding: { x: 10, y: 6 } })
       .setOrigin(0.5)
       .setName('znacka_obchodu');
     this.ovladaniKlavesnici();

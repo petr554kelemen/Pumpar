@@ -5,8 +5,9 @@ import { den } from '../services/den.ts';
 import { denik } from '../services/denik.ts';
 import { ZBOZI, type Zbozi, najdiZbozi, utrata, vejdeSe } from '../services/katalog.ts';
 import { SLUZEBNI_KARTA } from '../services/lock.ts';
-import { PENEZNI_KARTY, type PenezniKarta, penezenka } from '../services/penezenka.ts';
+import { PENEZNI_KARTY, penezenka } from '../services/penezenka.ts';
 import { teckyZaBenzin, ucet } from '../services/ucet.ts';
+import { KARTY, type KartaNaObrazovce, PanelKaret } from './kartyPanel.ts';
 import { addNav, type SceneKey } from './nav.ts';
 import type { StationData } from './StationScene.ts';
 
@@ -22,21 +23,6 @@ const REGAL = { x0: 165, y0: 200, dx: 260, dy: 150, sirka: 240, vyska: 136, slou
 const KOSIK = { x: 425, y: 580, sirka: 790, vyska: 250 } as const;
 const POLOZKY = { x0: 135, y0: 525, dx: 56, dy: 62, vRade: 8 } as const;
 const UTRATA = { cisloX: 640, x0: 662, y0: 505, d: 19, r: 7, vRade: 10 } as const;
-/** Karty vpravo pod sebou. */
-/** Tečky karty po 10 v řadě (jako útrata v košíku) – karta 20 = dvě plné řady. */
-const KARTY = { x: 1068, y0: 140, dy: 84, sirka: 370, vyska: 74, x0: -84, d: 21, r: 8, vRade: 10 } as const;
-
-/** Barva karty podle hodnoty (hráč pozná hodnotu podle barvy; skutečné barvy karet zatím neznáme). */
-const BARVA_KARTY: Readonly<Record<number, number>> = { 20: 0x9a7d0a, 15: 0x1e8449, 10: 0x1f4f8f };
-
-interface KartaNaObrazovce {
-  karta: PenezniKarta;
-  obal: Phaser.GameObjects.Container;
-  pozadi: Phaser.GameObjects.Rectangle;
-  cislo: Phaser.GameObjects.Text;
-  tecky: Phaser.GameObjects.Arc[];
-}
-
 type Stav = 'nakup' | 'placeni';
 
 // Obchod (fáze 4): hráč vybírá zboží klepnutím na regál nebo pípnutím visačky, útrata v košíku roste
@@ -45,14 +31,14 @@ type Stav = 'nakup' | 'placeni';
 // zkusí jinou kartu. Karty drží zůstatek po celý herní den.
 // Přišel-li hráč od stojanu („🛒 Jít platit“), je v košíku napřed benzín ⛽ (modré tečky, nedá se vrátit)
 // a po zaplacení se hra vrátí ke stojanu. Bez zaplacení se odejít nedá (rodič: „to se nedělá“) – navigace je
-// zamčená, hráč ubere zboží, aby nákup zaplatil. Nestačí-li na samotný benzín žádná karta, obsluha ho stornuje
-// služební kartou K000 (jinak K000 v obchodě neplatí).
+// zamčená, hráč ubere zboží, aby nákup zaplatil. Nestačí-li na samotný benzín žádná karta, obsluha pípne
+// služební kartu K000 = restart (karty plné, zpět ke stojanu, čas běží dál); jinak K000 v obchodě neplatí.
 export class ShopScene extends Phaser.Scene {
   private stav: Stav = 'nakup';
   private kosik: Zbozi[] = [];
   private kosikObjekty: Phaser.GameObjects.GameObject[] = [];
   private policka = new Map<string, Phaser.GameObjects.Container>();
-  private karty: KartaNaObrazovce[] = [];
+  private panel!: PanelKaret;
   private kosikIkona!: Phaser.GameObjects.Text;
   /** Benzín na účtu (setiny litru) a jeho cena v tečkách; 0 = obchod bez benzínu. */
   private benzinSetin = 0;
@@ -67,7 +53,6 @@ export class ShopScene extends Phaser.Scene {
     this.kosik = [];
     this.kosikObjekty = [];
     this.policka.clear();
-    this.karty = [];
     this.benzinSetin = ucet().benzin ?? 0;
     this.benzin = this.benzinSetin > 0 ? teckyZaBenzin(this.benzinSetin) : 0;
     addNav(this, { zamceno: () => this.benzin > 0, priPokusu: () => this.nezaplaceno() });
@@ -89,7 +74,7 @@ export class ShopScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true });
     vysypat.on('pointerdown', () => this.vysypej());
 
-    PENEZNI_KARTY.forEach((k, i) => this.karty.push(this.vytvorKartu(k, KARTY.x, KARTY.y0 + i * KARTY.dy)));
+    this.panel = new PanelKaret(this, (kn) => this.zaplat(kn));
 
     this.prekresliKosik();
     const odhlasit = bus.on('scan', (d) => this.onScan(d));
@@ -126,7 +111,7 @@ export class ShopScene extends Phaser.Scene {
         return;
       }
       case 'karta': {
-        const k = this.karty.find((kn) => kn.karta.kod === info.kod);
+        const k = this.panel.najdi(info.kod);
         if (k) this.zaplat(k);
         else if (info.kod === SLUZEBNI_KARTA && this.lzeStornovat()) this.stornoBenzinu();
         else this.chyba(KARTY.x, 360); // služební nebo neznámá karta neplatí
@@ -233,43 +218,6 @@ export class ShopScene extends Phaser.Scene {
     }
   }
 
-  // ---------- Karty ----------
-
-  private vytvorKartu(karta: PenezniKarta, x: number, y: number): KartaNaObrazovce {
-    const pozadi = this.add
-      .rectangle(0, 0, KARTY.sirka, KARTY.vyska, BARVA_KARTY[karta.hodnota] ?? 0x1f4f8f)
-      .setStrokeStyle(4, 0xd4ac0d);
-    const cislo = this.add
-      .text(-KARTY.sirka / 2 + 16, 0, '', { fontFamily: FONT, fontSize: '44px', fontStyle: 'bold', color: '#f1c40f' })
-      .setOrigin(0, 0.5);
-    // Tečky karty po 10 v řadě, vpravo od čísla.
-    const radku = Math.ceil(karta.hodnota / KARTY.vRade);
-    const tecky = Array.from({ length: karta.hodnota }, (_, i) =>
-      this.add
-        .circle(
-          KARTY.x0 + (i % KARTY.vRade) * KARTY.d,
-          (Math.floor(i / KARTY.vRade) - (radku - 1) / 2) * KARTY.d,
-          KARTY.r,
-          ZLUTA,
-        )
-        .setStrokeStyle(2, 0xfef9e7)
-        .setName(`${karta.kod}_tecka_${i + 1}`),
-    );
-    const obal = this.add.container(x, y, [pozadi, cislo, ...tecky]).setName(`karta_${karta.kod}`);
-    pozadi.setInteractive({ useHandCursor: true });
-    const kn: KartaNaObrazovce = { karta, obal, pozadi, cislo, tecky };
-    pozadi.on('pointerdown', () => this.zaplat(kn));
-    this.prekresliKartu(kn);
-    return kn;
-  }
-
-  /** Zůstatek karty: plné tečky = zbývá, prázdná kolečka = utraceno dnes. */
-  private prekresliKartu(kn: KartaNaObrazovce): void {
-    const zbyva = penezenka().zustatek(kn.karta.kod) ?? 0;
-    kn.cislo.setText(String(zbyva));
-    kn.tecky.forEach((t, i) => t.setFillStyle(ZLUTA, i < zbyva ? 1 : 0));
-  }
-
   // ---------- Placení ----------
 
   private zaplat(kn: KartaNaObrazovce): void {
@@ -285,7 +233,7 @@ export class ShopScene extends Phaser.Scene {
     const pred = penezenka().zustatek(kn.karta.kod) ?? 0;
     const platba = penezenka().zaplat(kn.karta.kod, cena);
     if (!platba.ok) {
-      this.odmitni(kn);
+      this.panel.odmitni(kn);
       return;
     }
 
@@ -302,12 +250,8 @@ export class ShopScene extends Phaser.Scene {
     });
 
     // Tečky z karty odletí jedna po druhé na tečky útraty v košíku (odečítání viditelně).
-    for (let i = 0; i < cena; i++) {
-      const zdroj = kn.tecky[pred - 1 - i];
-      if (!zdroj) continue;
-      const start = { x: kn.obal.x + zdroj.x, y: kn.obal.y + zdroj.y };
+    this.panel.odeberTecky(kn, pred, cena).forEach((start, i) => {
       const cil = this.teckaUtraty(cena - 1 - i);
-      zdroj.setFillStyle(ZLUTA, 0);
       const letici = this.add.circle(start.x, start.y, KARTY.r + 1, ZLUTA).setDepth(20);
       this.tweens.add({
         targets: letici,
@@ -324,10 +268,10 @@ export class ShopScene extends Phaser.Scene {
           if (tecka instanceof Phaser.GameObjects.Arc) tecka.setFillStyle(ZELENA);
         },
       });
-    }
+    });
     // Číslo zůstatku se změní, až tečky doletí.
     this.time.delayedCall(cena * 110 + 550, () => {
-      this.prekresliKartu(kn);
+      this.panel.prekresli(kn);
       this.hotovo();
     });
   }
@@ -346,11 +290,16 @@ export class ShopScene extends Phaser.Scene {
     return PENEZNI_KARTY.every((k) => (penezenka().zustatek(k.kod) ?? 0) < this.benzin);
   }
 
+  /**
+   * Storno služební kartou = hra jako na začátku (rozhodnutí rodiče): karty zase plné, účet prázdný, zpět ke
+   * stojanu. Čas dne běží dál a deník zůstává – hráč má hlídat, aby restart potřeba nebyl.
+   */
   private stornoBenzinu(): void {
     if (this.stav !== 'nakup') return;
     this.stav = 'placeni';
     beep.tick(500, 0.1);
-    ucet().benzin = null;
+    penezenka().naplnVse();
+    ucet().vyprazdni();
     this.scene.start('Station' satisfies SceneKey);
   }
 
@@ -375,24 +324,6 @@ export class ShopScene extends Phaser.Scene {
       this.prekresliKosik();
       this.stav = 'nakup';
     });
-  }
-
-  private odmitni(kn: KartaNaObrazovce): void {
-    beep.error();
-    kn.pozadi.setFillStyle(0xc0392b);
-    const x = kn.obal.x;
-    this.tweens.add({
-      targets: kn.obal,
-      x: { from: x - 14, to: x + 14 },
-      duration: 60,
-      yoyo: true,
-      repeat: 3,
-      onComplete: () => {
-        kn.obal.x = x;
-        kn.pozadi.setFillStyle(BARVA_KARTY[kn.karta.hodnota] ?? 0x1f4f8f);
-      },
-    });
-    this.krizek(kn.obal.x, kn.obal.y, 80);
   }
 
   /** Chyba (neznámý kód, plný košík): chybový zvuk a ❌. */

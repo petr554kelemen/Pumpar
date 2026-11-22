@@ -1,12 +1,11 @@
 import Phaser from 'phaser';
 import { bus, type GameEvents } from '../services/eventBus.ts';
 import * as beep from '../services/beep.ts';
-import { type Disk, type KoloId, type StavKola, cenaKola, cenaVyberu, noveAuto, zaplat } from '../services/air.ts';
-import { najdiKartu, penezenka } from '../services/penezenka.ts';
+import { type Disk, type KoloId, type StavKola, cenaKola, cenaVyberu, noveAuto } from '../services/air.ts';
+import { penezenka } from '../services/penezenka.ts';
+import { type KartaNaObrazovce, PanelKaret } from './kartyPanel.ts';
 import { addNav, type SceneKey } from './nav.ts';
 
-const FONT = 'Arial, Helvetica, sans-serif';
-const NOMINALY = [10, 15, 20] as const;
 const ZLUTA = 0xf1c40f;
 /** Barvy disků (cena podle barvy – viz air.ts): ráfek a paprsky. */
 const BARVA_DISKU: Readonly<Record<Disk, { rafek: number; paprsky: number }>> = {
@@ -45,29 +44,17 @@ interface Kolo {
   napoveda: Phaser.GameObjects.Arc[];
 }
 
-interface Karta {
-  hodnota: number;
-  /** Peněžní karta `K…` se zůstatkem na celý den (platba se odečte i v peněžence); karty 10/15/20 na obrazovce ne. */
-  kod?: string;
-  /** Kolik teček na kartě ještě zbývá (u jednoho auta lze platit vícekrát). */
-  zbyva: number;
-  obal: Phaser.GameObjects.Container;
-  pozadi: Phaser.GameObjects.Rectangle;
-  tecky: Phaser.GameObjects.Arc[];
-}
-
 type Stav = 'vyber' | 'placeni' | 'odjezd';
 
 // Dofukování kol (nápad hráče): auto jako plánek ze shora, kola z boku – splasklé má dole plošku.
 // Cena dofouknutí podle barvy disku (modrý 2, červený 3, zelený 5), kontrola plného kola 1.
-// Hráč vybere kola, zaplatí jednou kartou (10/15/20 klepnutím, nebo pípnutím bankovky B…).
-// Málo teček = odmítnuto. Tečky z karty odletí ke kolům, zbytek zůstane na kartě.
+// Hráč vybere kola, zaplatí jednou peněžní kartou (stejná sada K001–K007 jako v obchodě, klepnutím nebo
+// pípnutím; zůstatek společný na celý herní den). Málo teček = odmítnuto. Tečky z karty odletí ke kolům.
 export class AirScene extends Phaser.Scene {
   private stav: Stav = 'vyber';
   private auto!: Phaser.GameObjects.Container;
   private kola: Kolo[] = [];
-  private karty: Karta[] = [];
-  private docasnaKarta: Karta | null = null;
+  private panel!: PanelKaret;
   private dalsiAuto!: Phaser.GameObjects.Text;
 
   constructor() {
@@ -77,18 +64,16 @@ export class AirScene extends Phaser.Scene {
   create(): void {
     this.stav = 'vyber';
     this.kola = [];
-    this.karty = [];
-    this.docasnaKarta = null;
     addNav(this);
 
     // Světlá plocha stání (beton) – černé pneumatiky na ní jsou dobře vidět, i ploška splasklého kola.
     this.add.rectangle(AUTO.x, AUTO.y, 560, 610, 0xb3bcc4).setStrokeStyle(4, 0xd5dbe0).setName('stani');
-    NOMINALY.forEach((h, i) => this.karty.push(this.vytvorKartu(h, 1010, 175 + i * 185)));
+    this.panel = new PanelKaret(this, (kn) => this.plat(kn));
     this.vytvorAuto(0);
     this.auto.y = this.cilY;
 
     this.dalsiAuto = this.add
-      .text(1010, 670, '🚗 ➡️', { fontSize: '56px', backgroundColor: '#37404c', padding: { x: 18, y: 4 } })
+      .text(780, 50, '🚗 ➡️', { fontSize: '56px', backgroundColor: '#37404c', padding: { x: 18, y: 4 } })
       .setOrigin(0.5)
       .setName('dalsi_auto')
       .setInteractive({ useHandCursor: true });
@@ -232,63 +217,16 @@ export class AirScene extends Phaser.Scene {
     }
   }
 
-  // ---------- Karty ----------
-
-  private vytvorKartu(hodnota: number, x: number, y: number): Karta {
-    const sirka = 300;
-    const vyska = 165;
-    const pozadi = this.add.rectangle(0, 0, sirka, vyska, 0x1f4f8f).setStrokeStyle(4, 0xd4ac0d);
-    const cislo = this.add
-      .text(-sirka / 2 + 22, 0, String(hodnota), { fontFamily: FONT, fontSize: '64px', fontStyle: 'bold', color: '#f1c40f' })
-      .setOrigin(0, 0.5);
-    const tecky: Phaser.GameObjects.Arc[] = [];
-    const radku = Math.ceil(hodnota / 5);
-    for (let i = 0; i < hodnota; i++) {
-      const r = Math.floor(i / 5);
-      const s = i % 5;
-      tecky.push(
-        this.add
-          .circle(10 + s * 26, (r - (radku - 1) / 2) * 26, 10, ZLUTA)
-          .setStrokeStyle(2, 0xfef9e7)
-          .setName(`karta_${hodnota}_tecka_${i + 1}`),
-      );
-    }
-    const obal = this.add.container(x, y, [pozadi, cislo, ...tecky]).setName(`karta_${hodnota}`);
-    pozadi.setInteractive({ useHandCursor: true });
-    const karta: Karta = { hodnota, zbyva: hodnota, obal, pozadi, tecky };
-    pozadi.on('pointerdown', () => this.plat(karta));
-    return karta;
-  }
+  // ---------- Placení ----------
 
   private onScan({ info }: GameEvents['scan']): void {
-    if (this.stav !== 'vyber') return;
-    if (info.druh === 'karta') {
-      // Peněžní karta se zůstatkem (K001…): dočasná karta ukáže dnešní zůstatek.
-      const penezni = najdiKartu(info.kod);
-      const zbyva = penezni && penezenka().zustatek(penezni.kod);
-      if (penezni && zbyva !== undefined) this.plat(this.vytvorDocasnouKartu(penezni.hodnota, penezni.kod, zbyva));
-      return;
-    }
-    if (info.druh !== 'bankovka') return;
-    // Pípnutá bankovka: použije se karta na obrazovce se stejnou hodnotou, jinak dočasná karta.
-    const karta = this.karty.find((k) => k.hodnota === info.hodnota) ?? this.vytvorDocasnouKartu(info.hodnota);
-    this.plat(karta);
+    if (this.stav !== 'vyber' || info.druh !== 'karta') return;
+    // Peněžní karta (K001…) = jako klepnutí na ni; služební a neznámá karta neplatí.
+    const kn = this.panel.najdi(info.kod);
+    if (kn) this.plat(kn);
   }
 
-  private vytvorDocasnouKartu(hodnota: number, kod?: string, zbyva = hodnota): Karta {
-    this.docasnaKarta?.obal.destroy();
-    const karta = this.vytvorKartu(hodnota, 1010, 360);
-    karta.obal.setDepth(10);
-    if (kod) {
-      karta.kod = kod;
-      karta.zbyva = zbyva;
-      karta.tecky.forEach((t, i) => i < hodnota - zbyva && t.setFillStyle(ZLUTA, 0));
-    }
-    this.docasnaKarta = karta;
-    return karta;
-  }
-
-  private plat(karta: Karta): void {
+  private plat(kn: KartaNaObrazovce): void {
     if (this.stav !== 'vyber') return;
     const vybrana = this.kola.filter((k) => k.vybrane);
     if (vybrana.length === 0) {
@@ -301,13 +239,12 @@ export class AirScene extends Phaser.Scene {
     }
 
     const cena = cenaVyberu(vybrana);
-    const platba = zaplat(karta.zbyva, cena);
-    if (!platba.ok) {
-      this.odmitni(karta);
+    const pred = penezenka().zustatek(kn.karta.kod) ?? 0;
+    if (!penezenka().zaplat(kn.karta.kod, cena).ok) {
+      this.panel.odmitni(kn);
       return;
     }
 
-    if (karta.kod) penezenka().zaplat(karta.kod, cena);
     this.stav = 'placeni';
     beep.tick(880, 0.1);
     vybrana.forEach((k) => {
@@ -317,14 +254,9 @@ export class AirScene extends Phaser.Scene {
 
     // Tečky z karty odletí ke kolům (odečítání viditelně): 3 k dofukovanému, 1 ke kontrolovanému.
     const cile = vybrana.flatMap((k) => Array.from({ length: cenaKola(k) }, () => k));
-    const prvni = karta.hodnota - karta.zbyva; // dřív utracené tečky jsou na začátku
-    karta.zbyva -= cena;
-    for (let i = 0; i < cena; i++) {
-      const zdroj = karta.tecky[prvni + i];
+    this.panel.odeberTecky(kn, pred, cena).forEach((start, i) => {
       const kolo = cile[i];
-      if (!zdroj || !kolo) continue;
-      const start = { x: karta.obal.x + zdroj.x, y: karta.obal.y + zdroj.y };
-      zdroj.setFillStyle(ZLUTA, 0); // na kartě zůstane prázdné kolečko
+      if (!kolo) return;
       const cil = this.svetovaPozice(kolo);
       const letici = this.add.circle(start.x, start.y, 10, ZLUTA).setDepth(20);
       this.tweens.add({
@@ -339,38 +271,12 @@ export class AirScene extends Phaser.Scene {
           letici.destroy();
         },
       });
-    }
+    });
 
+    // Číslo zůstatku se změní, až tečky doletí.
+    this.time.delayedCall(cena * 140 + 450, () => this.panel.prekresli(kn));
     // Po doletu teček foukání kol jedno po druhém.
     this.time.delayedCall(cena * 140 + 500, () => this.nafoukni(vybrana, 0));
-  }
-
-  private odmitni(karta: Karta): void {
-    beep.error();
-    karta.pozadi.setFillStyle(0xc0392b);
-    const x = karta.obal.x;
-    this.tweens.add({
-      targets: karta.obal,
-      x: { from: x - 14, to: x + 14 },
-      duration: 60,
-      yoyo: true,
-      repeat: 3,
-      onComplete: () => {
-        karta.obal.x = x;
-        karta.pozadi.setFillStyle(0x1f4f8f);
-        // Odmítnutá pípnutá bankovka zmizí.
-        if (karta === this.docasnaKarta) {
-          this.tweens.add({ targets: karta.obal, alpha: 0, delay: 500, duration: 300, onComplete: () => karta.obal.destroy() });
-          this.docasnaKarta = null;
-        }
-      },
-    });
-    const krizek = this.add
-      .text(karta.obal.x, karta.obal.y, '❌', { fontSize: '110px', padding: { x: 10, y: 20 } })
-      .setOrigin(0.5)
-      .setDepth(30)
-      .setName('odmitnuto');
-    this.tweens.add({ targets: krizek, alpha: { from: 1, to: 0 }, delay: 700, duration: 400, onComplete: () => krizek.destroy() });
   }
 
   private nafoukni(kola: Kolo[], index: number): void {
@@ -481,14 +387,6 @@ export class AirScene extends Phaser.Scene {
     beep.tick(500, 0.1);
     const stare = this.auto;
     this.tweens.add({ targets: stare, y: -700, duration: 900, ease: 'Quad.In', onComplete: () => stare.destroy() });
-
-    // Karty znovu plné, dočasná karta pryč.
-    this.docasnaKarta?.obal.destroy();
-    this.docasnaKarta = null;
-    this.karty.forEach((k) => {
-      k.zbyva = k.hodnota;
-      k.tecky.forEach((t) => t.setFillStyle(ZLUTA, 1));
-    });
 
     this.time.delayedCall(700, () => {
       this.vytvorAuto(1100);
