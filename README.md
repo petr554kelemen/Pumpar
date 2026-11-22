@@ -25,10 +25,13 @@ https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-ver
   - `codes.ts` – rozpoznání kódů (`parseCode` → `CodeInfo`, tabulka kategorií `CATEGORIES`),
   - `scanInput.ts` – vstup kódů z klávesnice / USB čtečky (převod CZ rozložení, ochrana proti dvojímu čtení),
   - `beep.ts` – jednoduché zvuky,
-  - `pump.ts` (stojan), `air.ts` (vzduch), `lock.ts` (zámek benzínky), `den.ts` (herní den, odpočet směny).
+  - `pump.ts` (stojan), `air.ts` (vzduch), `lock.ts` (zámek benzínky), `den.ts` (herní den, odpočet směny),
+  - `katalog.ts` (zboží: kód → výrobek, cena), `penezenka.ts` (peněžní karty a jejich zůstatky),
+    `denik.ts` (deník směny – prodeje pro uzávěrku, localStorage), `ucet.ts` (nezaplacený benzín od stojanu).
 - `src/scenes/` – Phaser scény: `LockScene.ts` (zamčená benzínka, výchozí), `StationScene.ts` (stojan),
-  `AirScene.ts` (vzduch), `ScanTestScene.ts` („Pípni něco“), `UzaverkaScene.ts` (konec dne),
-  `nav.ts` (přepínání scén ikonami vlevo nahoře + odpočet směny vpravo), `hodiny.ts` (kreslení hodin).
+  `AirScene.ts` (vzduch), `ShopScene.ts` (obchod), `ScanTestScene.ts` („Pípni něco“), `UzaverkaScene.ts` (konec dne),
+  `nav.ts` (přepínání scén ikonami vlevo nahoře + odpočet směny vpravo), `hodiny.ts` (kreslení hodin),
+  `kartyPanel.ts` (peněžní karty na obrazovce – obchod, vzduch – a přehled zůstatků u stojanu).
 - `tests/` – testy služeb (`npm test`).
 - `tisk.html`, `src/tisk/` – stránka pro tisk visaček (jen pro rodiče); `layout.ts` = rozvržení listu (mm).
 - `karty.html`, `src/tisk/karty.ts` – štítky na staré platební karty (sada karet s tečkami + služební karta).
@@ -77,6 +80,9 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
   porovnávání (stačí karta?), rozsahy (předvolba, terč přesnosti), sčítání (cena roste po kolech),
   násobilka (kolo = 3 tečky → 3, 6, 9, 12), **odečítání**: tečky z karty viditelně odletí jedna po druhé
   k věci, kterou platí, a zbytek se vrátí do peněženky (ve staré verzi tečky jen mizely – nebylo to odečítání).
+- **Finanční gramotnost** (cíl rodiče, 2026-11-22): nejde jen o hru – hráč se učí hospodařit. Karta má omezený
+  zůstatek na celý den, co utratí jinde, chybí v obchodě; když nestačí, ubere zboží; benzín se musí zaplatit.
+  Nová mechanika s penězi má tento cíl podporovat, ne obcházet (žádné bezedné karty, doplňování, dluh bez následků).
 - **Kde jsou dvě cesty, platí obě.** Kódy ze čtečky jsou zábava, ale nemusí být všude povinné: např. dveře
   benzínky odemkne zadaný kód **nebo** pípnutá karta (karta = „PIN v kapse“). Hráč volí, co má po ruce.
 - **Slova hráče, ne naše.** Ve frázích používat jeho pojmenování: **benzínka, benzinář** – „pumpa / pumpař“
@@ -200,16 +206,26 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
 | **SPZ** (`LA01`, `KE01`) na kartě | prošlá platební karta | **laser + QR H** (laminovaný / přelepený štítek) | místo na velký QR, odolné slunci |
 | **SPZ** na velkém autíčku | autíčko | D30 termoštítek, Code128 (jde z plastu dolů) | termotisk bledne na slunci |
 | **SPZ** u malého autíčka | visačka **u auta** (ne na něm) | laser + QR H + laminace | štítek by se na malém autě zdeformoval a čtečka ho nepřečte |
-| **Karty s tečkami** (`B010`, `B015`, `B020`) | prošlá platební karta | **laser + QR H**, štítek 26 × 29 mm přelepený páskou | `karty.html`; sada 1 × 20, 2 × 15, 4 × 10 |
+| **Peněžní karty** (`K001`–`K007`) | prošlá platební karta | **laser + QR H**, štítek 26 × 29 mm přelepený páskou | `karty.html`; sada 1 × 20, 2 × 15, 4 × 10 |
 | **Služební karta** (`K000`) 🔑 | prošlá platební karta | **laser + QR H** | odemyká benzínku, `karty.html` |
-| **Herní karta se zůstatkem** (`K001`…) | prošlá platební karta | **laser + QR H** | později (fáze 5 – peněženka) |
 | **Bankovky** (`B020`) | kód přímo na papírové bankovce | laser, papír | bez samolepek |
 | **Rodičovské kódy** (`9001`) | list pro rodiče | laser, papír | hráč je nemá mít po ruce |
 
-- **Karty s tečkami = pevná hodnota** (rozhodnutí 2026-11-18): kód bankovky `Bxxx` (číslo = tečky), na štítku
-  **jen QR** (+ drobný kód pro rodiče) – **hodnotu hráč pozná podle barvy karty**. Karta neubývá – platí se jednou
-  kartou, malá je odmítnuta.
-  Karty se zůstatkem (`K001`…) přibudou později jako další druh, tyto platnost neztratí.
+- **Peněžní karty se zůstatkem** (rozhodnutí 2026-11-22, nahrazuje „karty s pevnou hodnotou `Bxxx`“ z 2026-11-18):
+  **každá karta má vlastní kód** `K001`–`K007` a počáteční hodnotu (`K001` = 20, `K002`–`K003` = 15,
+  `K004`–`K007` = 10; tabulka v `penezenka.ts`). **Zůstatek se drží po celý herní den**, nový den = karty zase plné.
+  Na štítku **jen QR** (+ drobný kód pro rodiče) – **hodnotu hráč pozná podle barvy karty**. Nákup se platí
+  jednou kartou; na kterou zůstatek nestačí, ta je odmítnuta ❌. Přečerpání zatím ne (nápad rodiče).
+  **Proč (cíl rodiče):** hráč se má naučit, že **platební karta není bezedná peněženka** – ani při skutečném
+  nákupu. Během jedné hry (herního dne) si hlídá, kolik si ještě může dovolit – zůstatky vidí na kartách
+  a u stojanu. Nezjednodušovat na nekonečnou kartu ani na doplňování karet během dne (to dřív dělal vzduch).
+  Kódy `Bxxx` zůstávají pro bankovky/mince (fáze 5).
+- **Benzín se platí v obchodě a bez zaplacení se neodchází** (rozhodnutí 2026-11-22): po tankování „🛒 Jít platit“,
+  benzín je v košíku a nedá se vrátit; když karta nestačí, hráč ubere zboží. Navigace je do zaplacení zamčená.
+  Nezaplatí-li benzín žádná karta, služební karta `K000` = **restart** (karty plné, čas dne běží dál).
+  U stojanu je vidět zůstatek všech karet (kolik zbývá na nákupy).
+- **Karty jsou i na obrazovce** (hra je hratelná bez čtečky): obchod i vzduch ukazují sadu `K001`–`K007`
+  se zůstatkem; zaplatit jde **klepnutím na kartu nebo jejím pípnutím**.
 - **Ceny se na štítky netisknou.** Visačka nese jen co to je (písmeno kategorie, obrázek, kód).
   Kolik to stojí, určuje ceník ve hře (nastavuje „vedoucí benzínky“ v dílně ✏️) – změna ceny = žádný nový tisk.
 - **O značení rozhoduje hráč.** Hra nekontroluje, na čem visačka visí. Pomůcka: **obrázkový seznam

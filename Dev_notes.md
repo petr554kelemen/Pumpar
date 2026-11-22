@@ -11,7 +11,11 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 
 ## Další krok
 - Pořadí fází: 0 ✅ → 2 ✅ → **1** a **4** souběžně → 3 (čísla fází se nemění).
-- Fáze 4: stojan převeden (rodič ho vyzkouší proti staré verzi) → další: obchod (zboží pípáním do košíku).
+- Fáze 4: stojan i obchod 🛒 hotové a **napojené** (předvolby „🛒 + Obchod“, „🛒 Jít platit“) → rodič vyzkouší;
+  další: body za nákup / tankování do uzávěrky.
+  Rozhodnutí rodiče: **z obchodu se bez zaplacení benzínu neodchází** („to se nedělá“) – hráč ubere zboží.
+- **Karty:** štítky přegenerovány na `K001`–`K007` (každá karta vlastní kód, zůstatek na den) – pokud jsou staré
+  štítky `B…` už nalepené, vytisknout znovu https://petr554kelemen.github.io/Pumpar/karty.html (po nasazení).
 - **Dofukování kol 🛞 – ukázka pro hráče v dílně ✏️** (prototyp, ne schválené pravidlo): ukázat, nechat vyzkoušet,
   zapsat jeho připomínky; co „orazítkuje“, platí.
   Hráč dál hraje starou verzi, novou uvidí až hotovou (Pravidla jsou zákon, bod 1).
@@ -28,7 +32,7 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   - D30 výsledek 2 (2026-11-18, čtečka): vytištěné štítky přečetla bez problémů, QR na 12 × 40 s obtížemi
     → **D30 = Code128** (README → Tisk štítků). Hra kódy rozlišuje jen podle obsahu, ne podle druhu.
 - **Karty:** vytisknout https://petr554kelemen.github.io/Pumpar/karty.html, nalepit na karty podle barev,
-  ověřit čtení čtečkou (vzduch: pípnutí karty, dveře: `K000`).
+  ověřit čtení čtečkou (obchod a vzduch: pípnutí karty, dveře: `K000`).
 - **Výsledky obsluhy** (Plán): herní den ✅ → další: přidělení služební karty (pípnout → LA / KE), deník směny,
   výsledky do uzávěrky (scéna `UzaverkaScene` je připravená).
 
@@ -42,8 +46,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     (telefon: potíže taky jen s QR 12 × 40),
   - **laser:** ✅ testovací list `tisk.html` (25 visaček: Code128 0,2–0,33 mm, QR 10–20 mm, ostatní druhy kódů)
     → ☐ vytisknout, vystříhat, zalaminovat, ověřit čtení čtečkou i telefonem, zvolit velikost,
-  - ✅ **štítky na staré platební karty** (`karty.html`): 1 × 20, 2 × 15, 4 × 10 (`B020`/`B015`/`B010`) + služební
-    karta `K000`; **jen QR H 20 mm** (hodnotu hráč pozná podle barvy karty), štítek 26 × 29 mm
+  - ✅ **štítky na staré platební karty** (`karty.html`): 1 × 20, 2 × 15, 4 × 10 (od 2026-11-22 `K001`–`K007`,
+    každá vlastní kód) + služební karta `K000`; **jen QR H 20 mm** (hodnotu hráč pozná podle barvy karty), štítek 26 × 29 mm
     → ☐ vytisknout, nalepit, ověřit čtení,
   - ☐ bankovky, obrázkový seznam „kam co“, katalog (až po dílně s hráčem).
   Herní visačky/štítky až po odsouhlasení s hráčem (dílna ✏️ → razítko ✅).
@@ -54,10 +58,39 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   - [x] Stojan (`StationScene` + logika `src/services/pump.ts`): předvolba (klávesnice jako na pokladně,
     5/10/15 L, 🎲 3–22,80 L), rychle ⬆️ 0,07 L / 45 ms, pomalu ⬇️ 0,01 L / 95 ms (držet tlačítko/šipku),
     vyhodnocení přesně / před cílem / přeteklo, zvuky jako stará verze. Litry v setinách (celá čísla).
-  - [ ] Předvolby „+ Obchod“ a tlačítko „Jít platit“ – až s obchodem.
-  - [ ] Obchod.
+  - [x] **Napojení stojanu na obchod** (postup ze staré verze, `ucet.ts`): zelené předvolby `🛒 6 L`, `🛒 10 L`,
+    `🛒 🎲` (celé litry 4–14) zapnou režim obchodu (značka ⛽ ➡️ 🛒 nahoře). Po tankování (od 0,80 L) tlačítko
+    „🛒 Jít platit (N)“ ve výsledku → obchod: benzín je první položka košíku ⛽ s **modrými tečkami** (nedá se
+    vrátit), zboží se přidává zlatými, limit 30 platí i s benzínem. Zaplatí se **jednou kartou celé**, deník
+    zapíše i benzín. Po zaplacení zpět ke stojanu; v režimu obchodu s novou náhodnou předvolbou.
+    **Bez zaplacení se z obchodu neodejde** (rozhodnutí rodiče): s benzínem v košíku je navigace zamčená (ikony
+    ztlumené, klepnutí = chyba + zatřesení ⛽) – hráč ubere zboží, aby nákup zaplatil. Pojistka: nestačí-li
+    na samotný benzín **žádná** karta (karty za den vyčerpané), obsluha pípne služební kartu `K000` =
+    **restart hry** (rozhodnutí rodiče): karty zase plné, účet prázdný, zpět ke stojanu, **čas dne běží dál**,
+    deník zůstává. Hráč má hlídat, aby restart potřeba nebyl. Jinak `K000` v obchodě neplatí. Konec dne
+    (odpočet) obchod ukončí vždy, nový den účet vyprázdní.
+    **Kolik zbývá na nákupy** (rodič): u stojanu nahoře malé karty se zůstatkem (číslo + proužek, `prehled_K001`…)
+    – hráč při tankování vidí, kolik teček může zaplatit. Hra nehlídá shodu s předvolbou, jen jestli to zaplatí.
+    Změna proti staré verzi: platit jde jen benzín do **20 teček** (největší karta; dřív 22 kvůli bankovce 25)
+    a text „Cena v obchodě: N teček“ (bez „zlatých“ – benzín je v obchodě modře, jako ve staré verzi).
+  - [x] **Karty na obrazovce** (`src/scenes/kartyPanel.ts`, rodič: hra hratelná i bez pípání): obchod i vzduch
+    mají stejný sloupec karet `K001`–`K007` (hodnoty sady 20/15/15/10/10/10/10) se zůstatkem dne; karta se
+    aktivuje **klepnutím nebo pípnutím**. U vzduchu tím zmizely karty 10/15/20 doplňované s každým autem
+    i placení pípnutou bankovkou `B…` (bankovky přijdou až ve fázi 5).
+  - [x] **Obchod** (`ShopScene` 🛒, `katalog.ts`, `penezenka.ts`, `denik.ts`) – postup podle rodiče: **nejdřív zboží**
+    (klepnutí na regál nebo pípnutí visačky), útrata v košíku roste (číslo + tečky po 10), klepnutím na zboží v košíku
+    se vrátí, 🗑️ vysype. Pak hráč **sám zvolí kartu** podle útraty a pípne ji (nebo klepne) → stačí = tečky odletí
+    do košíku (zezelenají), ✅, zápis do deníku; nestačí = ❌ a zatřesení karty. Vpravo všech 7 karet se zůstatkem
+    (plné tečky = zbývá, prázdná kolečka = dnes utraceno) → hráč porovná. Útrata max. 30, víc = ❌.
+    Zboží a ceny ze staré verze (🍪 2, 🍦 3, ☕ 4, 🧃 5, 🌭 6, 🏎️ 9; kódy S001, S002, P001, P002, J001, A001) –
+    **návrh do dílny ✏️**. Barvy karet na obrazovce (20 zlatá, 15 zelená, 10 modrá) jsou zatím odhad – sladit
+    se skutečnými kartami.
+  - **Nápad rodiče (zatím ne):** jedno přečerpání karty ve stejné hodnotě (karta by za den měla 2× svou hodnotu).
+    Použít jen tehdy, když se při hraní ukáže, že celková částka na kartách (100 teček) je na jedno kolo hry
+    málo. Hra se dá kdykoli restartovat a hrát znovu, takže přečerpání je jen jedna z možností.
 - [ ] **5 – Peněženka:** trvalý zůstatek, placení naskenovanými bankovkami, výpočet vrácení.
   **Volba platby jako na samoobslužné pokladně (nápad hráče):**
+  - ✅ hotovo v obchodě (2026-11-22, zůstatek po herní den; u vzduchu platí pípnutá `K…` taky).
   - 💳 **Kartou (jednodušší):** karta (`K…`, stará platební karta s QR) má **zůstatek** uložený ve hře
     (vytištěné tečky by neubývaly → zůstatek se ukáže po pípnutí). Hráč vybere kartu, na které je dost
     (porovnání). Tečky z karty viditelně odletí k nákupu (odečítání), zůstatek se zmenší. Málo teček = odmítnuto ❌
@@ -137,7 +170,7 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   - [x] **Prototyp (scéna `AirScene`, ikona 🛞, logika `src/services/air.ts`):** auto-plánek ze shora, kola
     v rozích **z boku** (kulatá s ráfkem jako 🛞; splasklé má **dole plošku** a vyboulené boky – přání rodiče),
     náhodně 1–4 kola splasklá, klepnutím výběr (žlutý rámeček, s nápovědou 3 tečky), karty 10/15/20 klepnutím nebo pípnutím `B…`
-    (jiná hodnota = dočasná karta), malá = ❌ + zatřesení, jinak tečky odletí ke kolům (na kartě prázdná kolečka),
+    (jiná hodnota = dočasná karta) – **od 2026-11-22 nahrazeno sadou `K001`–`K007` (viz fáze 4 → Karty na obrazovce)**, malá = ❌ + zatřesení, jinak tečky odletí ke kolům (na kartě prázdná kolečka),
     kola se postupně nafouknou + cink, 🚗➡️ další auto. Nápověda (tečky ceny u kola) je **vždy zapnutá**. **S prázdným kolem se nejezdí:** 🚗➡️ při prázdném kole
     = nad ním bliká ❗ + chybový zvuk, auto zůstane. Doplatit lze další kartou; karta si pamatuje zůstatek
     (prázdná kolečka) do odjezdu auta.
@@ -193,6 +226,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     prodaného zboží (🧃 🍭 …), tečky tržby → porovnání „kdo víc“ obrázkem. **Pro rodiče** tabulka s historií po dnech
     (samostatná stránka jako `tisk.html`).
   - Pořadí: deník + přihlášení obsluhy + uzávěrka nad stojanem a vzduchem hned; zboží až s obchodem.
+  - ✅ Deník (`denik.ts`, localStorage `pumpar.denik`) zapisuje **prodeje v obchodě** (zboží, tečky, karta, den).
+    Chybí: kdo obsluhoval, tankování, vzduch, zobrazení v uzávěrce.
   - **Do dílny ✏️:** kódy/karty obsluhy (dnes jediná `K000` / 1111), vzhled uzávěrky, zda se počítají auta
     nebo jednotlivé práce (tankování + vzduch u jednoho auta = 1 nebo 2 body), mazání výsledků (kód `9…`).
 - [ ] **Písmena (po fázi 4):** písmeno kategorie na štítcích a ve hře, úkoly „pípni zboží na M“, SPZ u stojanu.
@@ -233,6 +268,11 @@ _(zatím nic)_
   podle fyzické klávesy (`e.code`).
 
 ## WISH
+- **Infografika dne** (nápad rodiče, 2026-11-22; finanční gramotnost): v uzávěrce malý obrázkový přehled,
+  za co šly tečky (⛽ benzín, 🛞 vzduch, 🧃🍪 zboží) a kolik zbylo na kartách. Jedna z možných podob je stromová
+  mapa (plochy podle útraty). Data jsou v deníku (`denik.ts`). Podobu dořešit s rodičem.
+  Je to **přehled dne benzínky, ne hodnocení hráče**: nakupují zákazníci (auta), takže žádné „dobře/špatně utraceno“
+  ani poučky o hospodaření (rozhodnutí rodiče).
 - **Minihra na čekání – mini pexeso** (nápad rodiče; hráč pexeso umí): malé (ne 8 × 8, třeba 3 × 4), obrázky
   z benzínky (⛽ 🛞 🚗 💳 🧃 …). Hraje se, než benzínka otevře (viz Plán → Otevírání benzínky → Čekání zákazníka).
 - **Státní svátek – zavřeno** (nápad rodiče): občas (náhodně / podle kalendáře) je svátek → na dveřích
@@ -378,3 +418,20 @@ _(zatím nic)_
   s pevnou hodnotou (kód bankovky, fungují ve hře hned u vzduchu) 1 × 20, 2 × 15, 4 × 10 (hráč bere vždy největší)
   + služební karta `K000`. Karty se zůstatkem `K001`… až s peněženkou. 49/49 testů, ověřeno v Chrome (náhled listu).
   Upřesnění rodiče: na štítku stačí QR – hodnotu hráč pozná podle barvy karty → štítek zmenšen na 26 × 29 mm.
+- 2026-11-22 (uživatel + Claude): **Obchod 🛒** (samostatně, bez benzínu): nejdřív zboží (klepnutí / pípnutí),
+  útrata roste, pak hráč zvolí a pípne kartu → ✅ (tečky odletí, zápis do deníku) / ❌. Rozhodnutí rodiče: karty
+  drží **zůstatek po herní den** → každá karta vlastní kód `K001`–`K007` (README → Tisk štítků, `karty.html`
+  přegenerován). Vzduch přijímá pípnutou `K…`. Nové služby `katalog`, `penezenka`, `denik`. 56/56 testů, typecheck,
+  build OK, ověřeno v headless Chrome (útrata 14, K004 odmítnuta, K001 → zbývá 6, 7 > 6 odmítnuto, X123 ❌,
+  vzduch s K001 platí z dnešního zůstatku, deník zapsán).
+- 2026-11-22 (uživatel + Claude): **Napojení stojanu na obchod** – předvolby „🛒 + Obchod“, „🛒 Jít platit“,
+  benzín na účtu (`ucet.ts`) jako první položka košíku (modré tečky), zaplatí se jednou kartou se zbožím, pak zpět
+  ke stojanu. 60/60 testů, typecheck, build OK, ověřeno v headless Chrome (🛒 6 L → 4,69 L → Jít platit (5) →
+  + 🍪 🏎️ = 16 → K004 odmítnuta, K001 zaplatila → stojan s novou předvolbou 7 L, deník s benzínem).
+- 2026-11-22 (uživatel + Claude): Obchod – s nezaplaceným benzínem nejde odejít (zamčená navigace), storno `K000`
+  jen když benzín nezaplatí žádná karta. Ověřeno v Chrome (⛽/🛞 z obchodu nepustí, `K000` při dostatku ❌,
+  K001 zaplatí → stojan). Storno při vyčerpaných kartách ověřeno jen kódem, ne v prohlížeči.
+- 2026-11-22 (uživatel + Claude): Storno `K000` = restart hry (karty plné, čas běží dál); u stojanu přehled zůstatků
+  karet („kolik zbývá na nákupy“); společný panel karet `kartyPanel.ts` – vzduch platí stejnou sadou `K001`–`K007`
+  jako obchod (klepnutí i pípnutí), 🚗➡️ přesunuto do horní lišty. 60/60 testů, ověřeno v Chrome (K001 na 2 →
+  natankováno 16 → K003 odmítnuta → `K000` → stojan, karty plné; vzduch zaplatil z K004).
