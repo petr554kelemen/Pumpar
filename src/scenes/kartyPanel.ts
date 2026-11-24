@@ -19,6 +19,20 @@ export function barva(k: PenezniKarta): number {
   return BARVA_KARTY[k.hodnota] ?? 0x1f4f8f;
 }
 
+/**
+ * Kritická chyba (rozhodnutí rodiče 2026-11-24): chybový zvuk a velké ❌, které za chvíli zmizí.
+ * Např. placení neaktivní, služební nebo neznámou kartou (obchod i vzduch).
+ */
+export function krizek(s: Phaser.Scene, x: number, y: number, velikost = 110): void {
+  beep.error();
+  const k = s.add
+    .text(x, y, '❌', { fontSize: `${velikost}px`, padding: { x: 10, y: 20 } })
+    .setOrigin(0.5)
+    .setDepth(30)
+    .setName('odmitnuto');
+  s.tweens.add({ targets: k, alpha: { from: 1, to: 0 }, delay: 700, duration: 400, onComplete: () => k.destroy() });
+}
+
 export interface KartaNaObrazovce {
   karta: PenezniKarta;
   obal: Phaser.GameObjects.Container;

@@ -10,8 +10,7 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - WISH = nápady hráče a rodiče; do plánu/TODO se přesouvají až po domluvě s uživatelem.
 
 ## Další krok
-- **Výběr karet na začátku kola** ✅ (2026-11-24) → rodič vyzkouší. Otevřené: u vzduchu 🛞 se pípnutí
-  neaktivní karty zatím jen ignoruje – podle pravidla „nesprávná karta = kritická chyba ❌“ asi doplnit ❌ jako v obchodě.
+- **Výběr karet na začátku kola** ✅ (2026-11-24) → rodič vyzkouší. Nesprávná karta = ❌ v obchodě i u vzduchu 🛞.
 - Pořadí fází: 0 ✅ → 2 ✅ → **1** a **4** souběžně → 3 (čísla fází se nemění).
 - Fáze 4: stojan i obchod 🛒 hotové a **napojené** (předvolby „🛒 + Obchod“, „🛒 Jít platit“) → rodič vyzkouší;
   další: body za nákup / tankování do uzávěrky.
@@ -443,3 +442,6 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   a po restartu `K000` hráč aktivuje karty (✔, součet = strop kola); druhé pípnutí = zvuk + zatřesení bez ❌. Ve hře jen
   aktivní karty. 61/61 testů, typecheck, ověřeno v headless Chrome (K001 + K005 = 30, K001 znovu bez ❌, stojan ukazuje
   20 a 10, v obchodě K004 ❌, K005 zaplatila 9). Zjištěn BUG s mezipamětí Vite v Dropboxu.
+- 2026-11-24 (uživatel + Claude): U vzduchu 🛞 pípnutí neaktivní / služební / neznámé karty = ❌ + chybový zvuk
+  (dřív ignorováno). ❌ sdílí obchod i vzduch (`krizek` v `kartyPanel.ts`). Ověřeno v headless Chrome (aktivní K001,
+  u vzduchu K004 → ❌).

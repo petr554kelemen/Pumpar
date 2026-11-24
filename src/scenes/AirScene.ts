@@ -3,7 +3,7 @@ import { bus, type GameEvents } from '../services/eventBus.ts';
 import * as beep from '../services/beep.ts';
 import { type Disk, type KoloId, type StavKola, cenaKola, cenaVyberu, noveAuto } from '../services/air.ts';
 import { penezenka } from '../services/penezenka.ts';
-import { type KartaNaObrazovce, PanelKaret } from './kartyPanel.ts';
+import { KARTY, type KartaNaObrazovce, PanelKaret, krizek } from './kartyPanel.ts';
 import { addNav, type SceneKey } from './nav.ts';
 
 const ZLUTA = 0xf1c40f;
@@ -221,9 +221,11 @@ export class AirScene extends Phaser.Scene {
 
   private onScan({ info }: GameEvents['scan']): void {
     if (this.stav !== 'vyber' || info.druh !== 'karta') return;
-    // Peněžní karta (K001…) = jako klepnutí na ni; služební a neznámá karta neplatí.
+    // Aktivní peněžní karta = jako klepnutí na ni. Neaktivní, služební nebo neznámá karta = kritická chyba ❌
+    // (stejně jako v obchodě).
     const kn = this.panel.najdi(info.kod);
     if (kn) this.plat(kn);
+    else krizek(this, KARTY.x, 360);
   }
 
   private plat(kn: KartaNaObrazovce): void {

@@ -228,7 +228,8 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
   a po restartu `K000` si hráč karty **aktivuje** klepnutím nebo pípnutím; součet = strop teček na kolo, který pak
   hlídá. Aktivní karta svítí a má zelené ✔, neaktivní je bledá. Během kola se karty nepřidávají a ve hře jsou
   jen aktivní. **Druhé pípnutí už aktivní karty = jen chybový zvuk a zatřesení, bez ❌.**
-  **❌ je vyhrazený pro kritické chyby** – např. použití nesprávné karty (neaktivní / neznámé) při placení.
+  **❌ je vyhrazený pro kritické chyby** – např. použití nesprávné karty (neaktivní / neznámé) při placení
+  (obchod 🛒 i vzduch 🛞).
 - **Karty jsou i na obrazovce** (hra je hratelná bez čtečky): obchod i vzduch ukazují aktivní karty
   ze sady `K001`–`K007` se zůstatkem; zaplatit jde **klepnutím na kartu nebo jejím pípnutím**.
 - **Ceny se na štítky netisknou.** Visačka nese jen co to je (písmeno kategorie, obrázek, kód).

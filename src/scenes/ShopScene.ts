@@ -7,7 +7,7 @@ import { ZBOZI, type Zbozi, najdiZbozi, utrata, vejdeSe } from '../services/kata
 import { SLUZEBNI_KARTA } from '../services/lock.ts';
 import { PENEZNI_KARTY, penezenka } from '../services/penezenka.ts';
 import { teckyZaBenzin, ucet } from '../services/ucet.ts';
-import { KARTY, type KartaNaObrazovce, PanelKaret } from './kartyPanel.ts';
+import { KARTY, type KartaNaObrazovce, PanelKaret, krizek } from './kartyPanel.ts';
 import { addNav, type SceneKey } from './nav.ts';
 import type { StationData } from './StationScene.ts';
 
@@ -328,17 +328,7 @@ export class ShopScene extends Phaser.Scene {
 
   /** Chyba (neznámý kód, plný košík): chybový zvuk a ❌. */
   private chyba(x: number, y: number): void {
-    beep.error();
-    this.krizek(x, y, 110);
-  }
-
-  private krizek(x: number, y: number, velikost: number): void {
-    const krizek = this.add
-      .text(x, y, '❌', { fontSize: `${velikost}px`, padding: { x: 10, y: 20 } })
-      .setOrigin(0.5)
-      .setDepth(30)
-      .setName('odmitnuto');
-    this.tweens.add({ targets: krizek, alpha: { from: 1, to: 0 }, delay: 700, duration: 400, onComplete: () => krizek.destroy() });
+    krizek(this, x, y);
   }
 }
 
