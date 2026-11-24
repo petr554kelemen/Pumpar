@@ -222,10 +222,15 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
   Kódy `Bxxx` zůstávají pro bankovky/mince (fáze 5).
 - **Benzín se platí v obchodě a bez zaplacení se neodchází** (rozhodnutí 2026-11-22): po tankování „🛒 Jít platit“,
   benzín je v košíku a nedá se vrátit; když karta nestačí, hráč ubere zboží. Navigace je do zaplacení zamčená.
-  Nezaplatí-li benzín žádná karta, služební karta `K000` = **restart** (karty plné, čas dne běží dál).
-  U stojanu je vidět zůstatek všech karet (kolik zbývá na nákupy).
-- **Karty jsou i na obrazovce** (hra je hratelná bez čtečky): obchod i vzduch ukazují sadu `K001`–`K007`
-  se zůstatkem; zaplatit jde **klepnutím na kartu nebo jejím pípnutím**.
+  Nezaplatí-li benzín žádná karta, služební karta `K000` = **restart** (karty plné, hráč si je vybere znovu,
+  čas dne běží dál). U stojanu je vidět zůstatek aktivních karet (kolik zbývá na nákupy).
+- **Výběr karet na začátku kola = strop** (rozhodnutí rodiče 2026-11-24, scéna `KartyScene`): po odemčení benzínky
+  a po restartu `K000` si hráč karty **aktivuje** klepnutím nebo pípnutím; součet = strop teček na kolo, který pak
+  hlídá. Aktivní karta svítí a má zelené ✔, neaktivní je bledá. Během kola se karty nepřidávají a ve hře jsou
+  jen aktivní. **Druhé pípnutí už aktivní karty = jen chybový zvuk a zatřesení, bez ❌.**
+  **❌ je vyhrazený pro kritické chyby** – např. použití nesprávné karty (neaktivní / neznámé) při placení.
+- **Karty jsou i na obrazovce** (hra je hratelná bez čtečky): obchod i vzduch ukazují aktivní karty
+  ze sady `K001`–`K007` se zůstatkem; zaplatit jde **klepnutím na kartu nebo jejím pípnutím**.
 - **Ceny se na štítky netisknou.** Visačka nese jen co to je (písmeno kategorie, obrázek, kód).
   Kolik to stojí, určuje ceník ve hře (nastavuje „vedoucí benzínky“ v dílně ✏️) – změna ceny = žádný nový tisk.
 - **O značení rozhoduje hráč.** Hra nekontroluje, na čem visačka visí. Pomůcka: **obrázkový seznam

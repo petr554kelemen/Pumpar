@@ -10,6 +10,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - WISH = nápady hráče a rodiče; do plánu/TODO se přesouvají až po domluvě s uživatelem.
 
 ## Další krok
+- **Výběr karet na začátku kola** ✅ (2026-11-24) → rodič vyzkouší. Otevřené: u vzduchu 🛞 se pípnutí
+  neaktivní karty zatím jen ignoruje – podle pravidla „nesprávná karta = kritická chyba ❌“ asi doplnit ❌ jako v obchodě.
 - Pořadí fází: 0 ✅ → 2 ✅ → **1** a **4** souběžně → 3 (čísla fází se nemění).
 - Fáze 4: stojan i obchod 🛒 hotové a **napojené** (předvolby „🛒 + Obchod“, „🛒 Jít platit“) → rodič vyzkouší;
   další: body za nákup / tankování do uzávěrky.
@@ -260,7 +262,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] Obrázkový „Návod 1“ s pravidly hry (verzovaný – změna = nový návod s vyšším číslem).
 
 ## BUG
-_(zatím nic)_
+- 2026-11-24: Dev server (`npm run dev`) se rozbil – Vite nemohl přejmenovat `node_modules/.vite/deps_temp_…` na `deps`
+  (EBUSY, zámek nejspíš od Dropboxu) → Phaser 504, hra se nenačte (stránka sama vrací 200!). Řešení: restart serveru;
+  když se bude opakovat, přesunout `cacheDir` Vite mimo Dropbox (zeptat se uživatele). Test: načíst hru, ne jen stránku.
 
 ## FIX
 - 2026-11-17: Číslice z numerické klávesnice se zahazovaly při vypnutém NumLocku (přišlo „Insert“, „End“…)
@@ -435,3 +439,7 @@ _(zatím nic)_
   karet („kolik zbývá na nákupy“); společný panel karet `kartyPanel.ts` – vzduch platí stejnou sadou `K001`–`K007`
   jako obchod (klepnutí i pípnutí), 🚗➡️ přesunuto do horní lišty. 60/60 testů, ověřeno v Chrome (K001 na 2 →
   natankováno 16 → K003 odmítnuta → `K000` → stojan, karty plné; vzduch zaplatil z K004).
+- 2026-11-24 (uživatel + Claude): **Výběr karet na začátku kola** (`KartyScene`, `penezenka.aktivuj/strop`): po odemčení
+  a po restartu `K000` hráč aktivuje karty (✔, součet = strop kola); druhé pípnutí = zvuk + zatřesení bez ❌. Ve hře jen
+  aktivní karty. 61/61 testů, typecheck, ověřeno v headless Chrome (K001 + K005 = 30, K001 znovu bez ❌, stojan ukazuje
+  20 a 10, v obchodě K004 ❌, K005 zaplatila 9). Zjištěn BUG s mezipamětí Vite v Dropboxu.
