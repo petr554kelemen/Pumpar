@@ -31,6 +31,8 @@ test('Katalog: útrata = součet cen, do košíku jen do 30 teček', () => {
 
 test('Peněženka: zůstatek se odečítá, malý zůstatek = odmítnuto beze změny', () => {
   const p = new Penezenka();
+  p.aktivuj('K004');
+  p.aktivuj('K005');
   assert.equal(p.zustatek('K004'), 10);
   assert.deepEqual(p.zaplat('K004', 6), { ok: true, zbytek: 4 });
   assert.deepEqual(p.zaplat('k004', 5), { ok: false, chybi: 1 });
@@ -46,12 +48,32 @@ test('Peněženka: služební a neznámá karta neplatí', () => {
   assert.equal(p.zaplat('K099', 1).ok, false);
 });
 
+test('Peněženka: aktivace karet určí strop kola, platí jen aktivní karty', () => {
+  const p = new Penezenka();
+  assert.deepEqual(p.aktivniKarty(), [], 'na začátku není aktivní nic');
+  assert.equal(p.zustatek('K001'), undefined);
+  assert.equal(p.zaplat('K001', 1).ok, false, 'neaktivní karta neplatí');
+  assert.equal(p.aktivuj('k004'), 'aktivovano');
+  assert.equal(p.aktivuj('K004'), 'uz_aktivni', 'druhé pípnutí = chyba hráče');
+  assert.equal(p.aktivuj('K000'), 'neznama', 'služební karta se neaktivuje');
+  assert.equal(p.aktivuj('K001'), 'aktivovano');
+  assert.equal(p.strop(), 30);
+  assert.deepEqual(p.aktivniKarty().map((k) => k.kod), ['K001', 'K004'], 'pořadí podle sady');
+  assert.equal(p.zaplat('K001', 5).ok, true);
+  p.naplnVse();
+  assert.deepEqual(p.aktivniKarty(), [], 'restart / nový den: vybírá se znovu');
+  assert.equal(p.jeAktivni('K001'), false);
+});
+
 test('Peněženka: nový herní den = karty zase plné', () => {
   const karta = PENEZNI_KARTY[0];
   assert.ok(karta);
+  penezenka().aktivuj(karta.kod);
   assert.equal(penezenka().zaplat(karta.kod, 7).ok, true);
   assert.equal(penezenka().zustatek(karta.kod), karta.hodnota - 7, 'během dne zůstatek drží');
   novyDen();
+  assert.equal(penezenka().zustatek(karta.kod), undefined, 'nový den: karty znovu neaktivní');
+  penezenka().aktivuj(karta.kod);
   assert.equal(penezenka().zustatek(karta.kod), karta.hodnota);
 });
 

@@ -1,6 +1,8 @@
 // Peněžní karty se zůstatkem (rozhodnutí rodiče 2026-11-22): každá stará platební karta má vlastní kód
 // `K001`… a počáteční hodnotu v tečkách. Zůstatek se drží po celý herní den, nový den = karty zase plné.
 // Hodnotu karty hráč pozná podle její barvy (na štítku je jen QR). Přečerpání zatím ne (nápad rodiče).
+// Na začátku kola (po odemčení benzínky a po restartu K000) si hráč karty sám aktivuje – tím si určí strop
+// na celé kolo (rozhodnutí rodiče 2026-11-24). Platí jen aktivní karty; během kola se nic nepřidává.
 // Bez závislosti na Phaseru.
 
 import { den } from './den.ts';
@@ -29,9 +31,13 @@ export function najdiKartu(kod: string): PenezniKarta | undefined {
 
 export type Platba = { ok: true; zbytek: number } | { ok: false; chybi: number };
 
+/** Výsledek aktivace: nová karta / už aktivní (chyba hráče) / neznámá nebo služební karta. */
+export type Aktivace = 'aktivovano' | 'uz_aktivni' | 'neznama';
+
 /** Zůstatky karet během jednoho dne. */
 export class Penezenka {
   private zustatky = new Map<string, number>();
+  private aktivni = new Set<string>();
   private readonly karty: readonly PenezniKarta[];
 
   constructor(karty: readonly PenezniKarta[] = PENEZNI_KARTY) {
@@ -39,24 +45,49 @@ export class Penezenka {
     this.naplnVse();
   }
 
-  /** Zůstatek karty; neznámá karta = undefined. */
+  /** Aktivuje kartu pro toto kolo. Už aktivní karta se nemění (hráč ji pípl podruhé). */
+  aktivuj(kod: string): Aktivace {
+    const k = kod.trim().toUpperCase();
+    if (!this.zustatky.has(k)) return 'neznama';
+    if (this.aktivni.has(k)) return 'uz_aktivni';
+    this.aktivni.add(k);
+    return 'aktivovano';
+  }
+
+  jeAktivni(kod: string): boolean {
+    return this.aktivni.has(kod.trim().toUpperCase());
+  }
+
+  /** Aktivní karty v pořadí sady. */
+  aktivniKarty(): PenezniKarta[] {
+    return this.karty.filter((k) => this.aktivni.has(k.kod));
+  }
+
+  /** Strop kola: součet hodnot aktivních karet. */
+  strop(): number {
+    return this.aktivniKarty().reduce((s, k) => s + k.hodnota, 0);
+  }
+
+  /** Zůstatek aktivní karty; neznámá nebo neaktivní karta = undefined. */
   zustatek(kod: string): number | undefined {
-    return this.zustatky.get(kod.trim().toUpperCase());
+    const k = kod.trim().toUpperCase();
+    return this.aktivni.has(k) ? this.zustatky.get(k) : undefined;
   }
 
   /** Zaplatí z karty. Stačí-li zůstatek, odečte se; jinak se nic nezmění. */
   zaplat(kod: string, cena: number): Platba {
     const k = kod.trim().toUpperCase();
-    const zbyva = this.zustatky.get(k);
+    const zbyva = this.zustatek(k);
     if (zbyva === undefined) return { ok: false, chybi: cena };
     if (zbyva < cena) return { ok: false, chybi: cena - zbyva };
     this.zustatky.set(k, zbyva - cena);
     return { ok: true, zbytek: zbyva - cena };
   }
 
-  /** Nový den: všechny karty zase plné. */
+  /** Nový den / restart: všechny karty zase plné a neaktivní – hráč si je vybere znovu. */
   naplnVse(): void {
     this.zustatky = new Map(this.karty.map((k) => [k.kod, k.hodnota]));
+    this.aktivni = new Set();
   }
 }
 

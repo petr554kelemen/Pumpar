@@ -1,9 +1,10 @@
 // Peněžní karty na obrazovce (obchod, vzduch) a jejich malý přehled (stojan). Hra je hratelná i bez čtečky:
-// karta se aktivuje klepnutím nebo pípnutím (`K001`…). Zůstatek je společný pro celý herní den (penezenka.ts).
+// karta se použije klepnutím nebo pípnutím (`K001`…). Zůstatek je společný pro celý herní den (penezenka.ts).
+// Ve hře jsou jen karty, které si hráč na začátku kola aktivoval (KartyScene).
 
 import type Phaser from 'phaser';
 import * as beep from '../services/beep.ts';
-import { PENEZNI_KARTY, type PenezniKarta, penezenka } from '../services/penezenka.ts';
+import { type PenezniKarta, penezenka } from '../services/penezenka.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
 const ZLUTA = 0xf1c40f;
@@ -14,7 +15,7 @@ export const KARTY = { x: 1068, y0: 140, dy: 84, sirka: 370, vyska: 74, x0: -84,
 /** Barva karty podle hodnoty (hráč pozná hodnotu podle barvy; skutečné barvy karet zatím neznáme). */
 export const BARVA_KARTY: Readonly<Record<number, number>> = { 20: 0x9a7d0a, 15: 0x1e8449, 10: 0x1f4f8f };
 
-function barva(k: PenezniKarta): number {
+export function barva(k: PenezniKarta): number {
   return BARVA_KARTY[k.hodnota] ?? 0x1f4f8f;
 }
 
@@ -26,14 +27,14 @@ export interface KartaNaObrazovce {
   tecky: Phaser.GameObjects.Arc[];
 }
 
-/** Sloupec všech peněžních karet se zůstatkem; klepnutí na kartu zavolá `priKlepnuti`. */
+/** Sloupec aktivních peněžních karet se zůstatkem; klepnutí na kartu zavolá `priKlepnuti`. */
 export class PanelKaret {
   readonly karty: KartaNaObrazovce[];
   private readonly scene: Phaser.Scene;
 
   constructor(scene: Phaser.Scene, priKlepnuti: (kn: KartaNaObrazovce) => void) {
     this.scene = scene;
-    this.karty = PENEZNI_KARTY.map((k, i) => this.vytvor(k, KARTY.x, KARTY.y0 + i * KARTY.dy, priKlepnuti));
+    this.karty = penezenka().aktivniKarty().map((k, i) => this.vytvor(k, KARTY.x, KARTY.y0 + i * KARTY.dy, priKlepnuti));
   }
 
   najdi(kod: string): KartaNaObrazovce | undefined {
@@ -120,11 +121,11 @@ export class PanelKaret {
   }
 }
 
-/** Malý přehled zůstatků (u stojanu): kolik zbývá na nákupy – barevná karta s číslem. */
+/** Malý přehled zůstatků aktivních karet (u stojanu): kolik zbývá na nákupy – barevná karta s číslem. */
 export function prehledKaret(scene: Phaser.Scene, x0: number, y: number): void {
   const sirka = 62;
   const mezera = 6;
-  PENEZNI_KARTY.forEach((k, i) => {
+  penezenka().aktivniKarty().forEach((k, i) => {
     const zbyva = penezenka().zustatek(k.kod) ?? 0;
     const x = x0 + i * (sirka + mezera) + sirka / 2;
     const pozadi = scene.add.rectangle(0, 0, sirka, 52, barva(k)).setStrokeStyle(3, 0xd4ac0d);

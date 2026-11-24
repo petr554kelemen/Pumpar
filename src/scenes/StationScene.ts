@@ -14,6 +14,7 @@ import {
   tecky,
 } from '../services/pump.ts';
 import { MAX_BENZIN_TECEK, lzeJitPlatit, teckyZaBenzin, ucet } from '../services/ucet.ts';
+import { penezenka } from '../services/penezenka.ts';
 import { prehledKaret } from './kartyPanel.ts';
 import { addNav, type SceneKey } from './nav.ts';
 
@@ -81,6 +82,11 @@ export class StationScene extends Phaser.Scene {
   }
 
   create(data: StationData = {}): void {
+    // Pojistka: bez aktivních karet nejdřív výběr karet na kolo.
+    if (penezenka().aktivniKarty().length === 0) {
+      this.scene.start('Karty' satisfies SceneKey);
+      return;
+    }
     // Stav se nastavuje při každém spuštění scény (návrat z jiné scény začíná od nuly).
     this.predvolba = new Predvolba();
     this.stojan = new Stojan();

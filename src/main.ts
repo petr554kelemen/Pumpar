@@ -6,6 +6,7 @@ import { StationScene } from './scenes/StationScene.ts';
 import { AirScene } from './scenes/AirScene.ts';
 import { ShopScene } from './scenes/ShopScene.ts';
 import { LockScene } from './scenes/LockScene.ts';
+import { KartyScene } from './scenes/KartyScene.ts';
 import { UzaverkaScene } from './scenes/UzaverkaScene.ts';
 
 // Vstupní bod hry. Scény jen zobrazují; logika a hardware jsou ve službách (src/services).
@@ -23,6 +24,6 @@ new Phaser.Game({
     width: 1280,
     height: 720,
   },
-  // První scéna je výchozí: zamčená benzínka (odemkne kód nebo služební karta) → stojan.
-  scene: [LockScene, StationScene, AirScene, ShopScene, ScanTestScene, UzaverkaScene],
+  // První scéna je výchozí: zamčená benzínka (odemkne kód nebo služební karta) → výběr karet → stojan.
+  scene: [LockScene, KartyScene, StationScene, AirScene, ShopScene, ScanTestScene, UzaverkaScene],
 });

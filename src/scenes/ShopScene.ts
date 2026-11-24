@@ -32,7 +32,7 @@ type Stav = 'nakup' | 'placeni';
 // Přišel-li hráč od stojanu („🛒 Jít platit“), je v košíku napřed benzín ⛽ (modré tečky, nedá se vrátit)
 // a po zaplacení se hra vrátí ke stojanu. Bez zaplacení se odejít nedá (rodič: „to se nedělá“) – navigace je
 // zamčená, hráč ubere zboží, aby nákup zaplatil. Nestačí-li na samotný benzín žádná karta, obsluha pípne
-// služební kartu K000 = restart (karty plné, zpět ke stojanu, čas běží dál); jinak K000 v obchodě neplatí.
+// služební kartu K000 = restart (karty plné, hráč je vybere znovu, čas běží dál); jinak K000 v obchodě neplatí.
 export class ShopScene extends Phaser.Scene {
   private stav: Stav = 'nakup';
   private kosik: Zbozi[] = [];
@@ -291,8 +291,8 @@ export class ShopScene extends Phaser.Scene {
   }
 
   /**
-   * Storno služební kartou = hra jako na začátku (rozhodnutí rodiče): karty zase plné, účet prázdný, zpět ke
-   * stojanu. Čas dne běží dál a deník zůstává – hráč má hlídat, aby restart potřeba nebyl.
+   * Storno služební kartou = hra jako na začátku (rozhodnutí rodiče): karty zase plné a neaktivní, účet prázdný,
+   * hráč si karty vybere znovu a jde ke stojanu. Čas dne běží dál a deník zůstává – hráč má hlídat, aby restart potřeba nebyl.
    */
   private stornoBenzinu(): void {
     if (this.stav !== 'nakup') return;
@@ -300,7 +300,7 @@ export class ShopScene extends Phaser.Scene {
     beep.tick(500, 0.1);
     penezenka().naplnVse();
     ucet().vyprazdni();
-    this.scene.start('Station' satisfies SceneKey);
+    this.scene.start('Karty' satisfies SceneKey);
   }
 
   private hotovo(): void {

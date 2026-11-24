@@ -30,7 +30,7 @@ const BARVA = {
 const HODINY = { x: 515, y: 232, r: 62 } as const;
 
 /** Po odemčení přejde hra sem. */
-const PO_ODEMCENI: SceneKey = 'Station';
+const PO_ODEMCENI: SceneKey = 'Karty'; // výběr karet na kolo, pak stojan
 
 // Zamčená benzínka (nápad hráče): bez benzináře je zavřeno. Na začátku volba, kdo přichází (lock.ts → Role):
 // 🧑‍🔧 obsluha odemyká kódem na klávesnici u dveří (hvězdičky, ✅ / Enter) nebo služební kartou – kdykoli;

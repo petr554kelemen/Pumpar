@@ -4,7 +4,7 @@ import type Phaser from 'phaser';
 import * as beep from '../services/beep.ts';
 import { den } from '../services/den.ts';
 
-export type SceneKey = 'Lock' | 'Station' | 'Air' | 'Shop' | 'ScanTest' | 'Uzaverka';
+export type SceneKey = 'Lock' | 'Karty' | 'Station' | 'Air' | 'Shop' | 'ScanTest' | 'Uzaverka';
 
 // 🔒 = zavřít benzínku (konec směny) → konec dne. Zamčená scéna a konec dne navigaci nemají.
 const SCENES: ReadonlyArray<{ key: SceneKey; ikona: string }> = [
