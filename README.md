@@ -206,8 +206,8 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
 | **SPZ** (`LA01`, `KE01`) na kartě | prošlá platební karta | **laser + QR H** (laminovaný / přelepený štítek) | místo na velký QR, odolné slunci |
 | **SPZ** na velkém autíčku | autíčko | D30 termoštítek, Code128 (jde z plastu dolů) | termotisk bledne na slunci |
 | **SPZ** u malého autíčka | visačka **u auta** (ne na něm) | laser + QR H + laminace | štítek by se na malém autě zdeformoval a čtečka ho nepřečte |
-| **Peněžní karty** (`K001`–`K007`) | prošlá platební karta | **laser + QR H**, štítek 26 × 29 mm přelepený páskou | `karty.html`; sada 1 × 20, 2 × 15, 4 × 10 |
-| **Služební karta** (`K000`) 🔑 | prošlá platební karta | **laser + QR H** | jediná karta obsluhy: odemyká benzínku **a** v obchodě dělá storno = restart (viz níže), `karty.html` |
+| **Peněžní karty** (`K001`–`K007`) | prošlá platební karta | **štítek Code128** z aplikace tiskárny, nalepený na světlý podpisový proužek (2026-11-26; `karty.html` s QR H zůstává jako záloha) | sada 1 × 20, 2 × 15, 4 × 10 |
+| **Služební karta** (`K000`) 🔑 | prošlá platební karta | **štítek Code128** jako peněžní karty | jediná karta obsluhy: odemyká benzínku **a** v obchodě dělá storno = restart (viz níže), `karty.html` |
 | **Bankovky** (`B020`) | kód přímo na papírové bankovce | laser, papír | bez samolepek |
 | **Rodičovské kódy** (`9001`) | list pro rodiče | laser, papír | hráč je nemá mít po ruce |
 
