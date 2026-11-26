@@ -1,6 +1,6 @@
 // Peněžní karty na obrazovce (obchod, vzduch) a jejich malý přehled (stojan). Hra je hratelná i bez čtečky:
 // karta se použije klepnutím nebo pípnutím (`K001`…). Zůstatek je společný pro celý herní den (penezenka.ts).
-// Ve hře jsou jen karty, které si hráč na začátku kola aktivoval (KartyScene).
+// Ve hře jsou jen karty, které si hráč na začátku kola aktivoval v bance (BankaScene).
 
 import type Phaser from 'phaser';
 import * as beep from '../services/beep.ts';

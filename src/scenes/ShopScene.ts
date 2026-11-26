@@ -300,7 +300,7 @@ export class ShopScene extends Phaser.Scene {
     beep.tick(500, 0.1);
     penezenka().naplnVse();
     ucet().vyprazdni();
-    this.scene.start('Karty' satisfies SceneKey);
+    this.scene.start('Banka' satisfies SceneKey);
   }
 
   private hotovo(): void {

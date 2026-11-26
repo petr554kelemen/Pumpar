@@ -84,7 +84,7 @@ export class StationScene extends Phaser.Scene {
   create(data: StationData = {}): void {
     // Pojistka: bez aktivních karet nejdřív výběr karet na kolo.
     if (penezenka().aktivniKarty().length === 0) {
-      this.scene.start('Karty' satisfies SceneKey);
+      this.scene.start('Banka' satisfies SceneKey);
       return;
     }
     // Stav se nastavuje při každém spuštění scény (návrat z jiné scény začíná od nuly).
