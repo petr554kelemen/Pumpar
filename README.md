@@ -28,8 +28,8 @@ https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-ver
   - `pump.ts` (stojan), `air.ts` (vzduch), `lock.ts` (zámek benzínky), `den.ts` (herní den, odpočet směny),
   - `katalog.ts` (zboží: kód → výrobek, cena), `penezenka.ts` (peněžní karty a jejich zůstatky),
     `denik.ts` (deník směny – prodeje pro uzávěrku, localStorage), `ucet.ts` (nezaplacený benzín od stojanu).
-- `src/scenes/` – Phaser scény: `LockScene.ts` (zamčená benzínka, výchozí), `StationScene.ts` (stojan),
-  `AirScene.ts` (vzduch), `ShopScene.ts` (obchod), `ScanTestScene.ts` („Pípni něco“), `UzaverkaScene.ts` (konec dne),
+- `src/scenes/` – Phaser scény: `LockScene.ts` (zamčená benzínka, výchozí), `BankaScene.ts` (banka – aktivace karet na kolo),
+  `StationScene.ts` (stojan), `AirScene.ts` (vzduch), `ShopScene.ts` (obchod), `ScanTestScene.ts` („Pípni něco“), `UzaverkaScene.ts` (konec dne),
   `nav.ts` (přepínání scén ikonami vlevo nahoře + odpočet směny vpravo), `hodiny.ts` (kreslení hodin),
   `kartyPanel.ts` (peněžní karty na obrazovce – obchod, vzduch – a přehled zůstatků u stojanu).
 - `tests/` – testy služeb (`npm test`).
@@ -224,12 +224,12 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
   benzín je v košíku a nedá se vrátit; když karta nestačí, hráč ubere zboží. Navigace je do zaplacení zamčená.
   Nezaplatí-li benzín žádná karta, služební karta `K000` = **restart** (karty plné, hráč si je vybere znovu,
   čas dne běží dál). U stojanu je vidět zůstatek aktivních karet (kolik zbývá na nákupy).
-- **Výběr karet na začátku kola = strop** (rozhodnutí rodiče 2026-11-24, scéna `KartyScene`): po odemčení benzínky
-  a po restartu `K000` si hráč karty **aktivuje** klepnutím nebo pípnutím; součet = strop teček na kolo, který pak
+- **Výběr karet na začátku kola = strop** (rozhodnutí rodiče 2026-11-24, scéna `BankaScene`): po odemčení benzínky
+  a po restartu `K000` hráč **zajede autem do banky** 🏦 (nápad rodiče 2026-11-26) a karty si tam **aktivuje** klepnutím nebo pípnutím; součet = strop teček na kolo, který pak
   hlídá. Aktivní karta svítí a má zelené ✔, neaktivní je bledá. Během kola se karty nepřidávají a ve hře jsou
   jen aktivní. **Druhé pípnutí už aktivní karty = jen chybový zvuk a zatřesení, bez ❌.**
   **❌ je vyhrazený pro kritické chyby** – např. použití nesprávné karty (neaktivní / neznámé) při placení
-  (obchod 🛒 i vzduch 🛞).
+  (obchod 🛒 i vzduch 🛞). Po ✅ ➡️ ⛽ auto z banky odjede ke stojanu.
 - **Karty jsou i na obrazovce** (hra je hratelná bez čtečky): obchod i vzduch ukazují aktivní karty
   ze sady `K001`–`K007` se zůstatkem; zaplatit jde **klepnutím na kartu nebo jejím pípnutím**.
 - **Ceny se na štítky netisknou.** Visačka nese jen co to je (písmeno kategorie, obrázek, kód).

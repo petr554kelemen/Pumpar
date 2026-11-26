@@ -11,6 +11,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 
 ## Další krok
 - **Výběr karet na začátku kola** ✅ (2026-11-24) → rodič vyzkouší. Nesprávná karta = ❌ v obchodě i u vzduchu 🛞.
+- **Banka 🏦** ✅ (2026-11-26): karty se aktivují v bance (auto 🚙 přijede, po ✅ odjede ke stojanu) → rodič vyzkouší,
+  pak ukázat hráči v dílně ✏️ (nové prostředí = nové pravidlo „karty se aktivují v bance“).
 - Pořadí fází: 0 ✅ → 2 ✅ → **1** a **4** souběžně → 3 (čísla fází se nemění).
 - Fáze 4: stojan i obchod 🛒 hotové a **napojené** (předvolby „🛒 + Obchod“, „🛒 Jít platit“) → rodič vyzkouší;
   další: body za nákup / tankování do uzávěrky.
@@ -448,3 +450,7 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - 2026-11-26 (uživatel + Claude): Karty `K000`–`K007` mají štítky Code128 z aplikace tiskárny na podpisovém proužku.
   Bluetooth čtečka spárovaná s notebookem hráče (Linux), čte kód + Enter, rozložení klávesnice OK (`K000` odemkl).
   Rodič načetl všechny štítky (i ohnuté z role); nalepení na karty dělá hráč.
+- 2026-11-26 (uživatel + Claude): **Banka** – scéna výběru karet převlečena za banku (`KartyScene` → `BankaScene`, klíč
+  `Banka`): budova se štítem 🏦, silnice, auto hráče 🚙 přijede zleva, po ✅ ➡️ ⛽ odjede doprava ke stojanu. Logika aktivace
+  beze změny (karty jdou aktivovat hned, příjezd jen dokresluje). 61/61 testů, typecheck, build OK, ověřeno v headless Chrome
+  (K000 → banka, K001 + K005 = 30, K001 znovu jen zatřese, ✅ → auto odjede → stojan s kartami 20 a 10).
