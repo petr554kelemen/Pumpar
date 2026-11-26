@@ -447,4 +447,4 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   u vzduchu K004 → ❌).
 - 2026-11-26 (uživatel + Claude): Karty `K000`–`K007` mají štítky Code128 z aplikace tiskárny na podpisovém proužku.
   Bluetooth čtečka spárovaná s notebookem hráče (Linux), čte kód + Enter, rozložení klávesnice OK (`K000` odemkl).
-  Ověřeno `K001`; zbytek ověří rodič na výběru karet (strop všech = 90).
+  Rodič načetl všechny štítky (i ohnuté z role); nalepení na karty dělá hráč.
