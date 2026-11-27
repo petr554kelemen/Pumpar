@@ -4,6 +4,7 @@ import { den, novyDen } from '../services/den.ts';
 import { formatCas } from '../services/lock.ts';
 import { denik } from '../services/denik.ts';
 import { vysledkyDne } from '../services/vysledky.ts';
+import { rekniPo } from '../services/voice.ts';
 import { kresliRucicky, velkeHodiny } from './hodiny.ts';
 import { kresliListinu } from './listina.ts';
 import type { SceneKey } from './nav.ts';
@@ -65,5 +66,6 @@ export class UzaverkaScene extends Phaser.Scene {
     });
 
     beep.gong(true);
+    rekniPo(1300, 'zavreno'); // až dozní gong
   }
 }

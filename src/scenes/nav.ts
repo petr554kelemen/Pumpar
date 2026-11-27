@@ -3,6 +3,7 @@
 import type Phaser from 'phaser';
 import * as beep from '../services/beep.ts';
 import { den } from '../services/den.ts';
+import { rekniPo } from '../services/voice.ts';
 
 export type SceneKey =
   | 'Lock'
@@ -118,6 +119,7 @@ function addOdpocet(scene: Phaser.Scene): void {
     if (zavirani && !d.ohlaseno) {
       d.ohlaseno = true;
       beep.gong();
+      rekniPo(1300, 'uzaviraji'); // až dozní gong
       scene.tweens.add({ targets: hlaseni, scale: 1.3, duration: 300, yoyo: true, repeat: 5 });
     }
   };

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import * as beep from '../services/beep.ts';
 import { type Auto, garaz, jePrazdne, litryNaObrazovce, naRezerve, stavNadrzeAuta } from '../services/auta.ts';
 import { den } from '../services/den.ts';
+import { hlas } from '../services/voice.ts';
 import { bus, type GameEvents } from '../services/eventBus.ts';
 import { addNav, type SceneKey } from './nav.ts';
 import { tabulkaSpz } from './spz.ts';
@@ -76,6 +77,7 @@ export class ParkovisteScene extends Phaser.Scene {
       }
       case 'vlecka': {
         beep.tick(330, 0.12);
+        hlas().rekni('vlecka_vyjizdi');
         const t = this.add.text(640, 400, '🚛', { fontSize: '120px', padding: { x: 10, y: 10 } }).setOrigin(0.5).setDepth(20);
         this.tweens.add({ targets: t, x: 1400, duration: 1200, ease: 'Quad.In', onComplete: () => t.destroy() });
         return;

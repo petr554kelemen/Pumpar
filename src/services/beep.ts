@@ -1,5 +1,5 @@
 // Jednoduché zvuky generované Web Audio API (bez zvukových souborů).
-// Převzato ze staré verze hry. Hlasové fráze budou později ve službě `voice`.
+// Převzato ze staré verze hry. Hlasové fráze (nahrané MP3) jsou ve službě `voice`.
 
 let ctx: AudioContext | null = null;
 

@@ -8,6 +8,7 @@ import * as beep from '../services/beep.ts';
 import { bus } from '../services/eventBus.ts';
 import { KodovaKlavesnice } from '../services/lock.ts';
 import { spravnyPin } from '../services/penezenka.ts';
+import { hlas } from '../services/voice.ts';
 import { krizek } from './kartyPanel.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
@@ -150,6 +151,7 @@ export class PinTerminal {
     });
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.zavri());
     beep.tick(990, 0.06);
+    hlas().rekni('zadejte_pin');
   }
 
   get otevreny(): boolean {
@@ -188,6 +190,7 @@ export class PinTerminal {
     this.prekresli();
     if (ok) {
       beep.tick(1180, 0.1);
+      hlas().rekni('platba_prijata');
       this.zavri();
       this.priSpravnem();
       return;

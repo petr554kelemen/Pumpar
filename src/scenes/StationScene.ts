@@ -17,6 +17,7 @@ import { MAX_BENZIN_TECEK, lzeJitPlatit, teckyZaBenzin, ucet } from '../services
 import { penezenka } from '../services/penezenka.ts';
 import { type Auto, garaz, jePrazdne, stavNadrzeAuta } from '../services/auta.ts';
 import { den } from '../services/den.ts';
+import { hlas } from '../services/voice.ts';
 import { bus, type GameEvents } from '../services/eventBus.ts';
 import { prehledKaret } from './kartyPanel.ts';
 import { addNav, type SceneKey } from './nav.ts';
@@ -477,6 +478,7 @@ export class StationScene extends Phaser.Scene {
       return;
     }
     this.autoObal?.setAlpha(0.25);
+    hlas().rekni('vlecka_vyjizdi');
     this.vlecka = this.add
       .text(1400, 320, '🚛', { fontSize: '56px', padding: { x: 6, y: 10 } })
       .setOrigin(0.5)

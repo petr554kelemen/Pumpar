@@ -3,6 +3,7 @@ import * as beep from '../services/beep.ts';
 import { bus } from '../services/eventBus.ts';
 import { den } from '../services/den.ts';
 import { garaz } from '../services/auta.ts';
+import { rekniPo } from '../services/voice.ts';
 import { KodovaKlavesnice, type Role, formatCas, odemyka } from '../services/lock.ts';
 import { cifernik, kresliRucicky, velkeHodiny } from './hodiny.ts';
 import { klavesnice } from './terminal.ts';
@@ -250,6 +251,7 @@ export class LockScene extends Phaser.Scene {
       den().otevri(Date.now());
       garaz().noveKolo(Date.now()); // nové kolo: nádrže aut na ⅔
       beep.win();
+      rekniPo(500, 'otevreno');
       this.tweens.add({ targets: this.zakaznik, x: 515, y: 560, scale: 0.4, alpha: 0, duration: 900, ease: 'Sine.easeIn' });
       this.time.delayedCall(1300, () => this.scene.start(PO_ODEMCENI));
       return;
@@ -283,6 +285,7 @@ export class LockScene extends Phaser.Scene {
     den().otevri(Date.now());
     garaz().noveKolo(Date.now()); // nové kolo: nádrže aut na ⅔
     beep.win();
+    rekniPo(500, 'otevreno'); // po fanfáře, dohraje i v další scéně
     this.lcd.setFillStyle(BARVA.lcd);
     this.displej.setText('✅').setPadding(4);
     this.led.setFillStyle(BARVA.zelena);
