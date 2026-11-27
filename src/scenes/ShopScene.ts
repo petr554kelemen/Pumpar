@@ -3,6 +3,7 @@ import { bus, type GameEvents } from '../services/eventBus.ts';
 import * as beep from '../services/beep.ts';
 import { den } from '../services/den.ts';
 import { type ZaznamProdeje, denik } from '../services/denik.ts';
+import { garaz } from '../services/auta.ts';
 import { ZBOZI, type Zbozi, najdiZbozi, utrata, vejdeSe } from '../services/katalog.ts';
 import { SLUZEBNI_KARTA } from '../services/lock.ts';
 import { PENEZNI_KARTY, penezenka } from '../services/penezenka.ts';
@@ -140,6 +141,7 @@ export class ShopScene extends Phaser.Scene {
         return;
       case 'bankovka':
       case 'auto':
+      case 'vlecka':
       case 'rodic':
         return; // v obchodě nic nedělají
     }
@@ -282,6 +284,7 @@ export class ShopScene extends Phaser.Scene {
     this.stav = 'placeni';
     beep.tick(880, 0.1);
     const d = den();
+    const spz = ucet().spz;
     const zaznam: ZaznamProdeje = {
       druh: 'prodej',
       cas: new Date().toISOString(),
@@ -291,12 +294,15 @@ export class ShopScene extends Phaser.Scene {
       ...(this.benzinSetin > 0
         ? { benzin: this.benzinSetin, benzinTecky: this.benzin, benzinPlatny: ucet().benzinPlatny }
         : {}),
+      ...(this.benzinSetin > 0 && spz ? { spz } : {}),
       tecky: cena,
       karta: kn.karta.kod,
       hodnotaKarty: kn.karta.hodnota,
       zbytek: platba.zbytek,
     };
     denik.zapis(zaznam);
+    // Zaplacený benzín dostane auto, které stálo u stojanu (nejvýš do plné nádrže).
+    if (this.benzinSetin > 0 && spz) garaz().dotankuj(spz, this.benzinSetin, Date.now(), d);
     const radek = radekZeZaznamu(zaznam);
 
     // Tečky z karty odletí jedna po druhé na tečky útraty v košíku (odečítání viditelně).
@@ -349,7 +355,8 @@ export class ShopScene extends Phaser.Scene {
     this.stav = 'placeni';
     beep.tick(500, 0.1);
     penezenka().naplnVse();
-    ucet().vyprazdni();
+    ucet().vyprazdni(); // nezaplacený benzín auto nedostane
+    garaz().noveKolo(Date.now()); // nové kolo: nádrže aut na ⅔
     this.scene.start('Banka' satisfies SceneKey);
   }
 
@@ -363,7 +370,10 @@ export class ShopScene extends Phaser.Scene {
     this.tweens.add({ targets: fajfka, scale: { from: 0, to: 1 }, duration: 300, ease: 'Back.Out' });
     odmena(this, { x: KOSIK.x, y: KOSIK.y }, radek, kn);
     const sBenzinem = this.benzin > 0;
-    if (sBenzinem) ucet().benzin = null;
+    if (sBenzinem) {
+      ucet().benzin = null;
+      ucet().spz = null; // auto zaplatilo a odjelo od stojanu
+    }
     this.time.delayedCall(Math.max(1400, delkaOdmeny(radek) + 300), () => {
       if (sBenzinem) {
         // Benzín zaplacen → zpět ke stojanu (v režimu „+ Obchod“ s novou předvolbou).

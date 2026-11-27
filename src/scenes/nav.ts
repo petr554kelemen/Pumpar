@@ -4,12 +4,22 @@ import type Phaser from 'phaser';
 import * as beep from '../services/beep.ts';
 import { den } from '../services/den.ts';
 
-export type SceneKey = 'Lock' | 'Banka' | 'Station' | 'Air' | 'Shop' | 'Vysledky' | 'ScanTest' | 'Uzaverka';
+export type SceneKey =
+  | 'Lock'
+  | 'Banka'
+  | 'Station'
+  | 'Parkoviste'
+  | 'Air'
+  | 'Shop'
+  | 'Vysledky'
+  | 'ScanTest'
+  | 'Uzaverka';
 
 // 🔒 = zavřít benzínku (konec směny) → konec dne. Zamčená scéna a konec dne navigaci nemají.
 // Test čtečky (ScanTest) v navigaci není – jen pro rodiče přes Ctrl+F2 (main.ts).
 const SCENES: ReadonlyArray<{ key: SceneKey; ikona: string }> = [
   { key: 'Station', ikona: '⛽' },
+  { key: 'Parkoviste', ikona: '🅿️' },
   { key: 'Air', ikona: '🛞' },
   { key: 'Shop', ikona: '🛒' },
   { key: 'Vysledky', ikona: '🏆' },

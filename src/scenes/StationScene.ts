@@ -15,8 +15,12 @@ import {
 } from '../services/pump.ts';
 import { MAX_BENZIN_TECEK, lzeJitPlatit, teckyZaBenzin, ucet } from '../services/ucet.ts';
 import { penezenka } from '../services/penezenka.ts';
+import { type Auto, garaz, jePrazdne, stavNadrzeAuta } from '../services/auta.ts';
+import { den } from '../services/den.ts';
+import { bus, type GameEvents } from '../services/eventBus.ts';
 import { prehledKaret } from './kartyPanel.ts';
 import { addNav, type SceneKey } from './nav.ts';
+import { tabulkaSpz } from './spz.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
 const LCD_FONT = '"Courier New", Courier, monospace';
@@ -76,6 +80,16 @@ export class StationScene extends Phaser.Scene {
   private jitPlatit!: Tlacitko;
   private jitPlatitText!: Phaser.GameObjects.Text;
   private znackaObchodu!: Phaser.GameObjects.Text;
+  private napovedaKlaves!: Phaser.GameObjects.Text;
+  /** Část bargrafu = benzín, který už v nádrži auta byl (šedě); natankované pokračuje za ním. */
+  private nadrzZaklad!: Phaser.GameObjects.Rectangle;
+  /** Auto u stojanu (pípnutá SPZ); null = neznámé auto, plná nádrž = předvolba. */
+  private auto: Auto | null = null;
+  /** Stav nádrže auta při příjezdu (setiny L). */
+  private autoStav = 0;
+  private autoObal: Phaser.GameObjects.Container | null = null;
+  /** Hráč pípl vlečku – další prázdné auto přiveze ona. */
+  private vlecka: Phaser.GameObjects.Text | null = null;
 
   constructor() {
     super('Station' satisfies SceneKey);
@@ -92,6 +106,8 @@ export class StationScene extends Phaser.Scene {
     this.stojan = new Stojan();
     this.rezim = null;
     this.casovac = null;
+    this.autoObal = null;
+    this.vlecka = null;
     // Po zaplacení v režimu „+ Obchod“ hned další kolo s náhodnou předvolbou (stará verze).
     if (data.poPlatbe && ucet().rezimObchodu) this.predvolba.nahodnaSObchodem();
 
@@ -99,7 +115,13 @@ export class StationScene extends Phaser.Scene {
     this.vytvorLevyPanel();
     this.vytvorPravyPanel();
     // Kolik zbývá na nákupy: zůstatky karet nahoře – hráč vidí, kolik teček může natankovat a zaplatit.
-    prehledKaret(this, 470, 50);
+    prehledKaret(this, 560, 50);
+    // Auto, které u stojanu stálo (hráč odešel bez placení), tu stojí dál.
+    const spz = ucet().spz;
+    this.auto = spz ? (garaz().najdi(spz) ?? null) : null;
+    if (this.auto) this.prijedAuto(this.auto, false);
+    const odhlasit = bus.on('scan', (d) => this.onScan(d));
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, odhlasit);
     this.znackaObchodu = this.add
       .text(150, 200, '⛽➡️🛒', { fontSize: '36px', backgroundColor: '#1e8449', padding: { x: 10, y: 6 } })
       .setOrigin(0.5)
@@ -217,9 +239,10 @@ export class StationScene extends Phaser.Scene {
       .text(x + 110, ny + 22, '', { fontFamily: FONT, fontSize: '20px', fontStyle: 'bold', color: '#ecf0f1' })
       .setName('prutok_text');
     this.add.rectangle(x + 110, ny + 55, NADRZ_SIRKA, 20, 0x111111).setOrigin(0, 0.5).setName('nadrz');
+    this.nadrzZaklad = this.add.rectangle(x + 110, ny + 55, 0, 20, 0x7f8c8d).setOrigin(0, 0.5).setName('nadrz_auto');
     this.nadrzPruh = this.add.rectangle(x + 110, ny + 55, 0, 20, BARVA.oranzova).setOrigin(0, 0.5).setName('nadrz_pruh');
     this.add.rectangle(x + 110 + NADRZ_SIRKA / 2, ny + 55, 4, 30, 0xffffff).setName('nadrz_ryska');
-    this.add
+    this.napovedaKlaves = this.add
       .text(x + w - 30, ny + 40, 'Klávesnice:\n⬆️ Rychle | ⬇️ Pomalu', {
         fontFamily: FONT,
         fontSize: '15px',
@@ -376,6 +399,114 @@ export class StationScene extends Phaser.Scene {
     this.tweens.add({ targets: this.vysledek, alpha: { from: 0, to: 1 }, duration: 200 });
   }
 
+  // ---------- Auta se spotřebou (vylepšení 2) ----------
+
+  /**
+   * Pípnutí u stojanu: SPZ = auto přijelo (neznámé se přidá do garáže), vlečka = přiveze další prázdné auto.
+   * Prázdné auto samo nepřijede – jen 🪫 a nápověda 🚛 (žádné ❌, nic špatného se nestalo).
+   */
+  private onScan({ info }: GameEvents['scan']): void {
+    if (this.rezim) return; // během tankování se auto nemění
+    if (info.druh === 'vlecka') {
+      this.pripravVlecku();
+      return;
+    }
+    if (info.druh !== 'auto') return;
+
+    const ted = Date.now();
+    const { auto } = garaz().pridej(info.kod, ted);
+    if (this.auto?.spz === auto.spz) {
+      // Už tu stojí.
+      beep.tick(880, 0.06);
+      if (this.autoObal) this.tweens.add({ targets: this.autoObal, scale: { from: 1.15, to: 1 }, duration: 200 });
+      return;
+    }
+    const prazdne = jePrazdne(auto, ted, den());
+    if (prazdne && !this.vlecka) {
+      this.potrebujeVlecku(auto);
+      return;
+    }
+    // Jiné auto = začíná nové tankování (natankované nepatřilo jemu).
+    if (this.stojan.natankovano > 0) this.vynuluj(false);
+    const vlecka = this.vlecka;
+    this.vlecka = null;
+    this.auto = auto;
+    ucet().spz = auto.spz;
+    this.prijedAuto(auto, true, prazdne ? (vlecka ?? undefined) : undefined);
+    if (!prazdne && vlecka) {
+      // Vlečka nebyla potřeba – odjede.
+      this.tweens.add({ targets: vlecka, y: 520, alpha: 0, duration: 700, ease: 'Quad.In', onComplete: () => vlecka.destroy() });
+    }
+    this.prekresli();
+  }
+
+  /** SPZ tabulka auta vpravo vedle bargrafu; s animací přijede zprava (případně ji přitáhne vlečka). */
+  private prijedAuto(auto: Auto, animace: boolean, vlecka?: Phaser.GameObjects.Text): void {
+    this.autoStav = stavNadrzeAuta(auto, Date.now(), den());
+    this.autoObal?.destroy();
+    this.napovedaKlaves.setVisible(false);
+    const cil = { x: 1170, y: 320 };
+    this.autoObal = this.add
+      .container(cil.x, cil.y, [tabulkaSpz(this, 0, 0, auto.spz, 40)])
+      .setName('auto_u_stojanu');
+    if (!animace) return;
+    this.autoObal.x = 1400;
+    beep.tick(660, 0.1);
+    this.time.delayedCall(120, () => beep.tick(990, 0.15));
+    this.tweens.add({ targets: this.autoObal, x: cil.x, duration: vlecka ? 1200 : 600, ease: 'Quad.Out' });
+    if (vlecka) {
+      // Vlečka odjela pro auto a přitáhne ho: jede před ním (vlevo od SPZ), pak odjede dolů pryč.
+      this.tweens.killTweensOf(vlecka);
+      vlecka.setPosition(1400 - 130, cil.y).setScale(0.8);
+      this.tweens.add({
+        targets: vlecka,
+        x: cil.x - 130,
+        duration: 1200,
+        ease: 'Quad.Out',
+        onComplete: () =>
+          this.tweens.add({ targets: vlecka, y: 520, alpha: 0, delay: 600, duration: 800, ease: 'Quad.In', onComplete: () => vlecka.destroy() }),
+      });
+    }
+  }
+
+  /** Vlečka pípnutá: přijede na místo auta vedle bargrafu a čeká – další prázdné auto přiveze. */
+  private pripravVlecku(): void {
+    beep.tick(330, 0.12);
+    if (this.vlecka) {
+      this.tweens.add({ targets: this.vlecka, scale: { from: 1.2, to: 1 }, duration: 200 });
+      return;
+    }
+    this.autoObal?.setAlpha(0.25);
+    this.vlecka = this.add
+      .text(1400, 320, '🚛', { fontSize: '56px', padding: { x: 6, y: 10 } })
+      .setOrigin(0.5)
+      .setDepth(6)
+      .setName('vlecka');
+    this.napovedaKlaves.setVisible(false);
+    this.tweens.add({ targets: this.vlecka, x: 1170, duration: 700, ease: 'Quad.Out' });
+  }
+
+  /** Prázdné auto bez vlečky: 🪫 se zatřese a nápověda 🚛 zabliká – auto zůstane na parkovišti. */
+  private potrebujeVlecku(auto: Auto): void {
+    beep.tick(300, 0.15);
+    const prazdne = this.add
+      .container(1060, 420, [
+        tabulkaSpz(this, 0, 0, auto.spz, 40),
+        this.add.text(105, 0, '🪫', { fontSize: '40px', padding: { x: 4, y: 8 } }).setOrigin(0.5),
+        this.add.text(160, 0, '🚛', { fontSize: '40px', padding: { x: 4, y: 8 } }).setOrigin(0.5).setName('napoveda_vlecka'),
+      ])
+      .setDepth(20)
+      .setName('potrebuje_vlecku');
+    this.tweens.add({ targets: prazdne, x: { from: 1050, to: 1070 }, duration: 60, yoyo: true, repeat: 4 });
+    this.tweens.add({
+      targets: prazdne,
+      alpha: { from: 1, to: 0 },
+      delay: 1800,
+      duration: 500,
+      onComplete: () => prazdne.destroy(),
+    });
+  }
+
   // ---------- Zobrazení ----------
 
   private prekresli(): void {
@@ -390,9 +521,24 @@ export class StationScene extends Phaser.Scene {
 
     this.natankovanoText.setText(formatLitry(ted));
     this.cenaText.setText(`${((ted / 100) * CENA_LITRU_KC).toFixed(2)} Kč  |  (${tecky(ted)} teček)`);
-    const nadrz = stavNadrze(ted, cil);
-    this.nadrzPruh.width = NADRZ_SIRKA * nadrz.podil;
-    this.nadrzPruh.fillColor = { nepocita: BARVA.oranzova, pocita: BARVA.zelena, preteklo: BARVA.cervena }[nadrz.pasmo];
+    const barvaPasma = { nepocita: BARVA.oranzova, pocita: BARVA.zelena, preteklo: BARVA.cervena };
+    if (this.auto) {
+      // Nádrž auta: plná = kapacita auta; šedě co v ní už bylo, barevně natankované, přetečení celé červeně.
+      const kap = this.auto.kapacita;
+      const nadrz = stavNadrze(this.autoStav + ted, kap);
+      const zaklad = Math.min(1, this.autoStav / kap);
+      this.nadrzZaklad.width = NADRZ_SIRKA * zaklad;
+      this.nadrzZaklad.setVisible(nadrz.pasmo !== 'preteklo');
+      this.nadrzPruh.x = this.nadrzZaklad.x + (nadrz.pasmo === 'preteklo' ? 0 : this.nadrzZaklad.width);
+      this.nadrzPruh.width = nadrz.pasmo === 'preteklo' ? NADRZ_SIRKA : NADRZ_SIRKA * Math.max(0, nadrz.podil - zaklad);
+      this.nadrzPruh.fillColor = barvaPasma[nadrz.pasmo];
+    } else {
+      const nadrz = stavNadrze(ted, cil);
+      this.nadrzZaklad.width = 0;
+      this.nadrzPruh.x = this.nadrzZaklad.x;
+      this.nadrzPruh.width = NADRZ_SIRKA * nadrz.podil;
+      this.nadrzPruh.fillColor = barvaPasma[nadrz.pasmo];
+    }
     this.zbyvaText.setText(ted > cil ? `PŘESAH: +${formatLitry(ted - cil)} L` : `ZBÝVÁ: ${formatLitry(cil - ted)} L`);
   }
 

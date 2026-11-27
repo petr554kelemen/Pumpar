@@ -9,6 +9,7 @@ import { LockScene } from './scenes/LockScene.ts';
 import { BankaScene } from './scenes/BankaScene.ts';
 import { UzaverkaScene } from './scenes/UzaverkaScene.ts';
 import { VysledkyScene } from './scenes/VysledkyScene.ts';
+import { ParkovisteScene } from './scenes/ParkovisteScene.ts';
 import { type SceneKey, navigaceZamcena } from './scenes/nav.ts';
 import type { ScanTestData } from './scenes/ScanTestScene.ts';
 
@@ -28,7 +29,7 @@ const game = new Phaser.Game({
     height: 720,
   },
   // První scéna je výchozí: zamčená benzínka (odemkne kód nebo služební karta) → banka (aktivace karet) → stojan.
-  scene: [LockScene, BankaScene, StationScene, AirScene, ShopScene, VysledkyScene, ScanTestScene, UzaverkaScene],
+  scene: [LockScene, BankaScene, StationScene, ParkovisteScene, AirScene, ShopScene, VysledkyScene, ScanTestScene, UzaverkaScene],
 });
 
 // Test čtečky jen pro rodiče: Ctrl+F2 odkudkoli (čtečka posílá jen znaky + Enter, F-klávesy nikdy; skener

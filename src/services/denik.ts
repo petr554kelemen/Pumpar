@@ -29,6 +29,8 @@ export interface ZaznamProdeje extends ZaznamPlatby {
   benzinPlatny?: boolean;
   /** Tečky za benzín (část útraty). */
   benzinTecky?: number;
+  /** SPZ auta, které benzín dostalo (pípnuté u stojanu); bez SPZ = neznámé auto. */
+  spz?: string;
 }
 
 export interface ZaznamVzduchu extends ZaznamPlatby {

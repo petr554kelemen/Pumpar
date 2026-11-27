@@ -93,6 +93,10 @@ export class ScanTestScene extends Phaser.Scene {
         beep.tick(660, 0.1);
         setTimeout(() => beep.tick(990, 0.15), 120);
         break;
+      case 'vlecka':
+        this.vysledek.add([this.emoji(0, -40, '🚛', 200).setName('vlecka'), this.popisek(0, 130, `${kod} – vlečka`)]);
+        beep.tick(330, 0.12);
+        break;
       case 'rodic':
         this.vysledek.add([this.emoji(0, -40, '⚙️', 160), this.popisek(0, 110, kod)]);
         beep.tick(400, 0.08);

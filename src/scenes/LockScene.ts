@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import * as beep from '../services/beep.ts';
 import { bus } from '../services/eventBus.ts';
 import { den } from '../services/den.ts';
+import { garaz } from '../services/auta.ts';
 import { KodovaKlavesnice, type Role, formatCas, odemyka } from '../services/lock.ts';
 import { cifernik, kresliRucicky, velkeHodiny } from './hodiny.ts';
 import { klavesnice } from './terminal.ts';
@@ -247,6 +248,7 @@ export class LockScene extends Phaser.Scene {
     if (this.otviraciDoba) {
       this.oteviram = true;
       den().otevri(Date.now());
+      garaz().noveKolo(Date.now()); // nové kolo: nádrže aut na ⅔
       beep.win();
       this.tweens.add({ targets: this.zakaznik, x: 515, y: 560, scale: 0.4, alpha: 0, duration: 900, ease: 'Sine.easeIn' });
       this.time.delayedCall(1300, () => this.scene.start(PO_ODEMCENI));
@@ -279,6 +281,7 @@ export class LockScene extends Phaser.Scene {
   private otevri(): void {
     this.oteviram = true;
     den().otevri(Date.now());
+    garaz().noveKolo(Date.now()); // nové kolo: nádrže aut na ⅔
     beep.win();
     this.lcd.setFillStyle(BARVA.lcd);
     this.displej.setText('✅').setPadding(4);

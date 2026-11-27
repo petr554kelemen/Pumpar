@@ -32,6 +32,8 @@ export class HerniDen {
   private smenaOd: number | null = null;
   /** Směnu ukončila obsluha dřív (🔒). */
   private ukonceno = false;
+  /** Kdy (skutečný čas, ms) byla směna ukončena dřív; null = neukončena. */
+  private ukoncenoV: number | null = null;
   /** Hlášení o zavírání už zaznělo (hraje jednou za den, ať je hráč v kterékoli scéně). */
   ohlaseno = false;
 
@@ -75,8 +77,22 @@ export class HerniDen {
   }
 
   /** Obsluha zavřela benzínku dřív (🔒). */
-  ukonci(): void {
+  ukonci(ted = Date.now()): void {
+    if (!this.ukonceno) this.ukoncenoV = ted;
     this.ukonceno = true;
+  }
+
+  /**
+   * Kolik ms běžící směny leží mezi okamžiky t0 a t1 (auta pálí benzín jen během směny – auta.ts).
+   * Směna = od otevření do konce odpočtu nebo do dřívějšího zavření 🔒; před otevřením a po zavření nic.
+   */
+  msSmenyMezi(t0: number, t1: number): number {
+    if (this.smenaOd === null || t1 <= t0) return 0;
+    let konec = this.smenaOd + DELKA_SMENY_MS;
+    if (this.ukoncenoV !== null) konec = Math.min(konec, this.ukoncenoV);
+    const od = Math.max(t0, this.smenaOd);
+    const do_ = Math.min(t1, konec);
+    return Math.max(0, do_ - od);
   }
 
   zbyvaMs(ted: number): number {

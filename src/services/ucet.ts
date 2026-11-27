@@ -26,10 +26,13 @@ export class Ucet {
   benzinPlatny = false;
   /** Režim „+ Obchod“ (zelené předvolby): po zaplacení zpět ke stojanu s novou náhodnou předvolbou. */
   rezimObchodu = false;
+  /** SPZ auta u stojanu (pípnuté / přivezené vlečkou); po zaplacení dostane benzín do nádrže. null = neznámé auto. */
+  spz: string | null = null;
 
   vyprazdni(): void {
     this.benzin = null;
     this.benzinPlatny = false;
+    this.spz = null;
     this.rezimObchodu = false;
   }
 }
