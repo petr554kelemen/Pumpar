@@ -4,16 +4,25 @@ import type Phaser from 'phaser';
 import * as beep from '../services/beep.ts';
 import { den } from '../services/den.ts';
 
-export type SceneKey = 'Lock' | 'Banka' | 'Station' | 'Air' | 'Shop' | 'ScanTest' | 'Uzaverka';
+export type SceneKey = 'Lock' | 'Banka' | 'Station' | 'Air' | 'Shop' | 'Vysledky' | 'ScanTest' | 'Uzaverka';
 
 // 🔒 = zavřít benzínku (konec směny) → konec dne. Zamčená scéna a konec dne navigaci nemají.
+// Test čtečky (ScanTest) v navigaci není – jen pro rodiče přes Ctrl+F2 (main.ts).
 const SCENES: ReadonlyArray<{ key: SceneKey; ikona: string }> = [
   { key: 'Station', ikona: '⛽' },
   { key: 'Air', ikona: '🛞' },
   { key: 'Shop', ikona: '🛒' },
-  { key: 'ScanTest', ikona: '📟' },
+  { key: 'Vysledky', ikona: '🏆' },
   { key: 'Uzaverka', ikona: '🔒' },
 ];
+
+/** Zámek navigace právě běžící scény (platí i pro zkratku testu čtečky). */
+let aktualniZamek: ZamekNavigace | null = null;
+
+/** Je teď odchod ze scény zakázaný (obchod s nezaplaceným benzínem)? */
+export function navigaceZamcena(): boolean {
+  return aktualniZamek?.zamceno() ?? false;
+}
 
 /** Zámek navigace: dokud platí, ze scény se odejít nedá (obchod s nezaplaceným benzínem). */
 export interface ZamekNavigace {
@@ -24,6 +33,12 @@ export interface ZamekNavigace {
 
 export function addNav(scene: Phaser.Scene, zamek?: ZamekNavigace): void {
   const zamceno = zamek?.zamceno() ?? false;
+  if (zamek) {
+    aktualniZamek = zamek;
+    scene.events.once('shutdown', () => {
+      if (aktualniZamek === zamek) aktualniZamek = null;
+    });
+  }
   SCENES.forEach(({ key, ikona }, i) => {
     const aktivni = scene.scene.key === key;
     const tlacitko = scene.add

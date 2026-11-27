@@ -10,16 +10,21 @@ export interface Zbozi {
   emoji: string;
   /** Cena v tečkách. */
   cena: number;
+  /**
+   * Srdíčka ❤️ za prodej (výsledková listina): rostou rychleji než cena – drahé zboží rychle čerpá kartu
+   * a má se vyplatit (rozhodnutí rodiče 2026-11-27). Návrh do dílny ✏️.
+   */
+  srdicka: number;
 }
 
 /** Zboží ze staré verze (stejné ceny), kódy podle kategorií (README → Formát kódů). */
 export const ZBOZI: readonly Zbozi[] = [
-  { kod: 'S001', nazev: 'sušenka', emoji: '🍪', cena: 2 },
-  { kod: 'S002', nazev: 'zmrzlina', emoji: '🍦', cena: 3 },
-  { kod: 'P001', nazev: 'káva', emoji: '☕', cena: 4 },
-  { kod: 'P002', nazev: 'pitíčko', emoji: '🧃', cena: 5 },
-  { kod: 'J001', nazev: 'párek v rohlíku', emoji: '🌭', cena: 6 },
-  { kod: 'A001', nazev: 'autíčko', emoji: '🏎️', cena: 9 },
+  { kod: 'S001', nazev: 'sušenka', emoji: '🍪', cena: 2, srdicka: 1 },
+  { kod: 'S002', nazev: 'zmrzlina', emoji: '🍦', cena: 3, srdicka: 1 },
+  { kod: 'P001', nazev: 'káva', emoji: '☕', cena: 4, srdicka: 2 },
+  { kod: 'P002', nazev: 'pitíčko', emoji: '🧃', cena: 5, srdicka: 2 },
+  { kod: 'J001', nazev: 'párek v rohlíku', emoji: '🌭', cena: 6, srdicka: 3 },
+  { kod: 'A001', nazev: 'autíčko', emoji: '🏎️', cena: 9, srdicka: 5 },
 ];
 
 /** Útrata v košíku se drží do 30 teček (README → Rozsah do 30). */
@@ -48,6 +53,7 @@ export function chybyKatalogu(): string[] {
     if (parseCode(z.kod).druh !== 'zbozi') chyby.push(`${z.kod}: není kód zboží`);
     if (videne.has(z.kod)) chyby.push(`${z.kod}: duplicitní`);
     if (z.cena < 1 || z.cena > MAX_UTRATA) chyby.push(`${z.kod}: cena mimo 1–${MAX_UTRATA}`);
+    if (!Number.isInteger(z.srdicka) || z.srdicka < 0) chyby.push(`${z.kod}: srdíčka musí být celé číslo ≥ 0`);
     videne.add(z.kod);
   }
   return chyby;

@@ -330,6 +330,7 @@ export class StationScene extends Phaser.Scene {
     if (this.rezim || !lzeJitPlatit(natankovano)) return;
     beep.tick(880, 0.08);
     ucet().benzin = natankovano;
+    ucet().benzinPlatny = stavNadrze(natankovano, this.predvolba.setiny).pasmo !== 'nepocita';
     this.scene.start('Shop' satisfies SceneKey);
   }
 

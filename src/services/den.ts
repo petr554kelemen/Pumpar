@@ -35,11 +35,14 @@ export class HerniDen {
   /** Hlášení o zavírání už zaznělo (hraje jednou za den, ať je hráč v kterékoli scéně). */
   ohlaseno = false;
 
-  /** Kolikátý den (od načtení hry). */
+  /** Kolikátý den (od načtení hry) – po obnovení stránky začíná znovu od 1. */
   readonly cislo: number;
+  /** Jednoznačné ID dne (skutečný čas vzniku, ms) – deník podle něj pozná dnešní záznamy i po obnovení stránky. */
+  readonly id: number;
 
   constructor(ted: number, cislo = 1, rng: () => number = Math.random) {
     this.cislo = cislo;
+    this.id = ted;
     this.zacatek = ted;
     this.otevreni = vyber(OTEVIRACI_DOBY, rng);
     this.zavreni = vyber(ZAVIRACI_DOBY, rng);

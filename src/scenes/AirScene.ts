@@ -2,9 +2,14 @@ import Phaser from 'phaser';
 import { bus, type GameEvents } from '../services/eventBus.ts';
 import * as beep from '../services/beep.ts';
 import { type Disk, type KoloId, type StavKola, cenaKola, cenaVyberu, noveAuto } from '../services/air.ts';
+import { den } from '../services/den.ts';
+import { type ZaznamVzduchu, denik } from '../services/denik.ts';
 import { penezenka } from '../services/penezenka.ts';
-import { KARTY, type KartaNaObrazovce, PanelKaret, krizek } from './kartyPanel.ts';
+import { radekZeZaznamu } from '../services/vysledky.ts';
+import { KARTY, type KartaNaObrazovce, PanelKaret, barva, krizek } from './kartyPanel.ts';
 import { addNav, type SceneKey } from './nav.ts';
+import { odmena } from './odmena.ts';
+import { PinTerminal } from './terminal.ts';
 
 const ZLUTA = 0xf1c40f;
 /** Barvy disků (cena podle barvy – viz air.ts): ráfek a paprsky. */
@@ -44,7 +49,7 @@ interface Kolo {
   napoveda: Phaser.GameObjects.Arc[];
 }
 
-type Stav = 'vyber' | 'placeni' | 'odjezd';
+type Stav = 'vyber' | 'pin' | 'placeni' | 'odjezd';
 
 // Dofukování kol (nápad hráče): auto jako plánek ze shora, kola z boku – splasklé má dole plošku.
 // Cena dofouknutí podle barvy disku (modrý 2, červený 3, zelený 5), kontrola plného kola 1.
@@ -56,6 +61,7 @@ export class AirScene extends Phaser.Scene {
   private kola: Kolo[] = [];
   private panel!: PanelKaret;
   private dalsiAuto!: Phaser.GameObjects.Text;
+  private pin: PinTerminal | null = null;
 
   constructor() {
     super('Air' satisfies SceneKey);
@@ -64,6 +70,7 @@ export class AirScene extends Phaser.Scene {
   create(): void {
     this.stav = 'vyber';
     this.kola = [];
+    this.pin = null;
     addNav(this);
 
     // Světlá plocha stání (beton) – černé pneumatiky na ní jsou dobře vidět, i ploška splasklého kola.
@@ -219,7 +226,23 @@ export class AirScene extends Phaser.Scene {
 
   // ---------- Placení ----------
 
-  private onScan({ info }: GameEvents['scan']): void {
+  /** Zavře terminál s PINem – nic se nezaplatilo, výběr kol zůstává. */
+  private zavriPin(): void {
+    this.pin?.zavri();
+    this.pin = null;
+    if (this.stav === 'pin') this.stav = 'vyber';
+  }
+
+  private onScan({ kod, info }: GameEvents['scan']): void {
+    if (this.stav === 'pin') {
+      // Otevřený terminál: číslice + Enter = PIN; karta = zavřít a vybrat ji.
+      if (/^\d+$/.test(kod)) {
+        this.pin?.zkus(kod);
+        return;
+      }
+      if (info.druh !== 'karta') return;
+      this.zavriPin();
+    }
     if (this.stav !== 'vyber' || info.druh !== 'karta') return;
     // Aktivní peněžní karta = jako klepnutí na ni. Neaktivní, služební nebo neznámá karta = kritická chyba ❌
     // (stejně jako v obchodě).
@@ -228,7 +251,9 @@ export class AirScene extends Phaser.Scene {
     else krizek(this, KARTY.x, 360);
   }
 
+  /** Hráč zvolil kartu: stačí-li zůstatek, zákazník potvrdí platbu PINem; jinak ❌ hned (bez PINu). */
   private plat(kn: KartaNaObrazovce): void {
+    if (this.stav === 'pin') this.zavriPin();
     if (this.stav !== 'vyber') return;
     const vybrana = this.kola.filter((k) => k.vybrane);
     if (vybrana.length === 0) {
@@ -241,14 +266,43 @@ export class AirScene extends Phaser.Scene {
     }
 
     const cena = cenaVyberu(vybrana);
+    if (!penezenka().overPlatbu(kn.karta.kod, cena).ok) {
+      this.panel.odmitni(kn);
+      return;
+    }
+    this.stav = 'pin';
+    this.pin = new PinTerminal(this, AUTO.x, 390, cena, barva(kn.karta), () => {
+      this.pin = null;
+      this.proved(kn, vybrana, cena);
+    });
+  }
+
+  /** Správný PIN: odečet, zápis do deníku, tečky odletí ke kolům, foukání, odměna ⭐ ❤️. */
+  private proved(kn: KartaNaObrazovce, vybrana: Kolo[], cena: number): void {
     const pred = penezenka().zustatek(kn.karta.kod) ?? 0;
-    if (!penezenka().zaplat(kn.karta.kod, cena).ok) {
+    const platba = penezenka().zaplat(kn.karta.kod, cena);
+    if (!platba.ok) {
+      this.stav = 'vyber';
       this.panel.odmitni(kn);
       return;
     }
 
     this.stav = 'placeni';
     beep.tick(880, 0.1);
+    const d = den();
+    const zaznam: ZaznamVzduchu = {
+      druh: 'vzduch',
+      cas: new Date().toISOString(),
+      den: d.cislo,
+      denId: d.id,
+      kol: vybrana.length,
+      tecky: cena,
+      karta: kn.karta.kod,
+      hodnotaKarty: kn.karta.hodnota,
+      zbytek: platba.zbytek,
+    };
+    denik.zapis(zaznam);
+    const radek = radekZeZaznamu(zaznam);
     vybrana.forEach((k) => {
       k.napoveda.forEach((t) => t.destroy());
       k.napoveda = [];
@@ -275,8 +329,12 @@ export class AirScene extends Phaser.Scene {
       });
     });
 
-    // Číslo zůstatku se změní, až tečky doletí.
-    this.time.delayedCall(cena * 140 + 450, () => this.panel.prekresli(kn));
+    // Číslo zůstatku se změní, až tečky doletí; pak odměna k 🏆 (během foukání kol).
+    this.time.delayedCall(cena * 140 + 450, () => {
+      this.panel.prekresli(kn);
+      const prvni = vybrana[0];
+      odmena(this, prvni ? this.svetovaPozice(prvni) : AUTO, radek, kn);
+    });
     // Po doletu teček foukání kol jedno po druhém.
     this.time.delayedCall(cena * 140 + 500, () => this.nafoukni(vybrana, 0));
   }

@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { bus, type GameEvents } from '../services/eventBus.ts';
 import * as beep from '../services/beep.ts';
 import type { CodeInfo } from '../services/codes.ts';
-import { addNav, type SceneKey } from './nav.ts';
+import type { SceneKey } from './nav.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
 // Emoji ve velké velikosti přesahují rámeček textu – okraj zabrání oříznutí.
@@ -16,6 +16,12 @@ type AutoInfo = Extract<CodeInfo, { druh: 'auto' }>;
 // Zboží: velké písmeno kategorie + obrázek. Bankovka: číslo + stejný počet teček.
 // Auto (SPZ): obrázek auta + SPZ jako tabulka.
 // Chyba: velký ❌ (hráč zná jako „chyba“).
+// Jen pro rodiče (zkoušení nových štítků): v navigaci není, otevře se Ctrl+F2 (main.ts). Navigaci nemá –
+// ↩️ nebo Esc vrátí do scény, odkud rodič přišel (i ke dveřím, aby test neobešel zamčenou benzínku).
+export interface ScanTestData {
+  zpet?: SceneKey;
+}
+
 export class ScanTestScene extends Phaser.Scene {
   private vysledek!: Phaser.GameObjects.Container;
 
@@ -23,13 +29,23 @@ export class ScanTestScene extends Phaser.Scene {
     super('ScanTest' satisfies SceneKey);
   }
 
-  create(): void {
+  create(data: ScanTestData = {}): void {
     const { width, height } = this.scale;
-    addNav(this);
+    const zpet = data.zpet ?? 'Lock';
+    const odejdi = (): void => {
+      beep.tick(500, 0.06);
+      this.scene.start(zpet);
+    };
+    this.add
+      .text(20, 16, '↩️', { fontSize: '56px', backgroundColor: '#37404c', padding: { x: 6, y: 4 } })
+      .setName('zpet')
+      .setInteractive({ useHandCursor: true })
+      .on('pointerdown', odejdi);
+    this.input.keyboard?.once('keydown-ESC', odejdi);
 
     // Popisek jen pro rodiče.
     this.add
-      .text(width / 2, 40, 'Zkouška čtečky – pípni, nebo napiš kód a Enter (např. P001, B020, K001, LA01, KE03)', {
+      .text(width / 2 + 40, 40, 'Zkouška čtečky – pípni, nebo napiš kód a Enter (P001, K001, LA01…) · Esc = zpět', {
         fontFamily: FONT,
         fontSize: '22px',
         color: '#95a5a6',

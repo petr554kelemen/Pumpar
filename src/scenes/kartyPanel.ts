@@ -92,6 +92,8 @@ export class PanelKaret {
     const zbyva = penezenka().zustatek(kn.karta.kod) ?? 0;
     kn.cislo.setText(String(zbyva));
     kn.tecky.forEach((t, i) => t.setFillStyle(ZLUTA, i < zbyva ? 1 : 0));
+    // Vyčerpaná karta je bledá (jako u stojanu); klepnout na ni jde, jen je odmítnuta.
+    kn.obal.setAlpha(zbyva > 0 ? 1 : 0.45);
   }
 
   /**

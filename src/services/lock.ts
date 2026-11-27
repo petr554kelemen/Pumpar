@@ -1,6 +1,7 @@
 // Odemykání benzínky (nápad hráče): bez benzináře je zavřeno. Platí obě cesty –
 // kód na klávesnici u dveří, nebo pípnutí služební karty. Bez závislosti na Phaseru.
-// Kód i karta jsou zatím návrh do dílny ✏️ (kód zvolí hráč, jiný než PIN platební karty 1234).
+// Kód i karta jsou zatím návrh do dílny ✏️ (kód zvolí hráč). PIN platební karty je samostatné pravidlo
+// (`PIN_KARTY` v penezenka.ts) – klávesnice se zadáváním je stejná (`KodovaKlavesnice` s jinou kontrolou).
 
 /** Kód dveří (návrh – zvolí hráč v dílně). */
 export const KOD_DVERI = '1111';
@@ -35,9 +36,15 @@ export function odemyka(kod: string): boolean {
   return k === KOD_DVERI || k === SLUZEBNI_KARTA;
 }
 
-/** Zadávání kódu na klávesnici u dveří (na displeji jen hvězdičky). */
+/** Zadávání kódu na klávesnici (dveře, PIN karty) – na displeji jen hvězdičky. */
 export class KodovaKlavesnice {
   private cislice = '';
+  private readonly over: (kod: string) => boolean;
+
+  /** `over` = co je správný kód (výchozí: odemyká dveře). */
+  constructor(over: (kod: string) => boolean = odemyka) {
+    this.over = over;
+  }
 
   get zadano(): string {
     return this.cislice;
@@ -62,9 +69,9 @@ export class KodovaKlavesnice {
     this.cislice = '';
   }
 
-  /** Potvrdí zadání: vrátí, zda odemyká, a displej vymaže. */
+  /** Potvrdí zadání: vrátí, zda je kód správný, a displej vymaže. */
   potvrd(): boolean {
-    const ok = this.cislice !== '' && odemyka(this.cislice);
+    const ok = this.cislice !== '' && this.over(this.cislice);
     this.cislice = '';
     return ok;
   }

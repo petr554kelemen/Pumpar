@@ -4,6 +4,7 @@ import { bus } from '../services/eventBus.ts';
 import { den } from '../services/den.ts';
 import { KodovaKlavesnice, type Role, formatCas, odemyka } from '../services/lock.ts';
 import { cifernik, kresliRucicky, velkeHodiny } from './hodiny.ts';
+import { klavesnice } from './terminal.ts';
 import type { SceneKey } from './nav.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
@@ -201,19 +202,7 @@ export class LockScene extends Phaser.Scene {
       .setName('displej_kod');
     prvky.push(this.lcd, this.displej);
 
-    const klavesy = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'C', '0', '✅'];
-    const kw = 120;
-    const kh = 82;
-    const mezera = 15;
-    const x0 = (w - (3 * kw + 2 * mezera)) / 2;
-    klavesy.forEach((k, i) => {
-      const kx = x0 + (i % 3) * (kw + mezera);
-      const ky = 150 + Math.floor(i / 3) * (kh + mezera);
-      const barva = k === 'C' ? BARVA.cervena : k === '✅' ? BARVA.zelena : BARVA.klavesa;
-      const text = k === 'C' ? '#ffffff' : '#1e242b';
-      const nazev = k === '✅' ? 'klavesa_ok' : `klavesa_${k}`;
-      prvky.push(this.klavesa(kx, ky, kw, kh, k, barva, text, nazev));
-    });
+    prvky.push(...klavesnice(this, w, 150, (k) => this.stisk(k)));
 
     // Čtečka karty: sem se přikládá (pípá) služební karta.
     const cy = 545;
@@ -223,29 +212,6 @@ export class LockScene extends Phaser.Scene {
     prvky.push(this.led);
 
     this.terminal = this.add.container(x, y, prvky).setName('terminal');
-  }
-
-  private klavesa(
-    x: number,
-    y: number,
-    w: number,
-    h: number,
-    k: string,
-    barva: number,
-    barvaTextu: string,
-    nazev: string,
-  ): Phaser.GameObjects.Container {
-    const pozadi = this.add.rectangle(0, 0, w, h, barva).setInteractive({ useHandCursor: true });
-    const popis = this.add
-      .text(0, 0, k, { fontFamily: FONT, fontSize: '40px', fontStyle: 'bold', color: barvaTextu, padding: { x: 4, y: 4 } })
-      .setOrigin(0.5);
-    const obal = this.add.container(x + w / 2, y + h / 2, [pozadi, popis]).setName(nazev);
-    pozadi.on('pointerdown', () => {
-      obal.setScale(0.94);
-      this.time.delayedCall(90, () => obal.setScale(1));
-      this.stisk(k);
-    });
-    return obal;
   }
 
   private stisk(k: string): void {

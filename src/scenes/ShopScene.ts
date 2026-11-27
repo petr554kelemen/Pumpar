@@ -2,13 +2,16 @@ import Phaser from 'phaser';
 import { bus, type GameEvents } from '../services/eventBus.ts';
 import * as beep from '../services/beep.ts';
 import { den } from '../services/den.ts';
-import { denik } from '../services/denik.ts';
+import { type ZaznamProdeje, denik } from '../services/denik.ts';
 import { ZBOZI, type Zbozi, najdiZbozi, utrata, vejdeSe } from '../services/katalog.ts';
 import { SLUZEBNI_KARTA } from '../services/lock.ts';
 import { PENEZNI_KARTY, penezenka } from '../services/penezenka.ts';
 import { teckyZaBenzin, ucet } from '../services/ucet.ts';
-import { KARTY, type KartaNaObrazovce, PanelKaret, krizek } from './kartyPanel.ts';
+import { type RadekListiny, radekZeZaznamu } from '../services/vysledky.ts';
+import { KARTY, type KartaNaObrazovce, PanelKaret, barva, krizek } from './kartyPanel.ts';
 import { addNav, type SceneKey } from './nav.ts';
+import { delkaOdmeny, odmena } from './odmena.ts';
+import { PinTerminal } from './terminal.ts';
 import type { StationData } from './StationScene.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
@@ -23,12 +26,16 @@ const REGAL = { x0: 165, y0: 200, dx: 260, dy: 150, sirka: 240, vyska: 136, slou
 const KOSIK = { x: 425, y: 580, sirka: 790, vyska: 250 } as const;
 const POLOZKY = { x0: 135, y0: 525, dx: 56, dy: 62, vRade: 8 } as const;
 const UTRATA = { cisloX: 640, x0: 662, y0: 505, d: 19, r: 7, vRade: 10 } as const;
-type Stav = 'nakup' | 'placeni';
+/** Terminál s PINem nad regálem (karty vpravo zůstávají klepnutelné). */
+const PIN_POZICE = { x: 425, y: 380 } as const;
+type Stav = 'nakup' | 'pin' | 'placeni';
 
 // Obchod (fáze 4): hráč vybírá zboží klepnutím na regál nebo pípnutím visačky, útrata v košíku roste
 // viditelně (číslo + tečky). Pak sám zvolí kartu, kterou zaplatí – pípne ji (nebo na ni klepne). Stačí-li
 // zůstatek, tečky z karty odletí do košíku a nákup se zapíše do deníku; jinak ❌ a hráč ubere zboží nebo
 // zkusí jinou kartu. Karty drží zůstatek po celý herní den.
+// Na kartu se zůstatkem zákazník potvrdí platbu PINem (terminal.ts); teprve pak se odečte a zapíše do deníku
+// a k 🏆 vyletí odměna ⭐ ❤️ (vysledky.ts).
 // Přišel-li hráč od stojanu („🛒 Jít platit“), je v košíku napřed benzín ⛽ (modré tečky, nedá se vrátit)
 // a po zaplacení se hra vrátí ke stojanu. Bez zaplacení se odejít nedá (rodič: „to se nedělá“) – navigace je
 // zamčená, hráč ubere zboží, aby nákup zaplatil. Nestačí-li na samotný benzín žádná karta, obsluha pípne
@@ -43,6 +50,7 @@ export class ShopScene extends Phaser.Scene {
   /** Benzín na účtu (setiny litru) a jeho cena v tečkách; 0 = obchod bez benzínu. */
   private benzinSetin = 0;
   private benzin = 0;
+  private pin: PinTerminal | null = null;
 
   constructor() {
     super('Shop' satisfies SceneKey);
@@ -50,6 +58,7 @@ export class ShopScene extends Phaser.Scene {
 
   create(): void {
     this.stav = 'nakup';
+    this.pin = null;
     this.kosik = [];
     this.kosikObjekty = [];
     this.policka.clear();
@@ -101,7 +110,16 @@ export class ShopScene extends Phaser.Scene {
     this.policka.set(z.kod, obal);
   }
 
-  private onScan({ info }: GameEvents['scan']): void {
+  private onScan({ kod, info }: GameEvents['scan']): void {
+    if (this.stav === 'pin') {
+      // Otevřený terminál: číslice + Enter = PIN (žádné ❌ za „neznámý kód“); karta = zavřít a vybrat ji.
+      if (/^\d+$/.test(kod)) {
+        this.pin?.zkus(kod);
+        return;
+      }
+      if (info.druh !== 'karta') return;
+      this.zavriPin();
+    }
     if (this.stav !== 'nakup') return;
     switch (info.druh) {
       case 'zbozi': {
@@ -220,7 +238,16 @@ export class ShopScene extends Phaser.Scene {
 
   // ---------- Placení ----------
 
+  /** Zavře terminál s PINem (jiná karta, služební karta) – nic se nezaplatilo, nákup zůstává. */
+  private zavriPin(): void {
+    this.pin?.zavri();
+    this.pin = null;
+    if (this.stav === 'pin') this.stav = 'nakup';
+  }
+
+  /** Hráč zvolil kartu: stačí-li zůstatek, zákazník potvrdí platbu PINem; jinak ❌ hned (bez PINu). */
   private zaplat(kn: KartaNaObrazovce): void {
+    if (this.stav === 'pin') this.zavriPin();
     if (this.stav !== 'nakup') return;
     if (this.kosik.length === 0 && this.benzin === 0) {
       // Nejdřív vybrat zboží.
@@ -230,24 +257,47 @@ export class ShopScene extends Phaser.Scene {
     }
 
     const cena = utrata(this.kosik, this.benzin);
+    if (!penezenka().overPlatbu(kn.karta.kod, cena).ok) {
+      this.panel.odmitni(kn);
+      return;
+    }
+    this.stav = 'pin';
+    this.pin = new PinTerminal(this, PIN_POZICE.x, PIN_POZICE.y, cena, barva(kn.karta), () => {
+      this.pin = null;
+      this.proved(kn, cena);
+    });
+  }
+
+  /** Správný PIN: tečky z karty odletí, zápis do deníku, odměna ⭐ ❤️. */
+  private proved(kn: KartaNaObrazovce, cena: number): void {
     const pred = penezenka().zustatek(kn.karta.kod) ?? 0;
     const platba = penezenka().zaplat(kn.karta.kod, cena);
     if (!platba.ok) {
+      // Mezitím se nic neutratilo, ale pro jistotu: odmítnout a vrátit se k nákupu.
+      this.stav = 'nakup';
       this.panel.odmitni(kn);
       return;
     }
 
     this.stav = 'placeni';
     beep.tick(880, 0.1);
-    denik.zapis({
+    const d = den();
+    const zaznam: ZaznamProdeje = {
       druh: 'prodej',
       cas: new Date().toISOString(),
-      den: den().cislo,
+      den: d.cislo,
+      denId: d.id,
       zbozi: this.kosik.map((z) => z.kod),
-      ...(this.benzinSetin > 0 ? { benzin: this.benzinSetin } : {}),
+      ...(this.benzinSetin > 0
+        ? { benzin: this.benzinSetin, benzinTecky: this.benzin, benzinPlatny: ucet().benzinPlatny }
+        : {}),
       tecky: cena,
       karta: kn.karta.kod,
-    });
+      hodnotaKarty: kn.karta.hodnota,
+      zbytek: platba.zbytek,
+    };
+    denik.zapis(zaznam);
+    const radek = radekZeZaznamu(zaznam);
 
     // Tečky z karty odletí jedna po druhé na tečky útraty v košíku (odečítání viditelně).
     this.panel.odeberTecky(kn, pred, cena).forEach((start, i) => {
@@ -272,7 +322,7 @@ export class ShopScene extends Phaser.Scene {
     // Číslo zůstatku se změní, až tečky doletí.
     this.time.delayedCall(cena * 110 + 550, () => {
       this.panel.prekresli(kn);
-      this.hotovo();
+      this.hotovo(radek, kn);
     });
   }
 
@@ -303,7 +353,7 @@ export class ShopScene extends Phaser.Scene {
     this.scene.start('Banka' satisfies SceneKey);
   }
 
-  private hotovo(): void {
+  private hotovo(radek: RadekListiny, kn: KartaNaObrazovce): void {
     beep.win();
     const fajfka = this.add
       .text(KOSIK.x, KOSIK.y, '✅', { fontSize: '130px', padding: { x: 10, y: 20 } })
@@ -311,9 +361,10 @@ export class ShopScene extends Phaser.Scene {
       .setDepth(30)
       .setName('zaplaceno');
     this.tweens.add({ targets: fajfka, scale: { from: 0, to: 1 }, duration: 300, ease: 'Back.Out' });
+    odmena(this, { x: KOSIK.x, y: KOSIK.y }, radek, kn);
     const sBenzinem = this.benzin > 0;
     if (sBenzinem) ucet().benzin = null;
-    this.time.delayedCall(1400, () => {
+    this.time.delayedCall(Math.max(1400, delkaOdmeny(radek) + 300), () => {
       if (sBenzinem) {
         // Benzín zaplacen → zpět ke stojanu (v režimu „+ Obchod“ s novou předvolbou).
         this.scene.start('Station' satisfies SceneKey, { poPlatbe: true } satisfies StationData);

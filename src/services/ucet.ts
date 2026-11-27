@@ -22,11 +22,14 @@ export function teckyZaBenzin(setiny: number): number {
 export class Ucet {
   /** Nezaplacený benzín v setinách litru; null = nic nečeká. */
   benzin: number | null = null;
+  /** Natankoval aspoň polovinu předvolby (proti „crknutí“) → za benzín jsou srdíčka ❤️. */
+  benzinPlatny = false;
   /** Režim „+ Obchod“ (zelené předvolby): po zaplacení zpět ke stojanu s novou náhodnou předvolbou. */
   rezimObchodu = false;
 
   vyprazdni(): void {
     this.benzin = null;
+    this.benzinPlatny = false;
     this.rezimObchodu = false;
   }
 }

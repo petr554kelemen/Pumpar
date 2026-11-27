@@ -29,6 +29,17 @@ export function najdiKartu(kod: string): PenezniKarta | undefined {
   return PENEZNI_KARTY.find((karta) => karta.kod === k);
 }
 
+/**
+ * PIN platební karty – platba se potvrzuje jako při skutečném nákupu (rozhodnutí rodiče 2026-11-27).
+ * Jeden PIN pro všechny karty. Samostatné pravidlo vedle kódu dveří (`KOD_DVERI` v lock.ts) – dnes mají
+ * stejnou hodnotu, ale každé se smí v dílně ✏️ změnit samo. PIN nikdy nic nestornuje (storno = jen `K000`).
+ */
+export const PIN_KARTY = '1111';
+
+export function spravnyPin(kod: string): boolean {
+  return kod.trim() === PIN_KARTY;
+}
+
 export type Platba = { ok: true; zbytek: number } | { ok: false; chybi: number };
 
 /** Výsledek aktivace: nová karta / už aktivní (chyba hráče) / neznámá nebo služební karta. */
@@ -74,14 +85,19 @@ export class Penezenka {
     return this.aktivni.has(k) ? this.zustatky.get(k) : undefined;
   }
 
-  /** Zaplatí z karty. Stačí-li zůstatek, odečte se; jinak se nic nezmění. */
-  zaplat(kod: string, cena: number): Platba {
-    const k = kod.trim().toUpperCase();
-    const zbyva = this.zustatek(k);
+  /** Stačí zůstatek? Nic neodečte (před zadáním PINu). */
+  overPlatbu(kod: string, cena: number): Platba {
+    const zbyva = this.zustatek(kod);
     if (zbyva === undefined) return { ok: false, chybi: cena };
     if (zbyva < cena) return { ok: false, chybi: cena - zbyva };
-    this.zustatky.set(k, zbyva - cena);
     return { ok: true, zbytek: zbyva - cena };
+  }
+
+  /** Zaplatí z karty. Stačí-li zůstatek, odečte se; jinak se nic nezmění. */
+  zaplat(kod: string, cena: number): Platba {
+    const platba = this.overPlatbu(kod, cena);
+    if (platba.ok) this.zustatky.set(kod.trim().toUpperCase(), platba.zbytek);
+    return platba;
   }
 
   /** Nový den / restart: všechny karty zase plné a neaktivní – hráč si je vybere znovu. */
