@@ -24,7 +24,7 @@ https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-ver
   - `eventBus.ts` – sběrnice událostí; **všechny události a jejich data v rozhraní `GameEvents`**,
   - `codes.ts` – rozpoznání kódů (`parseCode` → `CodeInfo`, tabulka kategorií `CATEGORIES`),
   - `scanInput.ts` – vstup kódů z klávesnice / USB čtečky (převod CZ rozložení, ochrana proti dvojímu čtení),
-  - `beep.ts` – jednoduché zvuky,
+  - `beep.ts` – jednoduché zvuky, `voice.ts` – hlasové fráze (`FRAZE`, nahrané MP3, fronta),
   - `pump.ts` (stojan), `air.ts` (vzduch), `lock.ts` (zámek benzínky), `den.ts` (herní den, odpočet směny),
   - `katalog.ts` (zboží: kód → výrobek, cena), `penezenka.ts` (peněžní karty a jejich zůstatky),
     `denik.ts` (deník směny – platby v obchodě a u vzduchu, localStorage), `ucet.ts` (nezaplacený benzín od stojanu),
@@ -42,7 +42,7 @@ https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-ver
 - `karty.html`, `src/tisk/karty.ts` – štítky na staré platební karty (sada karet s tečkami + služební karta).
 - `public/stara-verze.html` – původní funkční verze (jeden soubor, čisté HTML/JS, bez Phaseru – stojan,
   obchod se 6 produkty, bankovky 15/20/25 teček). Zůstává hratelná, dokud ji nová verze nenahradí.
-- `public/` – soubory kopírované do buildu beze změny (později zvuky, obrázky).
+- `public/` – soubory kopírované do buildu beze změny; `public/hlas/<klic>.mp3` = nahrané hlasové fráze.
 - `gemini-code-1794737833330.md`, `Myslenkova_mapa_gemini-code-1794737980748.txt` – původní plán
   a myšlenková mapa (Gemini). Číselné kódy 1xx–4xx z nich jsou nahrazeny (viz Formát kódů).
 - `hlas_test_vety.txt` – testovací věty pro výběr hlasu.
@@ -80,7 +80,7 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
 - **Herní den, ne skutečný čas.** Hodiny ve hře ukazují časy, které hráč zná: otevírá se v 6:00–8:00
   (po půlhodinách), zavírá ve 20:00 / 21:00. Směna = **odpočet 20 minut** skutečného času (výseč jako kuchyňská
   minutka) → hráč má tempo. Před koncem hlášení „pokladny se budou uzavírat“, pak konec dne; dál = nový den.
-- **Hlasové pokyny** („Pípni zboží“, „Přilož kartu“, „Máš dost peněz“) – viz Hlas a písmena.
+- **Hlas jen tam, kde je to fajn** (pár slavnostních a „skutečných“ chvil), žádné hlasové pokyny – viz Hlas.
 - **Matematika skrytá ve hře** – každé počítání má být vidět jako pohyb teček, ne jako číslo:
   porovnávání (stačí karta?), rozsahy (předvolba, terč přesnosti), sčítání (cena roste po kolech),
   násobilka (kolo = 3 tečky → 3, 6, 9, 12), **odečítání**: tečky z karty viditelně odletí jedna po druhé
@@ -165,7 +165,8 @@ Pravidlo: služby nevolají Phaser, scény nevolají přímo hardware. Vše pře
 
 ## Formát kódů (Code 128 / QR)
 **Písmeno + 3 číslice. Písmeno = první písmeno kategorie** → hráč se učí písmena
-(velké písmeno na štítku, hlas při pípnutí: „Pé jako pití“). Zároveň se kódy nepletou s EAN v bytě.
+(velké písmeno na štítku). Zároveň se kódy nepletou s EAN v bytě. Sloupec „Písmeno jako…“ = jak se písmeno
+pojmenuje (štítky, rodič, případná hádanka); hra ho při pípnutí neříká (viz Hlas).
 
 Zakázaná písmena:
 - **s diakritikou** (Č, Š, Ř, Ž) – čtečka přes klávesnici je spolehlivě nepošle,
@@ -174,7 +175,7 @@ Zakázaná písmena:
 
 Tedy čokoláda i zmrzlina → `S`.
 
-| Kód | Kategorie | Hlas při pípnutí | Příklad |
+| Kód | Kategorie | Písmeno jako… | Příklad |
 |-----|-----------|------------------|---------|
 | `Pxxx` | pití (pitíčko, káva) | „Pé jako pití“ | `P001` |
 | `Sxxx` | sladkosti (sušenka, zmrzlina, čokoláda) | „Es jako sladkosti“ | `S001` |
@@ -251,7 +252,7 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
   Kolik to stojí, určuje ceník ve hře (nastavuje „vedoucí benzínky“ v dílně ✏️) – změna ceny = žádný nový tisk.
 - **O značení rozhoduje hráč.** Hra nekontroluje, na čem visačka visí. Pomůcka: **obrázkový seznam
   „kam co“** (jako pexeso – obrázek na visačce = obrázek na seznamu), žádný text.
-- **Hlas popisuje, nepřikazuje** („Es jako sladkosti“), aby hráče neomezoval v rozhodování.
+- **Hlas popisuje, nepřikazuje**, aby hráče neomezoval v rozhodování.
 - **Laser + laminace:** visačky, bankovky, obrázkový seznam. Tisk ovládá rodič, hráč podává papíry.
   Černobíle → **černé piktogramy s výraznými obrysy** (barevná emoji vyjdou šedě); ve hře zůstávají
   barevná emoji a piktogram s emoji musí být jasně „stejná věc“.
@@ -324,31 +325,33 @@ Hráč si **pípne svá autíčka do hry** (SPZ). Během směny jim **ubývá be
 - Čísla jsou **návrh do dílny ✏️** – mění se jen v `TABULKA_AUT` (`auta.ts`). Je to nové pravidlo pro hráče
   (Pravidla jsou zákon) – platí po ukázce a „orazítkování“.
 
-## Hlas a písmena
-- **Hlas = předgenerované audio soubory.** Hra jen přehrává soubory – žádné TTS za běhu
-  (české hlasy ve `speechSynthesis` na Linuxu chybí / zní špatně). Zdroj hlasu lze kdykoli vyměnit,
-  i po jednotlivých frázích. Výběr hlasu: viz Dev_notes.md.
-- **Hlas: Speechtech** (licencovaný, na stolním PC; český hlas – pravděpodobně Radka) – zřetelnější písmena
-  i výslovnost než Microsoft Jakub. Ve slovech „ch“ čte správně; jen samotné písmeno „CH“ rozloží na dvě.
-  → **Písmena se hlasu zadávají jejich názvem**, ne znakem: „em“, „bé“, „chá“ (ne „M“, „B“, „CH“),
-  i uprostřed věty: „Chá. Chá jako chleba.“ (ověřeno poslechem).
-  Ve Speechtechu je navíc výjimka (uživatelský slovník): samotné „ch“ → „chá“ (hráč si v programu sám píše
-  písmena a slova a nechává si je číst).
-  Písmeno CH ve hře zatím není (i ve škole přichází mezi posledními).
-- **Jeden hlas pro celou hru** – hráč slyší písmena vždy stejně. Hlasy se nemíchají.
-- Generování: rodič uloží fráze ze Speechtechu do WAV podle seznamu frází (pojmenování souborů = klíč fráze).
-- Záloha: Microsoft Jakub (Windows 11, generuje se skriptem přes WinRT se SSML; samotná písmena
-  `<prosody rate="-35%" volume="+60%" pitch="+10%"><emphasis level="strong">bé!</emphasis></prosody>`).
-  Balabolka se nepoužívá (antivirus hlásil čtení souborů na ploše).
-- Zdrojové nahrávky WAV (bezztrátově), do hry komprimovaná kopie (MP3/OGG).
-- Hlas rodiče se nepoužívá. Google Překladač (neoficiální gTTS) se nepoužívá.
-- Seznam frází jako jediný zdroj pravdy (např. `voice-phrases.json`: `klic → text`).
-  Klíče bez diakritiky (`pismeno_M`, `pipni_zbozi`). Po přidání fráze znovu spustit generování.
-- Služba `voice`: `say(klic)`, fronta (nepřekřikovat se), hlasitost, vypnutí.
-- **Písmena:** TTS u samotného písmena často řekne jen „em“ → fráze typu „Em. M jako myčka.“
-  Kde se ve hře objeví:
-  - velké písmeno kategorie na štítcích; po pípnutí hlas řekne písmeno + slovo,
-  - SPZ aut u stojanu – slabika + číslo (`LA-01`, viz SPZ aut),
-  - paliva N = Natural, D = Diesel,
-  - úkoly „Najdi a pípni zboží na M“ (hra ověří správnost),
-  - postupné přidávání písmen (začít malou sadou).
+## Hlas
+Rozhodnutí 2026-11-27 (nahrazuje původní návrh „hlasové pokyny, písmena při každém pípnutí“):
+- **Hlas jen tam, kde je to fajn** – slavnostní chvíle a věci, které hráč zná ze skutečného světa.
+  Málo frází = neomrzí se, a hra se rychle načítá.
+- **Fráze** (jediný zdroj pravdy: `FRAZE` v `src/services/voice.ts`, klíč = název souboru):
+
+  | Klíč | Text | Kdy |
+  |------|------|-----|
+  | `otevreno` | Benzínka je otevřená! | odemčení dveří / zákazník vejde |
+  | `uzaviraji` | Pokladny se budou uzavírat. | hlášení před koncem směny (po gongu) |
+  | `zavreno` | Benzínka je zavřená. | konec dne (po gongu) |
+  | `zadejte_pin` | Zadejte PIN. | otevře se platební terminál |
+  | `platba_prijata` | Platba přijata. | správný PIN |
+  | `vlecka_vyjizdi` | Vlečka vyjíždí! | pípnutí vlečky `LA999` (stojan, 🅿️) |
+
+- **Bez hlasu:** čísla, ceny, zbytky, počty ⭐❤️ (počítá hráč – hlas by počítal za něj), chyby ❌ (stačí zvuk
+  a zatřesení), tankování, vzduch, odměny, navigace, klávesnice, SPZ (porovnávat znaky umí sám), rodičovské kódy.
+- **Písmena při pípnutí zboží zatím ne** (po desátém „Pé jako pití“ by to otravovalo) – patří spíš do hádanky
+  písmen (WISH). Hlášení rezervy auta taky ne (stačí blikání). Rozhodne hráč.
+- **Nahrané MP3** v `public/hlas/<klic>.mp3` – žádné TTS za běhu (české hlasy ve `speechSynthesis` na Linuxu
+  chybí / zní špatně). Soubor se stáhne až při prvním přehrání. **Chybějící soubor se tiše přeskočí** – hra
+  funguje i bez nahrávek, fráze lze nahrávat postupně.
+- Služba `voice`: `hlas().rekni(klic)`, `rekniPo(ms, klic)` (např. až dozní gong); fronta – fráze se
+  nepřekřikují, stejná čekající fráze se nepřidá podruhé; `zapnuto` = vypnutí.
+- **Jeden hlas pro celou hru**, zdroj se vybere poslechem (Speechtech na stolním PC, záloha Microsoft Jakub).
+  Zdrojové nahrávky WAV, do hry MP3. Nová fráze = řádek do `FRAZE` + soubor.
+- Zkušenosti z výběru hlasu (pro případnou hádanku písmen): písmena se hlasu zadávají **názvem** („em“, „bé“,
+  „chá“), samotné písmeno zní ztlumeně → fráze typu „Em. M jako myčka.“; Jakub: SSML
+  `<prosody rate="-35%" volume="+60%" pitch="+10%"><emphasis level="strong">bé!</emphasis></prosody>`.
+  Balabolka a gTTS se nepoužívají.

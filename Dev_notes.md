@@ -10,6 +10,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - WISH = nápady hráče a rodiče; do plánu/TODO se přesouvají až po domluvě s uživatelem.
 
 ## Další krok
+- **Hlas** ✅ kód (2026-11-27, README → Hlas): 6 frází, služba `voice`. → **Rodič nahraje MP3** (Speechtech / Jakub, jeden
+  hlas) do `public/hlas/<klic>.mp3` – seznam klíčů a textů v README → Hlas. Bez souborů hra mlčí, nic se nerozbije.
 - **Auta se spotřebou 🚗⛽** ✅ (2026-11-27, README → Auta se spotřebou) → rodič vyzkouší s hráčem: pípnout autíčka
   (SPZ), sledovat 🅿️, tankovat konkrétní auto, vlečka `LA999`. **Vytisknout štítek vlečky `LA999`** (D30, Code128
   jako SPZ). Ladit tempo spotřeby (TODO). Hráči ukázat v dílně ✏️ (nové pravidlo).
@@ -131,7 +133,7 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     Klávesnice s číslicemi na telefonu, zadání jako hvězdičky. Špatně = ❌ „Špatný PIN“; po 3 pokusech blokace?
     (odblokuje rodič kódem `9…` = „banka“) – rozhodne dílna. Zůstatek až po správném PINu?
   - **Herní PIN nesmí být shodný se skutečným** (je uložen v prohlížeči nechráněně) – vymyslet nový.
-- [ ] **Hlas (průběžně od fáze 0):** služba `voice`, seznam frází, generování souborů; první fráze pro pípnutí a placení.
+- [x] **Hlas:** služba `voice` + 6 frází (2026-11-27, přehodnoceno: hlas jen kde je to fajn, žádné pokyny) – zbývá nahrát MP3.
 - [ ] **Garáž (s fází 4):** přiřazení SPZ → autíčko ve hře (vzhled, jméno), měnitelné rodičem/hráčem;
   pípnutí SPZ = auto přijede ke stojanu (+ úkol „natankuj …“).
   - ✅ 2026-11-27: pípnutí SPZ = auto přijede ke stojanu, auta mají nádrž a spotřebu (`auta.ts`, 🅿️). Zbývá vzhled
@@ -310,6 +312,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - **Státní svátek – zavřeno** (nápad rodiče): občas (náhodně / podle kalendáře) je svátek → na dveřích
   vlaječka ČR 🇨🇿, benzínka se neotevře. Zákazník odjede autem a za 2–3 minuty přijede znovu, pak hra pokračuje
   normálně. Hráč už ví, že vyvěšená vlajka = svátek a obchody jsou zavřené.
+- Písmena hlasem při pípnutí zboží (jen první pípnutí kategorie za den?) a hlášení rezervy auta – odloženo 2026-11-27,
+  rozhodne hráč (README → Hlas).
 - Hádanka písmen: hlas řekne názvy 3 obrázků a zeptá se „Ve kterém slově slyšíš písmenko M?“ – odpověď klepnutím
   nebo pípnutím zboží. V obchodě (zboží = obrázky), nebo samostatná scéna s vlastní ikonou. Rozhodnout v dílně.
 - NFC nálepky (NTAG) jako „přiložení karty“ na terminálu – jen Android.
@@ -501,3 +505,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   po 12 min LA01 na rezervě (červeně), po 17 min prázdné (šedé 🪫) → u ⛽ LA01 = 🪫 + 🚛 → `LA999` + LA01 = přivezeno
   → 3,71 L → zaplaceno K001 + PIN → 🅿️ LA01 = 4 L; KE01 s 13,33 L: šedě stav + zeleně natankované, jiné auto
   (LA02) vynuluje tankování.
+- 2026-11-27 (uživatel + Claude): **Hlas přehodnocen** – původní návrh (pokyny, písmena při každém pípnutí) zrušen,
+  hlas jen kde je to fajn: `otevreno`, `uzaviraji`, `zavreno`, `zadejte_pin`, `platba_prijata`, `vlecka_vyjizdi`. Nahrané MP3
+  (málo frází = rychlé načítání), stahují se až při prvním přehrání, chybějící se přeskočí. `voice.ts` (fronta),
+  napojení v LockScene, nav (hlášení po gongu), UzaverkaScene, terminálu a vlečce (stojan, 🅿️). README → Hlas
+  přepsán. 80/80 testů, typecheck OK, headless Chrome bez nahrávek: hra i platba proběhnou, konzole čistá.
