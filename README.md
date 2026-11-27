@@ -349,8 +349,11 @@ Rozhodnutí 2026-11-27 (nahrazuje původní návrh „hlasové pokyny, písmena 
   funguje i bez nahrávek, fráze lze nahrávat postupně.
 - Služba `voice`: `hlas().rekni(klic)`, `rekniPo(ms, klic)` (např. až dozní gong); fronta – fráze se
   nepřekřikují, stejná čekající fráze se nepřidá podruhé; `zapnuto` = vypnutí.
-- **Jeden hlas pro celou hru**, zdroj se vybere poslechem (Speechtech na stolním PC, záloha Microsoft Jakub).
-  Zdrojové nahrávky WAV, do hry MP3. Nová fráze = řádek do `FRAZE` + soubor.
+- **Jeden hlas pro celou hru: Microsoft Jakub** (rozhodnutí 2026-11-27 – bez hláskování písmen stačí; Speechtech
+  byl lepší jen na samotná písmena). Generuje se skriptem přes WinRT (`SynthesizeSsmlToStreamAsync`, skript
+  uložit jako UTF-8 **s BOM**, jinak PowerShell 5.1 pokazí diakritiku) – všechny fráze do jednoho WAV s pauzami,
+  v GoldWave normalizovat celé, pak nastříhat (krátký fade 5–10 ms) a uložit MP3 mono 64 kb/s.
+  Nová fráze = řádek do `FRAZE` + soubor.
 - Zkušenosti z výběru hlasu (pro případnou hádanku písmen): písmena se hlasu zadávají **názvem** („em“, „bé“,
   „chá“), samotné písmeno zní ztlumeně → fráze typu „Em. M jako myčka.“; Jakub: SSML
   `<prosody rate="-35%" volume="+60%" pitch="+10%"><emphasis level="strong">bé!</emphasis></prosody>`.

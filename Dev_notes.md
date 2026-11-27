@@ -10,8 +10,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - WISH = nápady hráče a rodiče; do plánu/TODO se přesouvají až po domluvě s uživatelem.
 
 ## Další krok
-- **Hlas** ✅ kód (2026-11-27, README → Hlas): 6 frází, služba `voice`. → **Rodič nahraje MP3** (Speechtech / Jakub, jeden
-  hlas) do `public/hlas/<klic>.mp3` – seznam klíčů a textů v README → Hlas. Bez souborů hra mlčí, nic se nerozbije.
+- **Výkon 30 snímků/s** ✅ (2026-11-27) → rodič sleduje baterii při hraní (dřív ~40 %/h).
+- **Hlas** ✅ kód (2026-11-27, README → Hlas): 6 frází, služba `voice`. → **Rodič nastříhá MP3** (hlas Jakub; WAV všech
+  frází vygenerován do Stažených souborů `hlas_fraze_jakub.wav`) do `public/hlas/<klic>.mp3` – seznam klíčů a textů v README → Hlas. Bez souborů hra mlčí, nic se nerozbije.
 - **Auta se spotřebou 🚗⛽** ✅ (2026-11-27, README → Auta se spotřebou) → rodič vyzkouší s hráčem: pípnout autíčka
   (SPZ), sledovat 🅿️, tankovat konkrétní auto, vlečka `LA999`. **Vytisknout štítek vlečky `LA999`** (D30, Code128
   jako SPZ). Ladit tempo spotřeby (TODO). Hráči ukázat v dílně ✏️ (nové pravidlo).
@@ -510,3 +511,6 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   (málo frází = rychlé načítání), stahují se až při prvním přehrání, chybějící se přeskočí. `voice.ts` (fronta),
   napojení v LockScene, nav (hlášení po gongu), UzaverkaScene, terminálu a vlečce (stojan, 🅿️). README → Hlas
   přepsán. 80/80 testů, typecheck OK, headless Chrome bez nahrávek: hra i platba proběhnou, konzole čistá.
+- 2026-11-27 (uživatel + Claude): **Výkon** – hráčův NB (Intel HD 500, Firefox/Linux, WebGL hardwarově) hřál a baterie
+  100 → 20 % za 2 h. Hra omezena na 30 snímků/s (`fps: { limit: 30 }` v `main.ts`, výchozí bylo 60 i bez pohybu).
+  Ověřit při příštím hraní spotřebu baterie; kdyby nestačilo → nekreslit, když se nic neděje.
