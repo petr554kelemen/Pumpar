@@ -10,9 +10,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - WISH = nápady hráče a rodiče; do plánu/TODO se přesouvají až po domluvě s uživatelem.
 
 ## Další krok
-- **Vylepšení 2 – auta se spotřebou 🚗⛽** (nápad rodiče 2026-11-27): návrh v `Megaprompt_auta_spotreba.md`
-  (pípnout auta do hry, nádrže na ⅔ každé kolo, benzín ubývá během směny, seznam bargrafů s výraznou SPZ 🅿️,
-  rezerva bliká červeně, vlečka 🚛) → zbývá rozhodnout kód vlečky (oddíl 7), pak provést.
+- **Auta se spotřebou 🚗⛽** ✅ (2026-11-27, README → Auta se spotřebou) → rodič vyzkouší s hráčem: pípnout autíčka
+  (SPZ), sledovat 🅿️, tankovat konkrétní auto, vlečka `LA999`. **Vytisknout štítek vlečky `LA999`** (D30, Code128
+  jako SPZ). Ladit tempo spotřeby (TODO). Hráči ukázat v dílně ✏️ (nové pravidlo).
 - **Výsledková listina 🏆 + PIN `1111`** ✅ (2026-11-27, README → Výsledková listina, Tisk štítků → PIN) → rodič
   vyzkouší s hráčem: zadávání PINu (rodič jako zákazník), zda hráč odměnu ⭐ ❤️ chápe, počty bodů v dílně ✏️
   (`PRAVIDLA_BODU`, `srdicka` v katalogu). Test čtečky je teď jen přes **Ctrl+F2**.
@@ -134,6 +134,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] **Hlas (průběžně od fáze 0):** služba `voice`, seznam frází, generování souborů; první fráze pro pípnutí a placení.
 - [ ] **Garáž (s fází 4):** přiřazení SPZ → autíčko ve hře (vzhled, jméno), měnitelné rodičem/hráčem;
   pípnutí SPZ = auto přijede ke stojanu (+ úkol „natankuj …“).
+  - ✅ 2026-11-27: pípnutí SPZ = auto přijede ke stojanu, auta mají nádrž a spotřebu (`auta.ts`, 🅿️). Zbývá vzhled
+    a jméno auta (zatím jen 🚙 hráč / 🚗 rodič).
 - [ ] **Otevírání benzínky (s fází 4, nápad hráče):** bez benzináře je benzínka zavřená – zákaz, auta netankují.
   **Odemyká se kódem u dveří** (hráč má kódový zámek i na pokladničce; karta by se ztrácela, používá se jen ráno):
   u zamčených dveří 🔒 číselná klávesnice → kód → otevřeno (světla, hlas „Benzínka je otevřená!“). Na konci směny
@@ -487,3 +489,13 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   🌭 = 6 klepnutím na K001 a PIN klepáním → karta 0, 3 ⭐ 3 ❤️; vzduch 2 kola = 4 z K004 → 2 ❤️; 🏆 = 12 ❤️ 3 ⭐;
   Ctrl+F2 → test čtečky (P001) → Esc zpět na 🏆; 🔒 → konec dne s listinou. 6 ⭐ (dočerpání 1 tečkou) a zámek Ctrl+F2
   s nezaplaceným benzínem ověřeny jen testy / kódem.
+- 2026-11-27 (uživatel + Claude): Nasazeno (listina + PIN), rodič s hráčem vyzkoušeli – hráč nadšený.
+- 2026-11-27 (uživatel + Claude): **Auta se spotřebou** (vylepšení 2, podle megapromptu; ten pak smazán – pravidla
+  v README): `auta.ts` (garáž v localStorage, kapacita 10/15/20 L, spotřeba 15/25/40 setin L za minutu směny,
+  ⅔ nádrže každé kolo, dopočet za čas směny `den.msSmenyMezi`, rezerva pod ¼), scéna 🅿️ `ParkovisteScene`
+  (SPZ tabulky + sloupce nádrží, rezerva bliká, prázdné 🪫), stojan (pípnutá SPZ = auto, bargraf nádrže auta, vlečka
+  `LA999` přitáhne prázdné auto), obchod dotankuje auto po zaplacení, deník zapíše SPZ. Kód `9200` = smazat auta.
+  75/75 testů, typecheck OK. Ověřeno v headless Chrome s posunem času: 3 auta v úložišti + `LA03` pípnutím →
+  po 12 min LA01 na rezervě (červeně), po 17 min prázdné (šedé 🪫) → u ⛽ LA01 = 🪫 + 🚛 → `LA999` + LA01 = přivezeno
+  → 3,71 L → zaplaceno K001 + PIN → 🅿️ LA01 = 4 L; KE01 s 13,33 L: šedě stav + zeleně natankované, jiné auto
+  (LA02) vynuluje tankování.

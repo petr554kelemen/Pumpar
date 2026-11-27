@@ -28,14 +28,15 @@ https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-ver
   - `pump.ts` (stojan), `air.ts` (vzduch), `lock.ts` (zámek benzínky), `den.ts` (herní den, odpočet směny),
   - `katalog.ts` (zboží: kód → výrobek, cena), `penezenka.ts` (peněžní karty a jejich zůstatky),
     `denik.ts` (deník směny – platby v obchodě a u vzduchu, localStorage), `ucet.ts` (nezaplacený benzín od stojanu),
-    `vysledky.ts` (výsledková listina – pravidla ⭐ a ❤️, tabulka `PRAVIDLA_BODU`).
+    `vysledky.ts` (výsledková listina – pravidla ⭐ a ❤️, tabulka `PRAVIDLA_BODU`),
+    `auta.ts` (auta se spotřebou – garáž, nádrže, `TABULKA_AUT`).
 - `src/scenes/` – Phaser scény: `LockScene.ts` (zamčená benzínka, výchozí), `BankaScene.ts` (banka – aktivace karet na kolo),
-  `StationScene.ts` (stojan), `AirScene.ts` (vzduch), `ShopScene.ts` (obchod), `VysledkyScene.ts` (výsledková listina 🏆),
+  `StationScene.ts` (stojan), `ParkovisteScene.ts` (parkoviště 🅿️ – nádrže aut), `AirScene.ts` (vzduch), `ShopScene.ts` (obchod), `VysledkyScene.ts` (výsledková listina 🏆),
   `ScanTestScene.ts` („Pípni něco“ – test čtečky jen pro rodiče, **Ctrl+F2**), `UzaverkaScene.ts` (konec dne s listinou),
   `nav.ts` (přepínání scén ikonami vlevo nahoře + odpočet směny vpravo), `hodiny.ts` (kreslení hodin),
   `kartyPanel.ts` (peněžní karty na obrazovce – obchod, vzduch – a přehled zůstatků u stojanu),
   `terminal.ts` (číselná klávesnice dveří a platební terminál s PINem), `listina.ts` (kreslení listiny),
-  `odmena.ts` (⭐ ❤️ letí po zaplacení k 🏆).
+  `odmena.ts` (⭐ ❤️ letí po zaplacení k 🏆), `spz.ts` (SPZ jako tabulka).
 - `tests/` – testy služeb (`npm test`).
 - `tisk.html`, `src/tisk/` – stránka pro tisk visaček (jen pro rodiče); `layout.ts` = rozvržení listu (mm).
 - `karty.html`, `src/tisk/karty.ts` – štítky na staré platební karty (sada karet s tečkami + služební karta).
@@ -92,6 +93,7 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
   benzínky odemkne zadaný kód **nebo** pípnutá karta (karta = „PIN v kapse“). Hráč volí, co má po ruce.
 - **Slova hráče, ne naše.** Ve frázích používat jeho pojmenování: **benzínka, benzinář** – „pumpa / pumpař“
   je pro něj něco jiného (pumpa stojí „hned vedle benzínky“). Název projektu „Pumpar“ je jen interní.
+  Odtahovce říká **vlečka**.
   Nové pojmy ověřit s hráčem (viz Pravidla, bod 4).
 - **Cíl navíc: naučit některá písmena.**
 - **Čísla vždy dvakrát:** číslice + stejný počet teček (učí se poznávat číslice).
@@ -184,7 +186,8 @@ Tedy čokoláda i zmrzlina → `S`.
 | `Nxxx` / `Dxxx` | palivo Natural / Diesel | „En jako Natural“ | `N001` |
 | `Bxxx` | herní bankovka (číslo = hodnota v tečkách) | „Bé jako bankovka“ | `B020` |
 | `Kxxx` | herní platební karta | „Ká jako karta“ | `K001` |
-| `9xxx` | rodičovské povely (přidat peníze, reset) – **jen číslice** | – | `9001` |
+| `LA999` | **vlečka** 🚛 (odtahovka) – jediný kód „SPZ se 3 číslicemi“, s auty se nesplete | – | `LA999` |
+| `9xxx` | rodičovské povely – **jen číslice**; `9200` = smazat auta (na 🅿️) | – | `9200` |
 
 Kategorie jsou **návrh – před prvním tiskem odsouhlasit s hráčem** (viz Pravidla jsou zákon). Úkoly typu „Pípni něco na Es“ / „Dones všechno na Pé“.
 
@@ -300,6 +303,26 @@ Hodnotí se **práce pokladního**, ne utrácení zákazníka (v souladu s WISH 
 - **Restart `K000` je bez postihu** – body i deník zůstávají.
 - Počty jsou **návrh do dílny ✏️** – mění se jen v `PRAVIDLA_BODU` (`vysledky.ts`) a `srdicka` v katalogu.
 - Listina patří k hernímu dni (`HerniDen.id` v deníku – přežije i obnovení stránky); nový den = prázdná.
+
+## Auta se spotřebou 🚗⛽ (2026-11-27)
+Hráč si **pípne svá autíčka do hry** (SPZ). Během směny jim **ubývá benzín** – každé má jinou spotřebu. Podle
+**parkoviště 🅿️** si sám najde auto, které potřebuje dotankovat. Prázdné auto přiveze **vlečka** 🚛.
+- **Pípnutí neznámé SPZ** (na 🅿️ nebo u ⛽) auto přidá; náhodně dostane **nádrž 10 / 15 / 20 L** a **spotřebu**
+  malou / střední / velkou (≈ 3 / 5 / 8 L za směnu). Spotřebu hráč nevidí – pozná ji podle ubývání.
+- **Na začátku každého kola** (odemčení benzínky, restart `K000`, tedy i každý nový den) mají všechna auta nádrž na **⅔**.
+- Benzín ubývá **jen během běžící směny**; stav se dopočítá z času (`stav₀ − spotřeba × čas směny od t₀`).
+- **🅿️:** SPZ jako skutečná tabulka (hráč porovnává znaky) + sloupec nádrže (délka podle kapacity) + litry.
+  Pod polovinou oranžová, **pod ¼ bliká červeně (rezerva)**, prázdné auto šedé s 🪫 – **žádné ❌**, nic se nestalo.
+  Auta se neřadí – najít, komu dochází, je hráčova práce.
+- **U stojanu pípnutá SPZ = auto přijelo:** bargraf je nádrž auta (šedě co v ní bylo, barevně natankované, plná =
+  kapacita auta, přetečení červeně). Předvolba zůstává hráčova volba. Zaplacený benzín dostane auto (nejvýš plnou
+  nádrž); nezaplacený (storno `K000`) ne. Bez SPZ se tankuje jako dřív.
+- **Prázdné auto samo nepřijede** (🪫 + nápověda 🚛). **Vlečka `LA999`** + SPZ = přitáhne ho ke stojanu; kolikrát
+  za den, je jedno. Kanystr zatím ne (nemá kód – WISH).
+- Auta se pamatují v prohlížeči (`pumpar.auta`); rodič je smaže kódem `9200` na 🅿️.
+- Odměny 🏆 se s auty zatím neladí (❤️ za benzín dál podle předvolby) – listina je jen závěrečná informace.
+- Čísla jsou **návrh do dílny ✏️** – mění se jen v `TABULKA_AUT` (`auta.ts`). Je to nové pravidlo pro hráče
+  (Pravidla jsou zákon) – platí po ukázce a „orazítkování“.
 
 ## Hlas a písmena
 - **Hlas = předgenerované audio soubory.** Hra jen přehrává soubory – žádné TTS za běhu
