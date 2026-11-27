@@ -22,6 +22,8 @@ const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
   backgroundColor: '#1e242b',
+  // Klidná hra: 30 snímků/s stačí a šetří procesor i baterii malého notebooku (výchozí je 60 i bez pohybu).
+  fps: { limit: 30 },
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
