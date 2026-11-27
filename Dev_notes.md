@@ -296,6 +296,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 
 ## WISH
 - **Kanystr ⛽🧴** (hráč ho má, kód zatím ne): dolít pár litrů prázdnému autu bez vlečky (k vylepšení 2).
+  Náčrt 2026-11-27: kód `LA888` (jako vlečka `LA999`), naplnit u stojanu (~5 L, platí se), na 🅿️ `LA888` + SPZ =
+  přeleje, kolik se vejde. **Odloženo (rodič): hra je už dost složitá** – nejdřív ověřit, jak hráč zvládá vlečku.
 - **Výsledky po osobách LA / KE** (odloženo 2026-11-27 – zatím jedna společná listina): body podle toho, kdo
   obsluhoval, vlastní služební karty, přidělování role benzináře hráčem (Plán → Výsledky obsluhy, původní text).
 - **Infografika dne** (nápad rodiče, 2026-11-22; finanční gramotnost): v uzávěrce malý obrázkový přehled,
