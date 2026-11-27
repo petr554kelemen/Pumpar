@@ -27,11 +27,15 @@ https://petr554kelemen.github.io/Pumpar/ – stará verze: `…/Pumpar/stara-ver
   - `beep.ts` – jednoduché zvuky,
   - `pump.ts` (stojan), `air.ts` (vzduch), `lock.ts` (zámek benzínky), `den.ts` (herní den, odpočet směny),
   - `katalog.ts` (zboží: kód → výrobek, cena), `penezenka.ts` (peněžní karty a jejich zůstatky),
-    `denik.ts` (deník směny – prodeje pro uzávěrku, localStorage), `ucet.ts` (nezaplacený benzín od stojanu).
+    `denik.ts` (deník směny – platby v obchodě a u vzduchu, localStorage), `ucet.ts` (nezaplacený benzín od stojanu),
+    `vysledky.ts` (výsledková listina – pravidla ⭐ a ❤️, tabulka `PRAVIDLA_BODU`).
 - `src/scenes/` – Phaser scény: `LockScene.ts` (zamčená benzínka, výchozí), `BankaScene.ts` (banka – aktivace karet na kolo),
-  `StationScene.ts` (stojan), `AirScene.ts` (vzduch), `ShopScene.ts` (obchod), `ScanTestScene.ts` („Pípni něco“), `UzaverkaScene.ts` (konec dne),
+  `StationScene.ts` (stojan), `AirScene.ts` (vzduch), `ShopScene.ts` (obchod), `VysledkyScene.ts` (výsledková listina 🏆),
+  `ScanTestScene.ts` („Pípni něco“ – test čtečky jen pro rodiče, **Ctrl+F2**), `UzaverkaScene.ts` (konec dne s listinou),
   `nav.ts` (přepínání scén ikonami vlevo nahoře + odpočet směny vpravo), `hodiny.ts` (kreslení hodin),
-  `kartyPanel.ts` (peněžní karty na obrazovce – obchod, vzduch – a přehled zůstatků u stojanu).
+  `kartyPanel.ts` (peněžní karty na obrazovce – obchod, vzduch – a přehled zůstatků u stojanu),
+  `terminal.ts` (číselná klávesnice dveří a platební terminál s PINem), `listina.ts` (kreslení listiny),
+  `odmena.ts` (⭐ ❤️ letí po zaplacení k 🏆).
 - `tests/` – testy služeb (`npm test`).
 - `tisk.html`, `src/tisk/` – stránka pro tisk visaček (jen pro rodiče); `layout.ts` = rozvržení listu (mm).
 - `karty.html`, `src/tisk/karty.ts` – štítky na staré platební karty (sada karet s tečkami + služební karta).
@@ -82,6 +86,7 @@ Předškolák (5 let) se základními znalostmi počtů, bez čtenářských dov
   k věci, kterou platí, a zbytek se vrátí do peněženky (ve staré verzi tečky jen mizely – nebylo to odečítání).
 - **Finanční gramotnost** (cíl rodiče, 2026-11-22): nejde jen o hru – hráč se učí hospodařit. Karta má omezený
   zůstatek na celý den, co utratí jinde, chybí v obchodě; když nestačí, ubere zboží; benzín se musí zaplatit.
+  Výsledková listina 🏆 oceňuje pokladního za dočerpání karet (viz Výsledková listina).
   Nová mechanika s penězi má tento cíl podporovat, ne obcházet (žádné bezedné karty, doplňování, dluh bez následků).
 - **Kde jsou dvě cesty, platí obě.** Kódy ze čtečky jsou zábava, ale nemusí být všude povinné: např. dveře
   benzínky odemkne zadaný kód **nebo** pípnutá karta (karta = „PIN v kapse“). Hráč volí, co má po ruce.
@@ -232,6 +237,13 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
   (obchod 🛒 i vzduch 🛞). Po ✅ ➡️ ⛽ auto z banky odjede ke stojanu.
 - **Karty jsou i na obrazovce** (hra je hratelná bez čtečky): obchod i vzduch ukazují aktivní karty
   ze sady `K001`–`K007` se zůstatkem; zaplatit jde **klepnutím na kartu nebo jejím pípnutím**.
+- **Platba se potvrzuje PINem jako při skutečném nákupu** (rozhodnutí rodiče 2026-11-27): pokladní (hráč) vybere
+  kartu, **zákazník (rodič) zadá PIN `1111`** na terminálu (klepáním nebo na klávesnici + Enter). Na kartu,
+  na kterou zůstatek nestačí, se PIN nezadává – odmítne se hned ❌. Odečet až po správném PINu; špatný PIN = ❌,
+  zkouší se znovu (zatím bez blokace). ↩️ zavře terminál bez placení. **PIN nikdy nic nestornuje** – storno
+  zůstává jen služební karta `K000`; terminál vypadá jinak než dveře (modrý rám, 💳 a částka nahoře).
+  `PIN_KARTY` (`penezenka.ts`) je samostatné pravidlo vedle kódu dveří `KOD_DVERI` – dnes stejná hodnota,
+  v dílně ✏️ se smí měnit zvlášť. Nahrazuje plán „PIN 1234 na telefonu“ (fáze 6).
 - **Ceny se na štítky netisknou.** Visačka nese jen co to je (písmeno kategorie, obrázek, kód).
   Kolik to stojí, určuje ceník ve hře (nastavuje „vedoucí benzínky“ v dílně ✏️) – změna ceny = žádný nový tisk.
 - **O značení rozhoduje hráč.** Hra nekontroluje, na čem visačka visí. Pomůcka: **obrázkový seznam
@@ -271,6 +283,23 @@ Hráč nečte, ale slyšené slovo umí rozdělit na slabiky → slabiku se nau�
     stříhání papíru hráč doma, stříhání zalaminované fólie (tuhá) zkusí hráč, jinak rodič,
   - stránka **`tisk.html`** (na webu `…/Pumpar/tisk.html`) – zatím technický test velikostí kódů.
 - **Termoštítky nelaminovat za tepla** (zčernají). Laminuje se jen laserový tisk.
+
+## Výsledková listina 🏆 (2026-11-27)
+**Jedna společná listina za herní den** – žádné dělení na LA / KE (hráč a rodič hrají spolu: rodič je zákazník
+a platí, hráč je pokladní a vybírá kartu). Scéna 🏆 v navigaci (místo bývalého 📟), stejná listina na konci dne.
+Hodnotí se **práce pokladního**, ne utrácení zákazníka (v souladu s WISH Infografika dne).
+- **⭐ hvězdy za výběr karty – čím víc přemýšlení, tím víc.** Rozhoduje zůstatek karty **po** platbě:
+  dočerpání karty **platbou 1 tečky = 6 ⭐** (nejvíc – hráč sám objevil, že 1 tečku stojí kontrola plného kola 🛞
+  a 1 litr benzínu ⛽; zboží za 1 tečku se proto nepřidává), vyčerpaná karta **10 = 5, 15 = 4, 20 = 3**,
+  zbytek 1–2 = 2, 3–5 = 1, víc = 0. Platba 1 tečkou z karty, kde ještě něco zbude, se hodnotí podle zbytku
+  (jinak by šlo sbírat hvězdy kontrolou kola dokola).
+- **❤️ srdíčka za snahu ve všech částech hry:** zboží podle katalogu, rostou rychleji než cena (🍪 1, 🍦 1, ☕ 2,
+  🧃 2, 🌭 3, 🏎️ 5 – drahé zboží rychle čerpá kartu, má se vyplatit; lineární srdíčka by kvůli stropu karet daly
+  za den vždy stejně); benzín a vzduch 1 ❤️ za započaté 3 tečky, **benzín jen od poloviny předvolby**.
+- Odměna se ukáže **hned po zaplacení** (⭐ ❤️ letí k 🏆, vyčerpaná karta se rozzáří a zbledne). 0 ⭐ = bez ❌.
+- **Restart `K000` je bez postihu** – body i deník zůstávají.
+- Počty jsou **návrh do dílny ✏️** – mění se jen v `PRAVIDLA_BODU` (`vysledky.ts`) a `srdicka` v katalogu.
+- Listina patří k hernímu dni (`HerniDen.id` v deníku – přežije i obnovení stránky); nový den = prázdná.
 
 ## Hlas a písmena
 - **Hlas = předgenerované audio soubory.** Hra jen přehrává soubory – žádné TTS za běhu

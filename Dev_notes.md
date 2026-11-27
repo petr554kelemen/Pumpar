@@ -10,6 +10,12 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - WISH = nápady hráče a rodiče; do plánu/TODO se přesouvají až po domluvě s uživatelem.
 
 ## Další krok
+- **Vylepšení 2 – auta se spotřebou 🚗⛽** (nápad rodiče 2026-11-27): návrh v `Megaprompt_auta_spotreba.md`
+  (pípnout auta do hry, nádrže na ⅔ každé kolo, benzín ubývá během směny, seznam bargrafů s výraznou SPZ 🅿️,
+  rezerva bliká červeně, vlečka 🚛) → zbývá rozhodnout kód vlečky (oddíl 7), pak provést.
+- **Výsledková listina 🏆 + PIN `1111`** ✅ (2026-11-27, README → Výsledková listina, Tisk štítků → PIN) → rodič
+  vyzkouší s hráčem: zadávání PINu (rodič jako zákazník), zda hráč odměnu ⭐ ❤️ chápe, počty bodů v dílně ✏️
+  (`PRAVIDLA_BODU`, `srdicka` v katalogu). Test čtečky je teď jen přes **Ctrl+F2**.
 - **Výběr karet na začátku kola** ✅ (2026-11-24) → rodič vyzkouší. Nesprávná karta = ❌ v obchodě i u vzduchu 🛞.
 - **Banka 🏦** ✅ (2026-11-26): karty se aktivují v bance (auto 🚙 přijede, po ✅ odjede ke stojanu) → rodič vyzkouší,
   pak ukázat hráči v dílně ✏️ (nové prostředí = nové pravidlo „karty se aktivují v bance“).
@@ -36,8 +42,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     → **D30 = Code128** (README → Tisk štítků). Hra kódy rozlišuje jen podle obsahu, ne podle druhu.
 - **Karty:** vytisknout https://petr554kelemen.github.io/Pumpar/karty.html, nalepit na karty podle barev,
   ověřit čtení čtečkou (obchod a vzduch: pípnutí karty, dveře: `K000`).
-- **Výsledky obsluhy** (Plán): herní den ✅ → další: přidělení služební karty (pípnout → LA / KE), deník směny,
-  výsledky do uzávěrky (scéna `UzaverkaScene` je připravená).
+- **Výsledky obsluhy** (Plán): herní den ✅, deník + jedna společná listina ✅ (2026-11-27). Dělení LA / KE odloženo
+  do WISH. Zbývá: tankování samotné bez obchodu se do listiny nedostane (platí se až v obchodě – v pořádku?).
 
 ## Plán (fáze)
 - [x] **0 – Kostra:** git, Node LTS v26, Phaser 4.2.1 + Vite 8 lokálně, `src/services/` a `src/scenes/`,
@@ -118,8 +124,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     způsob volby, rychlá pistole od začátku nebo až po zvládnutí pomalé. Nanečisto: konvička vs. kelímek, čárka.
   - Starou verzi (`public/stara-verze.html`) neměnit – hráč její pravidla zná (viz Pravidla jsou zákon).
 - [ ] **6 – Platební terminál:** telefon ukáže částku → sken karty `K…` → PIN → „Platba schválena“ + účtenka.
+  - ✅ **2026-11-27: terminál s PINem nejdřív ve hře na NB** (obchod i vzduch, `terminal.ts`): **PIN = 1111**
+    (rozhodnutí rodiče, nahrazuje 1234 níže), zadává ho zákazník (rodič), PIN nic nestornuje. Telefon později.
   - **PIN (hráč si PINy pamatuje a zadává, i 6místné):** **jeden univerzální PIN pro všechny karty**
-    (každá karta svůj = náročné pro rodiče): **PIN = 1234** (výchozí, rodič může změnit kódem `9…`).
+    (každá karta svůj = náročné pro rodiče): ~~PIN = 1234~~ → 1111 (rodič může změnit kódem `9…`?).
     Klávesnice s číslicemi na telefonu, zadání jako hvězdičky. Špatně = ❌ „Špatný PIN“; po 3 pokusech blokace?
     (odblokuje rodič kódem `9…` = „banka“) – rozhodne dílna. Zůstatek až po správném PINu?
   - **Herní PIN nesmí být shodný se skutečným** (je uložen v prohlížeči nechráněně) – vymyslet nový.
@@ -191,7 +199,11 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
     zaměřená na foukané kolo) – vidět, jak se ploška zaobluje. Prototyp je zatím skica. Bez hlasu.
   - Hráč: **dvě obtížnosti** – *s nápovědou* (u vybraného kola 3 tečky, cena roste viditelně) a *bez nápovědy*
     (ví, že kolo = 3 tečky, spočítá si sám a vybere kartu; hra jen potvrdí/odmítne). Přepíná rodič / nový návod.
-- [ ] **Výsledky obsluhy – uzávěrka (nápad rodiče, část fáze 7):** kolik aut obsloužil a kolik zboží prodal
+- [ ] **Výsledky obsluhy – uzávěrka (nápad rodiče, část fáze 7):**
+  - ✅ **2026-11-27 – jedna společná výsledková listina 🏆** (rozhodnutí rodiče; README → Výsledková listina):
+    ⭐ za dočerpání karty, ❤️ za snahu, scéna `VysledkyScene` + konec dne. **Dělení LA / KE níže je odložené
+    (WISH)** – hráč a rodič hrají spolu (rodič zákazník, hráč pokladní). Text níže = původní plán.
+  - Původně: kolik aut obsloužil a kolik zboží prodal
   **tatka (KE)** a **malej (LA)**. **Body patří tomu, kdo obsluhoval**, ne majiteli auta (malej obslouží
   i auto KE a je to platný bod za práci).
   - **Kdo obsluhuje = kdo odemkl.** Každý má **vlastní služební kartu / kód dveří** → hra ví, kdo je ve službě.
@@ -238,6 +250,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - [ ] **7 – Rozšíření z mapy:** příprava směny (drag & drop cen), uzávěrka a tržba, minihry za odměnu, QR kódy po bytě.
 
 ## TODO
+- [ ] **Postupné doladění – auta se spotřebou** (rodič 2026-11-27, po nasazení vylepšení 2):
+  - tempo spotřeby (`TABULKA_AUT`) – hráč nemá jen tankovat, musí stihnout i vzduch 🛞 a nákup 🛒,
+  - odměny listiny 🏆 se s auty „rozpadnou“ (❤️ za benzín podle předvolby vs. nádrž auta) – nevadí, listina je jen
+    závěrečná informace bez vlivu na průběh hry; ladit postupně.
 - [ ] Otevřít https://petr554kelemen.github.io/Pumpar/ na NB hráče (Linux, Chrome) – ověřit zobrazení a zvuk.
 - [x] Laminovací kapsy: **A5**, více visaček s rozestupy, rozstříhat, děrovačka (návrh rozměrů v README → Tisk štítků).
   Archy samolepek A4 už nejsou potřeba (zboží = laminované visačky, SPZ/karty = D30).
@@ -266,6 +282,10 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - 2026-11-24: Dev server (`npm run dev`) se rozbil – Vite nemohl přejmenovat `node_modules/.vite/deps_temp_…` na `deps`
   (EBUSY, zámek nejspíš od Dropboxu) → Phaser 504, hra se nenačte (stránka sama vrací 200!). Řešení: restart serveru;
   když se bude opakovat, přesunout `cacheDir` Vite mimo Dropbox (zeptat se uživatele). Test: načíst hru, ne jen stránku.
+- 2026-11-27: Kód pípnutý **během animace odemykání dveří** (≈ 5 s po `K000`) se ztratí – banka ještě neběží a dveře
+  už nic nepřijímají. Hráč, který hned pípne kartu, neuslyší nic. Návrh: dveře by kartu `K…` podržely a předaly bance.
+- 2026-11-27 (testování): `vite preview` vrací 404 na skripty z prohlížeče (hlavička `Sec-Fetch-Dest: script`),
+  curl bez ní 200 → headless test běží na dev serveru s `cacheDir` mimo Dropbox (konfigurace ve scratchpadu).
 
 ## FIX
 - 2026-11-17: Číslice z numerické klávesnice se zahazovaly při vypnutém NumLocku (přišlo „Insert“, „End“…)
@@ -273,6 +293,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   podle fyzické klávesy (`e.code`).
 
 ## WISH
+- **Kanystr ⛽🧴** (hráč ho má, kód zatím ne): dolít pár litrů prázdnému autu bez vlečky (k vylepšení 2).
+- **Výsledky po osobách LA / KE** (odloženo 2026-11-27 – zatím jedna společná listina): body podle toho, kdo
+  obsluhoval, vlastní služební karty, přidělování role benzináře hráčem (Plán → Výsledky obsluhy, původní text).
 - **Infografika dne** (nápad rodiče, 2026-11-22; finanční gramotnost): v uzávěrce malý obrázkový přehled,
   za co šly tečky (⛽ benzín, 🛞 vzduch, 🧃🍪 zboží) a kolik zbylo na kartách. Jedna z možných podob je stromová
   mapa (plochy podle útraty). Data jsou v deníku (`denik.ts`). Podobu dořešit s rodičem.
@@ -454,3 +477,13 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   `Banka`): budova se štítem 🏦, silnice, auto hráče 🚙 přijede zleva, po ✅ ➡️ ⛽ odjede doprava ke stojanu. Logika aktivace
   beze změny (karty jdou aktivovat hned, příjezd jen dokresluje). 61/61 testů, typecheck, build OK, ověřeno v headless Chrome
   (K000 → banka, K001 + K005 = 30, K001 znovu jen zatřese, ✅ → auto odjede → stojan s kartami 20 a 10).
+- 2026-11-27 (uživatel + Claude): **Výsledková listina 🏆 + PIN** (podle megapromptu; soubor pak nahrazen vylepšením 2): služba
+  `vysledky.ts` (⭐ za dočerpání karty – 1 tečkou 6, karta 10/15/20 → 5/4/3, zbytek 1–2 → 2, 3–5 → 1; ❤️ zboží podle
+  katalogu 1/1/2/2/3/5, benzín od poloviny předvolby a vzduch po 3 tečkách), deník zapisuje i vzduch, hodnotu karty,
+  zbytek a ID dne. Terminál s PINem 1111 v obchodě i u vzduchu (`terminal.ts`, klávesnice sdílená s dveřmi), odečet až
+  po PINu, ↩️ bez storna. Odměna ⭐ ❤️ letí k 🏆, vyčerpaná karta zbledne. Scéna `VysledkyScene` místo 📟, listina i na
+  konci dne. Test čtečky jen Ctrl+F2 (↩️ / Esc zpět, ne při nezaplaceném benzínu). 68/68 testů, typecheck, build OK.
+  Ověřeno v headless Chrome: 🧃 + 🏎️ = 14 z K001 (špatný PIN 1234 ❌ bez odečtu, 1111 + Enter bez ❌ za kód) → 0 ⭐ 7 ❤️;
+  🌭 = 6 klepnutím na K001 a PIN klepáním → karta 0, 3 ⭐ 3 ❤️; vzduch 2 kola = 4 z K004 → 2 ❤️; 🏆 = 12 ❤️ 3 ⭐;
+  Ctrl+F2 → test čtečky (P001) → Esc zpět na 🏆; 🔒 → konec dne s listinou. 6 ⭐ (dočerpání 1 tečkou) a zámek Ctrl+F2
+  s nezaplaceným benzínem ověřeny jen testy / kódem.
