@@ -10,6 +10,9 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - WISH = nápady hráče a rodiče; do plánu/TODO se přesouvají až po domluvě s uživatelem.
 
 ## Další krok
+- **Kanystr `LA888` + nová spotřeba + rozvrh nádrží** ✅ (2026-11-28, nasazeno, README → Auta se spotřebou). Hráč
+  testuje. **Vytisknout štítek kanystru `LA888`** (D30, Code128 jako `LA999`), do té doby napsat `LA888` + Enter.
+  Sledovat: stíhá hráč auta na rezervě? Když se dvě sejdou, zvolí vlečku, nebo kanystr? Ukázat v dílně ✏️.
 - **Výkon 30 snímků/s** ✅ (2026-11-27) → rodič sleduje baterii při hraní (dřív ~40 %/h).
 - **Hlas** ✅ kód (2026-11-27, README → Hlas): 6 frází, služba `voice`. → **Rodič nastříhá MP3** (hlas Jakub; WAV všech
   frází vygenerován do Stažených souborů `hlas_fraze_jakub.wav`) do `public/hlas/<klic>.mp3` – seznam klíčů a textů v README → Hlas. Bez souborů hra mlčí, nic se nerozbije.
@@ -256,7 +259,8 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 
 ## TODO
 - [ ] **Postupné doladění – auta se spotřebou** (rodič 2026-11-27, po nasazení vylepšení 2):
-  - tempo spotřeby (`TABULKA_AUT`) – hráč nemá jen tankovat, musí stihnout i vzduch 🛞 a nákup 🛒,
+  - tempo spotřeby (`TABULKA_AUT`) – hráč nemá jen tankovat, musí stihnout i vzduch 🛞 a nákup 🛒.
+    2026-11-28: spotřeba je teď podílem nádrže a rozvrh posílá auta na rezervu postupně. Dál ladit podle hraní.
   - odměny listiny 🏆 se s auty „rozpadnou“ (❤️ za benzín podle předvolby vs. nádrž auta) – nevadí, listina je jen
     závěrečná informace bez vlivu na průběh hry; ladit postupně.
 - [ ] Otevřít https://petr554kelemen.github.io/Pumpar/ na NB hráče (Linux, Chrome) – ověřit zobrazení a zvuk.
@@ -298,9 +302,24 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
   podle fyzické klávesy (`e.code`).
 
 ## WISH
-- **Kanystr ⛽🧴** (hráč ho má, kód zatím ne): dolít pár litrů prázdnému autu bez vlečky (k vylepšení 2).
-  Náčrt 2026-11-27: kód `LA888` (jako vlečka `LA999`), naplnit u stojanu (~5 L, platí se), na 🅿️ `LA888` + SPZ =
-  přeleje, kolik se vejde. **Odloženo (rodič): hra je už dost složitá** – nejdřív ověřit, jak hráč zvládá vlečku.
+- **Vlastní zboží z původních obalů** (nápad rodiče, 2026-11-28): hráč pípne čárový kód (EAN) na skutečném
+  obalu (jogurt, sušenky …) a hra se zeptá, jestli je to nové zboží. Pak se vybere **regál/kategorie** a **cena**
+  v logice hry (tečky, ceny podobné zboží ze stejné kategorie, pod limitem košíku 30). Zboží se uloží (localStorage)
+  a příště pípnutí rovnou přidá do košíku.
+  - Zakládá **hráč sám**.
+  - Nové zboží **nenahrazuje** to stávající. Kdyby nahrazovalo, nové zboží za 4 tečky by například vytlačilo kávu.
+    Zboží může být víc, omezené je jen zobrazení. Obchod proto dostane **3–4 prázdná políčka** na vlastní zboží.
+    Až budou políčka plná, hráč sám smaže zboží, které nechce, a uvolněné políčko obsadí novým.
+  - Obrázek bude **emoji**. Hráč vybere kategorii podle `codes.ts`: S sladkosti, P pití, J jídlo, H hračky,
+    A autíčka. Hra mu pak nabídne několik **náhodných emoji z té kategorie** a hráč si jedno vybere.
+  - Malá autíčka jako zboží jsou „angličáky“ (kategorie A). Nesmí to být auta, která mají ve hře vizitku se SPZ,
+    na to dohlédne hráč sám. Angličák nemá vlastní čárový kód a nálepka by se na něj nevešla. Dostane proto
+    **visačku s herním kódem** jako ostatní zboží v obchodě (`A00x`, tisk visaček). Vlastní zboží tedy půjde
+    založit i z herního kódu, nejen z EAN.
+  - Fotku kamerou nedělat kvůli výkonu slabého NB. Procesor hřeje, po omezení na 30 snímků/s méně, ale pořád.
+  - ✅ **Čtečka EAN-13 přečte celý** (ověřeno 2026-11-28: TicTac `8 000500 164976` → `8000500164976`, bez mezer).
+    Herní kódy mají 4 znaky (`codes.ts`), takže 13 číslic se od nich spolehlivě pozná. Dnes takový kód skončí
+    jako `chyba`, tedy jako neznámý kód.
 - **Výsledky po osobách LA / KE** (odloženo 2026-11-27 – zatím jedna společná listina): body podle toho, kdo
   obsluhoval, vlastní služební karty, přidělování role benzináře hráčem (Plán → Výsledky obsluhy, původní text).
 - **Infografika dne** (nápad rodiče, 2026-11-22; finanční gramotnost): v uzávěrce malý obrázkový přehled,
@@ -514,3 +533,12 @@ Popis hry, zásady návrhu a technická rozhodnutí jsou v [README.md](README.md
 - 2026-11-27 (uživatel + Claude): **Výkon** – hráčův NB (Intel HD 500, Firefox/Linux, WebGL hardwarově) hřál a baterie
   100 → 20 % za 2 h. Hra omezena na 30 snímků/s (`fps: { limit: 30 }` v `main.ts`, výchozí bylo 60 i bez pohybu).
   Ověřit při příštím hraní spotřebu baterie; kdyby nestačilo → nekreslit, když se nic neděje.
+- 2026-11-28 (uživatel + Claude): **Kanystr `LA888`** – z WISH do hry, protože je to nutnost: velké auto se nevejde
+  na vlečku, takže při 0 nešlo natankovat (přišel na to hráč).
+  - U stojanu se kanystr natankuje (5 L, platí se), na 🅿️ se pak `LA888` + SPZ přelije do auta s animací.
+  - Kanystr je nakreslený (`kanystrIkona.ts`, emoji 🧴 vypadalo jako krém).
+  **Spotřeba** = podíl nádrže za směnu (½ / ¾ / 1¼), protože LA-01 za celou hru na rezervu nedojelo. Stará auta se
+  převedou sama (`pumpar.auta.verze`).
+  **Rozvrh nádrží** v `noveKolo`: auta jdou na rezervu postupně po směně, ne 2–3 naráz. Rodič přijal, že se
+  občas sejdou dvě. Testy 87 ✅, nasazeno. NB po 30 snímcích/s hřeje méně, ale pořád.
+  **WISH vlastní zboží z obalů:** EAN pípnutý čtečkou, emoji, 3–4 políčka v obchodě. Čtečka EAN-13 přečte celý.

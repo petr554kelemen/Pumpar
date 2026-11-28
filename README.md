@@ -187,7 +187,8 @@ Tedy čokoláda i zmrzlina → `S`.
 | `Nxxx` / `Dxxx` | palivo Natural / Diesel | „En jako Natural“ | `N001` |
 | `Bxxx` | herní bankovka (číslo = hodnota v tečkách) | „Bé jako bankovka“ | `B020` |
 | `Kxxx` | herní platební karta | „Ká jako karta“ | `K001` |
-| `LA999` | **vlečka** 🚛 (odtahovka) – jediný kód „SPZ se 3 číslicemi“, s auty se nesplete | – | `LA999` |
+| `LA999` | **vlečka** 🚛 (odtahovka) – kód „SPZ se 3 číslicemi“, s auty se nesplete | – | `LA999` |
+| `LA888` | **kanystr** ⛽ (5 L) – stejný princip jako vlečka | – | `LA888` |
 | `9xxx` | rodičovské povely – **jen číslice**; `9200` = smazat auta (na 🅿️) | – | `9200` |
 
 Kategorie jsou **návrh – před prvním tiskem odsouhlasit s hráčem** (viz Pravidla jsou zákon). Úkoly typu „Pípni něco na Es“ / „Dones všechno na Pé“.
@@ -309,8 +310,14 @@ Hodnotí se **práce pokladního**, ne utrácení zákazníka (v souladu s WISH 
 Hráč si **pípne svá autíčka do hry** (SPZ). Během směny jim **ubývá benzín** – každé má jinou spotřebu. Podle
 **parkoviště 🅿️** si sám najde auto, které potřebuje dotankovat. Prázdné auto přiveze **vlečka** 🚛.
 - **Pípnutí neznámé SPZ** (na 🅿️ nebo u ⛽) auto přidá; náhodně dostane **nádrž 10 / 15 / 20 L** a **spotřebu**
-  malou / střední / velkou (≈ 3 / 5 / 8 L za směnu). Spotřebu hráč nevidí – pozná ji podle ubývání.
-- **Na začátku každého kola** (odemčení benzínky, restart `K000`, tedy i každý nový den) mají všechna auta nádrž na **⅔**.
+  malou / střední / velkou = **½ / ¾ / 1¼ nádrže za směnu** (20 min). Spotřebu hráč nevidí, pozná ji podle
+  toho, jak rychle benzín ubývá. Spotřeba je podílem nádrže, takže **každé auto během směny dojede na rezervu**
+  a tankování je nutnost, ne jen doplnění (změna 2026-11-28 po testu: LA-01 dřív rezervy nedosáhlo).
+- **Na začátku každého kola** (odemčení benzínky, restart `K000`, tedy i každý nový den) dostanou auta **rozvrh
+  nádrží**. Na rezervu (¼) nejedou naráz, ale postupně po směně: první auto začíná rovnou na ¼, další o
+  20 min / počet aut později. Pořadí je každé kolo jiné a pozdní místa dostanou jen auta, která na rezervu
+  stihnou dojet. Dvě auta se občas sejdou (prázdné jedno a na rezervě druhé). Rodič to přijal: hráč
+  zvolí, jestli jedno dotankuje a druhé přiveze, nebo vezme kanystr. Auto přidané během směny má **⅔**.
 - Benzín ubývá **jen během běžící směny**; stav se dopočítá z času (`stav₀ − spotřeba × čas směny od t₀`).
 - **🅿️:** SPZ jako skutečná tabulka (hráč porovnává znaky) + sloupec nádrže (délka podle kapacity) + litry.
   Pod polovinou oranžová, **pod ¼ bliká červeně (rezerva)**, prázdné auto šedé s 🪫 – **žádné ❌**, nic se nestalo.
@@ -319,8 +326,13 @@ Hráč si **pípne svá autíčka do hry** (SPZ). Během směny jim **ubývá be
   kapacita auta, přetečení červeně). Předvolba zůstává hráčova volba. Zaplacený benzín dostane auto (nejvýš plnou
   nádrž); nezaplacený (storno `K000`) ne. Bez SPZ se tankuje jako dřív.
 - **Prázdné auto samo nepřijede** (🪫 + nápověda 🚛). **Vlečka `LA999`** + SPZ = přitáhne ho ke stojanu; kolikrát
-  za den, je jedno. Kanystr zatím ne (nemá kód – WISH).
-- Auta se pamatují v prohlížeči (`pumpar.auta`); rodič je smaže kódem `9200` na 🅿️.
+  za den, je jedno.
+- **Kanystr `LA888`** (2026-11-28, nutnost: velké auto se nevejde na vlečku, takže by při 0 nešlo natankovat).
+  - U stojanu se pípne místo SPZ a natankuje se jako auto (nádrž 5 L, platí se jako benzín).
+  - Na 🅿️ pak `LA888` a SPZ auta: přeleje se tolik, kolik se do nádrže vejde, zbytek zůstane v kanystru.
+  - Kanystr je vidět nahoře na 🅿️. Na začátku každého kola je prázdný.
+- Starší uložená auta se na novou spotřebu převedou sama (`pumpar.auta.verze`).
+- Auta a kanystr se pamatují v prohlížeči (`pumpar.auta`, `pumpar.kanystr`); rodič je smaže kódem `9200` na 🅿️.
 - Odměny 🏆 se s auty zatím neladí (❤️ za benzín dál podle předvolby) – listina je jen závěrečná informace.
 - Čísla jsou **návrh do dílny ✏️** – mění se jen v `TABULKA_AUT` (`auta.ts`). Je to nové pravidlo pro hráče
   (Pravidla jsou zákon) – platí po ukázce a „orazítkování“.
