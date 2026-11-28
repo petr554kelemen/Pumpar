@@ -7,7 +7,7 @@
 // Bez závislosti na Phaseru.
 
 import { KOD_KANYSTRU } from './codes.ts';
-import type { HerniDen } from './den.ts';
+import { DELKA_SMENY_MS, type HerniDen } from './den.ts';
 import type { Uloziste } from './denik.ts';
 
 /** Litry v setinách (jako stojan – pump.ts). */
@@ -15,10 +15,12 @@ export const TABULKA_AUT = {
   /** Kapacita nádrže: 10 / 15 / 20 L – stejná čísla jako karty, vejde se do jedné platby. */
   kapacity: [1000, 1500, 2000],
   /**
-   * Spotřeba v setinách litru za minutu směny: malá / střední / velká = za celou směnu (20 min) cca 3 / 5 / 8 L.
-   * Tempo: hráč nemá jen tankovat – musí stihnout i vzduch a nákup (ladění = TODO v Dev_notes).
+   * Spotřeba malá / střední / velká = kolik nádrže auto spálí za celou směnu (podíl kapacity, ne litry – jinak
+   * by velká nádrž na rezervu nikdy nedojela). Ze startu ⅔ je rezerva (¼) po spálení 5/12 nádrže:
+   * ½ → rezerva ke konci směny (17. min), nevyprázdní se; ¾ → rezerva v 11. min, prázdné v 18. min;
+   * 1¼ → rezerva v 7. min, prázdné v 11. min. Ladění 2026-11-28: dřív 3 / 5 / 8 L a na rezervu skoro nic nedojelo.
    */
-  spotreby: [15, 25, 40],
+  spotrebyZaSmenu: [0.5, 0.75, 1.25],
   /** Na začátku každého kola (odemčení, restart K000) má každé auto nádrž na ⅔. */
   startPodil: 2 / 3,
   /** Pod touto částí kapacity jede auto „na rezervu“ (bliká červeně). */
@@ -42,11 +44,28 @@ export interface Auto {
 
 export const KLIC_AUT = 'pumpar.auta';
 export const KLIC_KANYSTRU = 'pumpar.kanystr';
+/** Verze uložených aut: 2 = spotřeba podílem nádrže (2026-11-28). Bez ní se stará spotřeba převede (jednou). */
+export const KLIC_VERZE_AUT = 'pumpar.auta.verze';
+const VERZE_AUT = '2';
 
 function vyber<T>(moznosti: readonly T[], rng: () => number): T {
   const v = moznosti[Math.floor(rng() * moznosti.length)];
   if (v === undefined) throw new Error('Prázdný výběr');
   return v;
+}
+
+/** Spotřeba v setinách L za minutu směny z podílu nádrže za směnu. */
+export function spotrebaAuta(kapacita: number, podilZaSmenu: number): number {
+  return Math.round((kapacita * podilZaSmenu) / (DELKA_SMENY_MS / 60_000));
+}
+
+/** Auta uložená před laděním 2026-11-28 (spotřeba 15 / 25 / 40) dostanou novou spotřebu ve stejném stupni. */
+const STARE_SPOTREBY = [15, 25, 40] as const;
+
+function prevedStarouSpotrebu(a: Auto): Auto {
+  const stupen = STARE_SPOTREBY.indexOf(a.spotreba as (typeof STARE_SPOTREBY)[number]);
+  const podil = TABULKA_AUT.spotrebyZaSmenu[stupen];
+  return podil === undefined ? a : { ...a, spotreba: spotrebaAuta(a.kapacita, podil) };
 }
 
 function startovniStav(kapacita: number): number {
@@ -83,6 +102,7 @@ export class Garaz {
   constructor(uloziste: Uloziste | null) {
     this.uloziste = uloziste;
     this.auta = this.nacti();
+    if (this.uloziste?.getItem(KLIC_VERZE_AUT) !== VERZE_AUT && this.uloziste?.getItem(KLIC_AUT)) this.uloz();
     this.kanystrObsah = this.nactiKanystr();
   }
 
@@ -94,7 +114,9 @@ export class Garaz {
   private nacti(): Auto[] {
     try {
       const data: unknown = JSON.parse(this.uloziste?.getItem(KLIC_AUT) ?? '[]');
-      return Array.isArray(data) ? (data as Auto[]) : [];
+      if (!Array.isArray(data)) return [];
+      const auta = data as Auto[];
+      return this.uloziste?.getItem(KLIC_VERZE_AUT) === VERZE_AUT ? auta : auta.map(prevedStarouSpotrebu);
     } catch {
       return [];
     }
@@ -104,6 +126,7 @@ export class Garaz {
     try {
       this.uloziste?.setItem(KLIC_AUT, JSON.stringify(this.auta));
       this.uloziste?.setItem(KLIC_KANYSTRU, String(this.kanystrObsah));
+      this.uloziste?.setItem(KLIC_VERZE_AUT, VERZE_AUT);
     } catch {
       // Plné / zakázané úložiště – hra jede dál, jen si auta nezapamatuje.
     }
@@ -155,7 +178,7 @@ export class Garaz {
     const auto: Auto = {
       spz: spz.trim().toUpperCase(),
       kapacita,
-      spotreba: vyber(TABULKA_AUT.spotreby, rng),
+      spotreba: spotrebaAuta(kapacita, vyber(TABULKA_AUT.spotrebyZaSmenu, rng)),
       stav0: startovniStav(kapacita),
       t0: ted,
     };

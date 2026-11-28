@@ -8,6 +8,7 @@ import {
   jePrazdne,
   litryNaObrazovce,
   naRezerve,
+  spotrebaAuta,
   stavNadrzeAuta,
 } from '../src/services/auta.ts';
 import { DELKA_SMENY_MS, HerniDen } from '../src/services/den.ts';
@@ -46,11 +47,11 @@ test('Auta: přidání – náhodná kapacita a spotřeba z tabulky, nádrž na 
   assert.equal(a.nove, true);
   assert.equal(a.auto.spz, 'LA01');
   assert.equal(a.auto.kapacita, TABULKA_AUT.kapacity[0]);
-  assert.equal(a.auto.spotreba, TABULKA_AUT.spotreby[0]);
+  assert.equal(a.auto.spotreba, 25); // ½ nádrže 10 L za 20 min
   assert.equal(a.auto.stav0, 667); // ⅔ z 10 L
   const b = g.pridej('KE01', T0, posledni);
   assert.equal(b.auto.kapacita, 2000);
-  assert.equal(b.auto.spotreba, 40);
+  assert.equal(b.auto.spotreba, 125); // 1¼ nádrže 20 L za 20 min
   assert.equal(g.pridej('LA01', T0 + MIN, posledni).nove, false);
   assert.equal(g.vsechna().length, 2);
 });
@@ -58,18 +59,44 @@ test('Auta: přidání – náhodná kapacita a spotřeba z tabulky, nádrž na 
 test('Auta: benzín ubývá rovnoměrně jen během směny, nikdy pod 0; opakovaný výpočet nic neodečte', () => {
   const d = new HerniDen(T0);
   const g = new Garaz(null);
-  const { auto } = g.pridej('KE01', T0, posledni); // 20 L, 40 setin/min, start 13,33 L
-  assert.equal(stavNadrzeAuta(auto, T0 + 30 * MIN, d), 1333); // zavřeno → nic
+  const { auto } = g.pridej('LA01', T0, prvni); // 10 L, 25 setin/min, start 6,67 L
+  assert.equal(stavNadrzeAuta(auto, T0 + 30 * MIN, d), 667); // zavřeno → nic
   d.otevri(T0 + 10 * MIN);
-  assert.equal(stavNadrzeAuta(auto, T0 + 20 * MIN, d), 1333 - 400);
-  assert.equal(stavNadrzeAuta(auto, T0 + 20 * MIN, d), 933); // znovu stejně
-  // Konec směny (20 min) = 800 setin spáleno a dál nic.
-  assert.equal(stavNadrzeAuta(auto, T0 + 10 * MIN + DELKA_SMENY_MS + 50 * MIN, d), 533);
-  // Malá nádrž s velkou spotřebou dojde na 0 a pod 0 nejde.
-  const male = g.pridej('LA02', T0 + 10 * MIN, () => 0.5); // 15 L, 25/min
+  assert.equal(stavNadrzeAuta(auto, T0 + 20 * MIN, d), 667 - 250);
+  assert.equal(stavNadrzeAuta(auto, T0 + 20 * MIN, d), 417); // znovu stejně
+  // Konec směny (20 min) = 500 setin spáleno a dál nic.
+  assert.equal(stavNadrzeAuta(auto, T0 + 10 * MIN + DELKA_SMENY_MS + 50 * MIN, d), 167);
+  // Velká spotřeba dojde na 0 a pod 0 nejde.
+  const velke = g.pridej('KE01', T0 + 10 * MIN, posledni); // 20 L, 125/min
+  assert.equal(stavNadrzeAuta(velke.auto, T0 + 10 * MIN + DELKA_SMENY_MS, d), 0);
+  const male = g.pridej('LA02', T0 + 10 * MIN, () => 0.5); // 15 L, 56/min
   male.auto.stav0 = 100;
   assert.equal(stavNadrzeAuta(male.auto, T0 + 30 * MIN, d), 0);
   assert.equal(jePrazdne(male.auto, T0 + 30 * MIN, d), true);
+});
+
+test('Auta: každé auto se během směny dostane na rezervu – kterákoli nádrž i spotřeba (ladění 2026-11-28)', () => {
+  for (const kapacita of TABULKA_AUT.kapacity) {
+    for (const podil of TABULKA_AUT.spotrebyZaSmenu) {
+      const d = new HerniDen(T0);
+      d.otevri(T0);
+      const auto = { spz: 'LA01', kapacita, spotreba: spotrebaAuta(kapacita, podil), stav0: Math.round(kapacita * 2 / 3), t0: T0 };
+      const konec = T0 + DELKA_SMENY_MS;
+      assert.ok(naRezerve(auto, konec, d) || jePrazdne(auto, konec, d), `${kapacita} / ${podil}`);
+      assert.equal(naRezerve(auto, T0 + 5 * MIN, d), false, `${kapacita} / ${podil}: ne hned na začátku`);
+    }
+  }
+});
+
+test('Auta: uložená se starou spotřebou (15 / 25 / 40) dostanou novou ve stejném stupni', () => {
+  const u = pametoveUloziste();
+  u.data.set(KLIC_AUT, JSON.stringify([
+    { spz: 'LA01', kapacita: 1000, spotreba: 15, stav0: 667, t0: T0 },
+    { spz: 'KE01', kapacita: 2000, spotreba: 40, stav0: 1333, t0: T0 },
+  ]));
+  assert.deepEqual(new Garaz(u).vsechna().map((a) => a.spotreba), [25, 125]);
+  // Převod jen jednou: nová malá spotřeba 25 u 10 L se podruhé nesmí brát jako stará střední.
+  assert.deepEqual(new Garaz(u).vsechna().map((a) => a.spotreba), [25, 125]);
 });
 
 test('Auta: rezerva pod ¼, prázdné není na rezervě; litry na obrazovce nahoru', () => {
@@ -92,8 +119,8 @@ test('Auta: dotankování přičte k dnešnímu stavu a nepřeteče nad kapacitu
   const d = new HerniDen(T0);
   d.otevri(T0);
   const g = new Garaz(null);
-  g.pridej('LA01', T0, prvni); // 10 L, 15/min, 6,67 L
-  assert.equal(g.dotankuj('LA01', 300, T0 + 10 * MIN, d), 667 - 150 + 300);
+  g.pridej('LA01', T0, prvni); // 10 L, 25/min, 6,67 L
+  assert.equal(g.dotankuj('LA01', 300, T0 + 10 * MIN, d), 667 - 250 + 300);
   assert.equal(g.dotankuj('LA01', 5000, T0 + 10 * MIN, d), 1000);
   assert.equal(g.dotankuj('KE09', 300, T0, d), undefined);
   g.noveKolo(T0 + 15 * MIN);
@@ -143,11 +170,11 @@ test('Kanystr: přelije do auta, kolik se vejde – zbytek zůstane; neznámé a
   const d = new HerniDen(T0);
   d.otevri(T0);
   const g = new Garaz(null);
-  g.pridej('KE01', T0, posledni); // 20 L, 40 setin/min, start 1333
+  g.pridej('KE01', T0, posledni); // 20 L, 125 setin/min, start 1333
   g.dotankuj('LA888', 500, T0, d);
   assert.equal(g.prelijKanystr('KE09', T0, d), undefined);
   // Za 25 min (směna jen 20) je velké auto prázdné → přelije se celých 5 L.
-  assert.equal(stavNadrzeAuta(g.najdi('KE01')!, T0 + 25 * MIN, d), 533);
+  assert.equal(stavNadrzeAuta(g.najdi('KE01')!, T0 + 25 * MIN, d), 0);
   const g2 = new Garaz(null);
   g2.pridej('LA01', T0, prvni); // 10 L, start 667
   g2.dotankuj('LA888', 500, T0, d);
@@ -156,7 +183,7 @@ test('Kanystr: přelije do auta, kolik se vejde – zbytek zůstane; neznámé a
   assert.equal(g2.kanystr().stav0, 167);
   assert.equal(g2.prelijKanystr('LA01', T0, d), 0); // plné auto nic
   assert.equal(g.prelijKanystr('KE01', T0 + 10 * MIN, d), 500);
-  assert.equal(stavNadrzeAuta(g.najdi('KE01')!, T0 + 10 * MIN, d), 1333 - 400 + 500);
+  assert.equal(stavNadrzeAuta(g.najdi('KE01')!, T0 + 10 * MIN, d), 1333 - 1250 + 500);
   assert.equal(g.kanystr().stav0, 0);
 });
 
