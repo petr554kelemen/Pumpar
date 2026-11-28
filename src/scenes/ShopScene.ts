@@ -142,6 +142,7 @@ export class ShopScene extends Phaser.Scene {
       case 'bankovka':
       case 'auto':
       case 'vlecka':
+      case 'kanystr':
       case 'rodic':
         return; // v obchodě nic nedělají
     }
@@ -301,7 +302,7 @@ export class ShopScene extends Phaser.Scene {
       zbytek: platba.zbytek,
     };
     denik.zapis(zaznam);
-    // Zaplacený benzín dostane auto, které stálo u stojanu (nejvýš do plné nádrže).
+    // Zaplacený benzín dostane auto (nebo kanystr), které stálo u stojanu (nejvýš do plné nádrže).
     if (this.benzinSetin > 0 && spz) garaz().dotankuj(spz, this.benzinSetin, Date.now(), d);
     const radek = radekZeZaznamu(zaznam);
 

@@ -3,6 +3,7 @@ import { bus, type GameEvents } from '../services/eventBus.ts';
 import * as beep from '../services/beep.ts';
 import type { CodeInfo } from '../services/codes.ts';
 import type { SceneKey } from './nav.ts';
+import { kanystrIkona } from './kanystrIkona.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
 // Emoji ve velké velikosti přesahují rámeček textu – okraj zabrání oříznutí.
@@ -96,6 +97,10 @@ export class ScanTestScene extends Phaser.Scene {
       case 'vlecka':
         this.vysledek.add([this.emoji(0, -40, '🚛', 200).setName('vlecka'), this.popisek(0, 130, `${kod} – vlečka`)]);
         beep.tick(330, 0.12);
+        break;
+      case 'kanystr':
+        this.vysledek.add([kanystrIkona(this, 0, -40, 200), this.popisek(0, 130, `${kod} – kanystr`)]);
+        beep.tick(500, 0.12);
         break;
       case 'rodic':
         this.vysledek.add([this.emoji(0, -40, '⚙️', 160), this.popisek(0, 110, kod)]);

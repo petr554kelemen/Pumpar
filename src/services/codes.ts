@@ -63,6 +63,7 @@ export type CodeInfo =
   | (CategoryCode & { druh: 'bankovka'; hodnota: number })
   | { druh: 'auto'; kod: string; slabika: SpzSlabika; cislo: number; spz: string; majitel: CarOwner }
   | { druh: 'vlecka'; kod: string }
+  | { druh: 'kanystr'; kod: string }
   | { druh: 'rodic'; kod: string }
   | { druh: 'chyba'; kod: string };
 
@@ -72,6 +73,13 @@ export type CodeInfo =
  * 2026-11-27). Jediný takový kód; jiné `LA` + 3 číslice zůstávají chyba.
  */
 export const KOD_VLECKY = 'LA999';
+
+/**
+ * Kanystr ⛽🧴 (2026-11-28): u stojanu se naplní (platí se jako benzín), na parkovišti 🅿️ + SPZ se přelije
+ * do auta. Nutnost, ne přepych: velké auto, které se nevejde na vlečku, by s prázdnou nádrží nešlo natankovat
+ * (přišel na to hráč). Stejný tvar jako vlečka (`LA` + 3 číslice).
+ */
+export const KOD_KANYSTRU = 'LA888';
 
 const CATEGORY_RE = /^([A-Z])(\d{3})$/;
 const SPZ_RE = /^([A-Z]{2})(\d{2})$/;
@@ -104,6 +112,7 @@ export function parseCode(raw: unknown): CodeInfo {
 
   if (ADMIN_RE.test(kod)) return { druh: 'rodic', kod };
   if (kod === KOD_VLECKY) return { druh: 'vlecka', kod };
+  if (kod === KOD_KANYSTRU) return { druh: 'kanystr', kod };
 
   const spz = parseSpz(kod);
   if (spz) return spz;

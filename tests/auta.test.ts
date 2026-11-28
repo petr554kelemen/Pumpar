@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {
   Garaz,
   KLIC_AUT,
+  KLIC_KANYSTRU,
   TABULKA_AUT,
   jePrazdne,
   litryNaObrazovce,
@@ -10,7 +11,7 @@ import {
   stavNadrzeAuta,
 } from '../src/services/auta.ts';
 import { DELKA_SMENY_MS, HerniDen } from '../src/services/den.ts';
-import { KOD_VLECKY, parseCode } from '../src/services/codes.ts';
+import { KOD_KANYSTRU, KOD_VLECKY, parseCode } from '../src/services/codes.ts';
 import type { Uloziste } from '../src/services/denik.ts';
 
 const T0 = 1_000_000;
@@ -119,4 +120,56 @@ test('Vlečka: LA999 je vlečka, jiné LA + 3 číslice chyba, SPZ beze změny',
   assert.equal(parseCode('la999').druh, 'vlecka');
   assert.equal(parseCode('LA998').druh, 'chyba');
   assert.equal(parseCode('LA99').druh, 'auto');
+});
+
+test('Kanystr: LA888 je kanystr, u stojanu je to „auto“ s nádrží 5 L, které nic nespotřebuje', () => {
+  assert.equal(KOD_KANYSTRU, 'LA888');
+  assert.equal(parseCode('la888').druh, 'kanystr');
+  const d = new HerniDen(T0);
+  d.otevri(T0);
+  const g = new Garaz(null);
+  const k = g.kanystr();
+  assert.equal(k.kapacita, TABULKA_AUT.kanystr);
+  assert.equal(k.stav0, 0);
+  assert.equal(g.vozidlo('la888')?.spz, 'LA888');
+  assert.equal(g.vsechna().length, 0); // na parkovišti mezi auty není
+  // Zaplacený benzín jde do kanystru, nejvýš 5 L; čas směny ho neubírá.
+  assert.equal(g.dotankuj('LA888', 300, T0, d), 300);
+  assert.equal(g.dotankuj('LA888', 900, T0, d), 500);
+  assert.equal(stavNadrzeAuta(g.kanystr(), T0 + 15 * MIN, d), 500);
+});
+
+test('Kanystr: přelije do auta, kolik se vejde – zbytek zůstane; neznámé auto nic', () => {
+  const d = new HerniDen(T0);
+  d.otevri(T0);
+  const g = new Garaz(null);
+  g.pridej('KE01', T0, posledni); // 20 L, 40 setin/min, start 1333
+  g.dotankuj('LA888', 500, T0, d);
+  assert.equal(g.prelijKanystr('KE09', T0, d), undefined);
+  // Za 25 min (směna jen 20) je velké auto prázdné → přelije se celých 5 L.
+  assert.equal(stavNadrzeAuta(g.najdi('KE01')!, T0 + 25 * MIN, d), 533);
+  const g2 = new Garaz(null);
+  g2.pridej('LA01', T0, prvni); // 10 L, start 667
+  g2.dotankuj('LA888', 500, T0, d);
+  assert.equal(g2.prelijKanystr('LA01', T0, d), 333); // vejde se jen do plné
+  assert.equal(stavNadrzeAuta(g2.najdi('LA01')!, T0, d), 1000);
+  assert.equal(g2.kanystr().stav0, 167);
+  assert.equal(g2.prelijKanystr('LA01', T0, d), 0); // plné auto nic
+  assert.equal(g.prelijKanystr('KE01', T0 + 10 * MIN, d), 500);
+  assert.equal(stavNadrzeAuta(g.najdi('KE01')!, T0 + 10 * MIN, d), 1333 - 400 + 500);
+  assert.equal(g.kanystr().stav0, 0);
+});
+
+test('Kanystr: pamatuje se, nové kolo i smazání aut ho vyprázdní', () => {
+  const u = pametoveUloziste();
+  const g = new Garaz(u);
+  g.dotankuj('LA888', 400, T0, new HerniDen(T0));
+  assert.equal(new Garaz(u).kanystr().stav0, 400);
+  g.noveKolo(T0);
+  assert.equal(new Garaz(u).kanystr().stav0, 0);
+  g.dotankuj('LA888', 400, T0, new HerniDen(T0));
+  g.smazVse();
+  assert.equal(new Garaz(u).kanystr().stav0, 0);
+  u.data.set(KLIC_KANYSTRU, 'nesmysl');
+  assert.equal(new Garaz(u).kanystr().stav0, 0);
 });

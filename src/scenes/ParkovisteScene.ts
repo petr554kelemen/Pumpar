@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
 import * as beep from '../services/beep.ts';
-import { type Auto, garaz, jePrazdne, litryNaObrazovce, naRezerve, stavNadrzeAuta } from '../services/auta.ts';
+import { type Auto, TABULKA_AUT, garaz, jePrazdne, litryNaObrazovce, naRezerve, stavNadrzeAuta } from '../services/auta.ts';
 import { den } from '../services/den.ts';
 import { hlas } from '../services/voice.ts';
 import { bus, type GameEvents } from '../services/eventBus.ts';
 import { addNav, type SceneKey } from './nav.ts';
+import { kanystrIkona } from './kanystrIkona.ts';
 import { tabulkaSpz } from './spz.ts';
 
 const FONT = 'Arial, Helvetica, sans-serif';
@@ -32,12 +33,22 @@ interface Radek {
   litry: Phaser.GameObjects.Text;
 }
 
+/** Kanystr nahoře mezi navigací a odpočtem; stejné měřítko nádrže jako auta (5 L = čtvrtina sloupce 20 L). */
+const KANYSTR = { x: 620, y: 52 } as const;
+
 // Parkoviště 🅿️ (vylepšení 2): seznam aut jako sloupce nádrže s výraznou SPZ. Nádrže živě ubývají (jen během
-// směny); rezerva bliká červeně, prázdné auto je šedé s 🪫 (žádné ❌ – pojede s vlečkou). Neřadí se – najít,
-// komu dochází, je hráčova práce. Pípnutí SPZ = auto se zvýrazní, nové se přidá.
+// směny); rezerva bliká červeně, prázdné auto je šedé s 🪫 (žádné ❌ – pojede s vlečkou nebo kanystrem).
+// Neřadí se – najít, komu dochází, je hráčova práce. Pípnutí SPZ = auto se zvýrazní, nové se přidá.
+// Kanystr `LA888` (naplněný u stojanu) + SPZ = přelije do auta, kolik se vejde; zbytek zůstane v kanystru.
 export class ParkovisteScene extends Phaser.Scene {
   private radky: Radek[] = [];
   private prazdno: Phaser.GameObjects.Text | null = null;
+  private kanystrObal!: Phaser.GameObjects.Container;
+  private kanystrRamecek!: Phaser.GameObjects.Rectangle;
+  private kanystrPruh!: Phaser.GameObjects.Rectangle;
+  private kanystrLitry!: Phaser.GameObjects.Text;
+  /** Hráč pípl plný kanystr – další pípnutá SPZ dostane benzín. */
+  private kanystrPripraven = false;
 
   constructor() {
     super('Parkoviste' satisfies SceneKey);
@@ -46,14 +57,16 @@ export class ParkovisteScene extends Phaser.Scene {
   create(): void {
     this.radky = [];
     this.prazdno = null;
+    this.kanystrPripraven = false;
     addNav(this);
     this.add
-      .text(1260, 704, 'Pípni SPZ auta – přidá se / zvýrazní · 9200 = smazat auta (rodič)', {
+      .text(1260, 704, 'Pípni SPZ auta – přidá se / zvýrazní · LA888 + SPZ = kanystr · 9200 = smazat auta (rodič)', {
         fontFamily: FONT,
         fontSize: '16px',
         color: '#5d6d7e',
       })
       .setOrigin(1, 1);
+    this.vytvorKanystr();
     this.prekresliSeznam();
     this.time.addEvent({ delay: 250, loop: true, callback: () => this.aktualizuj() });
 
@@ -69,12 +82,16 @@ export class ParkovisteScene extends Phaser.Scene {
           beep.tick(660, 0.1);
           this.time.delayedCall(120, () => beep.tick(990, 0.15));
           this.prekresliSeznam();
-        } else {
+        } else if (!this.kanystrPripraven) {
           beep.tick(880, 0.08);
         }
         this.zvyrazni(auto.spz);
+        if (this.kanystrPripraven) this.prelij(auto.spz);
         return;
       }
+      case 'kanystr':
+        this.pripravKanystr();
+        return;
       case 'vlecka': {
         beep.tick(330, 0.12);
         hlas().rekni('vlecka_vyjizdi');
@@ -97,6 +114,77 @@ export class ParkovisteScene extends Phaser.Scene {
       case 'bankovka':
         return;
     }
+  }
+
+  // ---------- Kanystr ----------
+
+  private vytvorKanystr(): void {
+    const delka = TABULKA_AUT.kanystr * PRUH.pxNaSetinu;
+    this.kanystrRamecek = this.add.rectangle(-6, 0, 90 + delka + 80, 50, BARVA.radek).setOrigin(0, 0.5).setStrokeStyle(4, 0xf1c40f, 0);
+    const ikona = kanystrIkona(this, 30, 0, 40);
+    const nadrz = this.add.rectangle(64, 0, delka, PRUH.vyska, BARVA.pozadi).setOrigin(0, 0.5).setStrokeStyle(2, 0x5d6d7e);
+    this.kanystrPruh = this.add.rectangle(64, 0, 0, PRUH.vyska - 4, BARVA.cervena).setOrigin(0, 0.5);
+    this.kanystrLitry = this.add
+      .text(64 + delka + 14, 0, '', { fontFamily: FONT, fontSize: '28px', fontStyle: 'bold', color: '#ecf0f1' })
+      .setOrigin(0, 0.5);
+    this.kanystrObal = this.add
+      .container(KANYSTR.x, KANYSTR.y, [this.kanystrRamecek, ikona, nadrz, this.kanystrPruh, this.kanystrLitry])
+      .setName('kanystr');
+    this.aktualizujKanystr();
+  }
+
+  private aktualizujKanystr(): void {
+    const obsah = garaz().kanystr().stav0;
+    this.kanystrPruh.width = obsah * PRUH.pxNaSetinu;
+    this.kanystrLitry.setText(String(litryNaObrazovce(obsah)));
+    this.kanystrObal.setAlpha(obsah > 0 ? 1 : 0.45);
+    this.kanystrRamecek.setStrokeStyle(4, 0xf1c40f, this.kanystrPripraven ? 1 : 0);
+  }
+
+  /** Pípnutý kanystr: plný čeká na SPZ, prázdný se zatřese a ukáže ⛽ (naplnit u stojanu). */
+  private pripravKanystr(): void {
+    if (garaz().kanystr().stav0 <= 0) {
+      beep.tick(300, 0.15);
+      this.kanystrPripraven = false;
+      this.tweens.add({ targets: this.kanystrObal, x: { from: KANYSTR.x, to: KANYSTR.x + 12 }, duration: 60, yoyo: true, repeat: 4 });
+      const napoveda = this.add
+        .text(KANYSTR.x + 290, KANYSTR.y, '⛽', { fontSize: '40px', padding: { x: 4, y: 8 } })
+        .setOrigin(0.5)
+        .setName('napoveda_stojan');
+      this.tweens.add({ targets: napoveda, alpha: { from: 1, to: 0 }, delay: 1500, duration: 500, onComplete: () => napoveda.destroy() });
+      this.aktualizujKanystr();
+      return;
+    }
+    beep.tick(500, 0.1);
+    this.kanystrPripraven = true;
+    this.radky.forEach((x) => x.ramecek.setStrokeStyle(4, 0xf1c40f, 0));
+    this.tweens.add({ targets: this.kanystrObal, scale: { from: 1.1, to: 1 }, duration: 300, ease: 'Back.Out' });
+    this.aktualizujKanystr();
+  }
+
+  /** Přelít kanystr do auta: kanystr přiletí k řádku, nakloní se a bublá; plné auto nic nedostane. */
+  private prelij(spz: string): void {
+    this.kanystrPripraven = false;
+    const prelito = garaz().prelijKanystr(spz, Date.now(), den()) ?? 0;
+    this.aktualizujKanystr();
+    if (prelito <= 0) {
+      beep.tick(300, 0.15); // plná nádrž – nic se nevešlo, kanystr zůstává
+      return;
+    }
+    const r = this.radky.find((x) => x.auto.spz === spz);
+    const cil = r ? { x: r.obal.x + PRUH.dx, y: r.obal.y - 20 } : { x: 640, y: 400 };
+    const letici = kanystrIkona(this, KANYSTR.x + 30, KANYSTR.y, 52).setDepth(20);
+    this.tweens.chain({
+      targets: letici,
+      tweens: [
+        { x: cil.x, y: cil.y, duration: 500, ease: 'Quad.Out' },
+        { angle: -70, duration: 250 },
+        { angle: -70, duration: 600, onStart: () => [0, 150, 300, 450].forEach((t) => this.time.delayedCall(t, () => beep.tick(440 + t / 3, 0.05))) },
+        { alpha: 0, angle: 0, duration: 300 },
+      ],
+      onComplete: () => letici.destroy(),
+    });
+    this.aktualizuj();
   }
 
   private prekresliSeznam(): void {

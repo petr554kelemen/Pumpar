@@ -1,10 +1,12 @@
 // Auta se spotřebou (vylepšení 2, nápad rodiče 2026-11-27): hráč pípne svá autíčka (SPZ) do hry, během směny
-// jim ubývá benzín – každé má jinou spotřebu. Prázdné auto k stojanu přiveze vlečka (`LA999`, codes.ts).
+// jim ubývá benzín – každé má jinou spotřebu. Prázdné auto k stojanu přiveze vlečka (`LA999`, codes.ts),
+// nebo se mu na parkovišti přileje z kanystru (`LA888` – naplní se u stojanu jako auto, kapacita `kanystr`).
 // Stav se nepočítá po krocích, ale dopočítá se vždy, když je potřeba: stav = stav₀ − spotřeba × čas směny od t₀
 // (čas směny = jen úsek běžícího odpočtu, den.ts → msSmenyMezi). Při každé změně (tankování, nové kolo) nový t₀.
 // Čísla jsou návrh do dílny ✏️ – mění se jen v TABULKA_AUT. Auta se pamatují v prohlížeči (localStorage).
 // Bez závislosti na Phaseru.
 
+import { KOD_KANYSTRU } from './codes.ts';
 import type { HerniDen } from './den.ts';
 import type { Uloziste } from './denik.ts';
 
@@ -21,6 +23,8 @@ export const TABULKA_AUT = {
   startPodil: 2 / 3,
   /** Pod touto částí kapacity jede auto „na rezervu“ (bliká červeně). */
   rezervaPodil: 1 / 4,
+  /** Kanystr: 5 L. Na začátku každého kola je prázdný. */
+  kanystr: 500,
 } as const;
 
 export interface Auto {
@@ -37,6 +41,7 @@ export interface Auto {
 }
 
 export const KLIC_AUT = 'pumpar.auta';
+export const KLIC_KANYSTRU = 'pumpar.kanystr';
 
 function vyber<T>(moznosti: readonly T[], rng: () => number): T {
   const v = moznosti[Math.floor(rng() * moznosti.length)];
@@ -72,10 +77,18 @@ export function litryNaObrazovce(setiny: number): number {
 export class Garaz {
   private readonly uloziste: Uloziste | null;
   private auta: Auto[];
+  /** Benzín v kanystru (setiny L). */
+  private kanystrObsah: number;
 
   constructor(uloziste: Uloziste | null) {
     this.uloziste = uloziste;
     this.auta = this.nacti();
+    this.kanystrObsah = this.nactiKanystr();
+  }
+
+  private nactiKanystr(): number {
+    const n = Number(this.uloziste?.getItem(KLIC_KANYSTRU) ?? 0);
+    return Number.isFinite(n) ? Math.min(TABULKA_AUT.kanystr, Math.max(0, n)) : 0;
   }
 
   private nacti(): Auto[] {
@@ -90,6 +103,7 @@ export class Garaz {
   private uloz(): void {
     try {
       this.uloziste?.setItem(KLIC_AUT, JSON.stringify(this.auta));
+      this.uloziste?.setItem(KLIC_KANYSTRU, String(this.kanystrObsah));
     } catch {
       // Plné / zakázané úložiště – hra jede dál, jen si auta nezapamatuje.
     }
@@ -102,6 +116,35 @@ export class Garaz {
   najdi(spz: string): Auto | undefined {
     const k = spz.trim().toUpperCase();
     return this.auta.find((a) => a.spz === k);
+  }
+
+  /**
+   * Kanystr jako „auto“ u stojanu: nádrž = kapacita kanystru, nic nespotřebuje. Snímek stavu – po změně
+   * (zaplacení, přelití) zavolat znovu.
+   */
+  kanystr(): Auto {
+    return { spz: KOD_KANYSTRU, kapacita: TABULKA_AUT.kanystr, spotreba: 0, stav0: this.kanystrObsah, t0: 0 };
+  }
+
+  /** Auto nebo kanystr podle kódu (u stojanu stojí i kanystr). */
+  vozidlo(spz: string): Auto | undefined {
+    return spz.trim().toUpperCase() === KOD_KANYSTRU ? this.kanystr() : this.najdi(spz);
+  }
+
+  /**
+   * Přelít kanystr do auta: kolik se vejde, zbytek zůstane v kanystru. Vrátí přelité setiny,
+   * nebo undefined pro neznámé auto.
+   */
+  prelijKanystr(spz: string, ted: number, d: HerniDen): number | undefined {
+    const a = this.najdi(spz);
+    if (!a) return undefined;
+    const stav = stavNadrzeAuta(a, ted, d);
+    const prelito = Math.max(0, Math.min(this.kanystrObsah, a.kapacita - stav));
+    a.stav0 = stav + prelito;
+    a.t0 = ted;
+    this.kanystrObsah -= prelito;
+    this.uloz();
+    return prelito;
   }
 
   /** Přidá auto, které hra ještě nezná (náhodná kapacita a spotřeba, nádrž na ⅔). Známé vrátí beze změny. */
@@ -127,11 +170,17 @@ export class Garaz {
       a.stav0 = startovniStav(a.kapacita);
       a.t0 = ted;
     }
+    this.kanystrObsah = 0;
     this.uloz();
   }
 
-  /** Zaplacený benzín do nádrže auta (nejvýš kapacita). Vrátí nový stav, nebo undefined pro neznámé auto. */
+  /** Zaplacený benzín do nádrže auta / kanystru (nejvýš kapacita). Vrátí nový stav, nebo undefined pro neznámé auto. */
   dotankuj(spz: string, setiny: number, ted: number, d: HerniDen): number | undefined {
+    if (spz.trim().toUpperCase() === KOD_KANYSTRU) {
+      this.kanystrObsah = Math.min(TABULKA_AUT.kanystr, this.kanystrObsah + Math.max(0, setiny));
+      this.uloz();
+      return this.kanystrObsah;
+    }
     const a = this.najdi(spz);
     if (!a) return undefined;
     a.stav0 = Math.min(a.kapacita, stavNadrzeAuta(a, ted, d) + Math.max(0, setiny));
@@ -143,6 +192,7 @@ export class Garaz {
   /** Rodič: smazat všechna auta (nové rozdělení). */
   smazVse(): void {
     this.auta = [];
+    this.kanystrObsah = 0;
     this.uloz();
   }
 }
