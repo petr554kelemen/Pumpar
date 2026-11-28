@@ -115,7 +115,7 @@ test('Auta: rezerva pod ¼, prázdné není na rezervě; litry na obrazovce naho
   assert.equal(litryNaObrazovce(667), 7);
 });
 
-test('Auta: dotankování přičte k dnešnímu stavu a nepřeteče nad kapacitu; nové kolo = ⅔', () => {
+test('Auta: dotankování přičte k dnešnímu stavu a nepřeteče nad kapacitu; nové kolo = rozvrh', () => {
   const d = new HerniDen(T0);
   d.otevri(T0);
   const g = new Garaz(null);
@@ -126,7 +126,48 @@ test('Auta: dotankování přičte k dnešnímu stavu a nepřeteče nad kapacitu
   g.noveKolo(T0 + 15 * MIN);
   const a = g.najdi('LA01');
   assert.ok(a);
-  assert.equal(stavNadrzeAuta(a, T0 + 15 * MIN, d), 667);
+  assert.equal(stavNadrzeAuta(a, T0 + 15 * MIN, d), 250); // jediné auto = první okénko = začne se ¼
+});
+
+/** Minuta směny, kdy auto poprvé spadne na rezervu (po minutách); null = za směnu ne. */
+function minutaRezervy(a: Parameters<typeof naRezerve>[0], d: HerniDen): number | null {
+  for (let m = 0; m <= 20; m += 0.25) if (naRezerve(a, T0 + m * MIN, d) || jePrazdne(a, T0 + m * MIN, d)) return m;
+  return null;
+}
+
+test('Auta: nové kolo rozvrhne rezervy po směně – žádná dvě auta naráz, první začne se ¼', () => {
+  const d = new HerniDen(T0);
+  d.otevri(T0);
+  const g = new Garaz(null);
+  // Mix nádrží a spotřeb: rng [kapacita, spotřeba] → index 0 / 1 / 2.
+  const mix = (k: number, s: number) => { const q = [k / 3 + 0.01, s / 3 + 0.01]; return () => q.shift() ?? 0; };
+  g.pridej('LA01', T0, mix(2, 2)); // 20 L, velká – s plnou na rezervu za 12 min
+  g.pridej('LA02', T0, mix(0, 0)); // 10 L, malá
+  g.pridej('KE01', T0, mix(1, 1)); // 15 L, střední
+  g.pridej('KE02', T0, mix(0, 2)); // 10 L, velká
+  for (const r of [0.1, 0.5, 0.9]) {
+    g.noveKolo(T0, () => r);
+    const casy = g.vsechna().map((a) => minutaRezervy(a, d));
+    assert.ok(casy.every((c) => c !== null), `${r}: všechna na rezervu během směny`);
+    const serazene = (casy as number[]).sort((a, b) => a - b);
+    assert.ok(serazene[0]! <= 0.25, `${r}: první hned na začátku`);
+    for (let i = 1; i < serazene.length; i++) {
+      assert.ok(serazene[i]! - serazene[i - 1]! >= 4.5, `${r}: odstup ${serazene.join(', ')}`);
+    }
+    for (const a of g.vsechna()) assert.ok(a.stav0 <= a.kapacita);
+  }
+});
+
+test('Auta: nové kolo – pozdní okénko nedostane auto, které by ho ani s plnou nádrží nestihlo', () => {
+  const g = new Garaz(null);
+  g.pridej('LA01', T0, () => 0.99); // 20 L, velká: z plné na rezervu za 12 min
+  g.pridej('LA02', T0, () => 0); // 10 L, malá: za 30 min
+  g.pridej('LA03', T0, () => 0); // 10 L, malá
+  // Okénka 0 / 6,67 / 13,33 min; rng 0 = první z těch, co okénko stihnou.
+  g.noveKolo(T0, () => 0);
+  assert.equal(g.najdi('LA02')!.stav0, Math.round(250 + 25 * (40 / 3))); // 13,33 min – LA01 by nestihlo
+  assert.equal(g.najdi('LA01')!.stav0, Math.round(500 + 125 * (20 / 3))); // 6,67 min
+  assert.equal(g.najdi('LA03')!.stav0, 250); // začne se ¼
 });
 
 test('Auta: pamatují se v úložišti (obnovení stránky), rodič je může smazat', () => {

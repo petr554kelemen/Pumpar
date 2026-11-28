@@ -357,7 +357,7 @@ export class ShopScene extends Phaser.Scene {
     beep.tick(500, 0.1);
     penezenka().naplnVse();
     ucet().vyprazdni(); // nezaplacený benzín auto nedostane
-    garaz().noveKolo(Date.now()); // nové kolo: nádrže aut na ⅔
+    garaz().noveKolo(Date.now()); // nové kolo: rozvrh nádrží aut (postupně na rezervu)
     this.scene.start('Banka' satisfies SceneKey);
   }
 

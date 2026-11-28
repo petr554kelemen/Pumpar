@@ -249,7 +249,7 @@ export class LockScene extends Phaser.Scene {
     if (this.otviraciDoba) {
       this.oteviram = true;
       den().otevri(Date.now());
-      garaz().noveKolo(Date.now()); // nové kolo: nádrže aut na ⅔
+      garaz().noveKolo(Date.now()); // nové kolo: rozvrh nádrží aut (postupně na rezervu)
       beep.win();
       rekniPo(500, 'otevreno');
       this.tweens.add({ targets: this.zakaznik, x: 515, y: 560, scale: 0.4, alpha: 0, duration: 900, ease: 'Sine.easeIn' });
@@ -283,7 +283,7 @@ export class LockScene extends Phaser.Scene {
   private otevri(): void {
     this.oteviram = true;
     den().otevri(Date.now());
-    garaz().noveKolo(Date.now()); // nové kolo: nádrže aut na ⅔
+    garaz().noveKolo(Date.now()); // nové kolo: rozvrh nádrží aut (postupně na rezervu)
     beep.win();
     rekniPo(500, 'otevreno'); // po fanfáře, dohraje i v další scéně
     this.lcd.setFillStyle(BARVA.lcd);

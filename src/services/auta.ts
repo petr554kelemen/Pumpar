@@ -21,7 +21,7 @@ export const TABULKA_AUT = {
    * 1¼ → rezerva v 7. min, prázdné v 11. min. Ladění 2026-11-28: dřív 3 / 5 / 8 L a na rezervu skoro nic nedojelo.
    */
   spotrebyZaSmenu: [0.5, 0.75, 1.25],
-  /** Na začátku každého kola (odemčení, restart K000) má každé auto nádrž na ⅔. */
+  /** Auto přidané během směny má nádrž na ⅔ (na začátku kola rozvrh – viz Garaz.noveKolo). */
   startPodil: 2 / 3,
   /** Pod touto částí kapacity jede auto „na rezervu“ (bliká červeně). */
   rezervaPodil: 1 / 4,
@@ -70,6 +70,15 @@ function prevedStarouSpotrebu(a: Auto): Auto {
 
 function startovniStav(kapacita: number): number {
   return Math.round(kapacita * TABULKA_AUT.startPodil);
+}
+
+/** Za kolik minut směny dojede auto z plné nádrže na rezervu. */
+function minutDoRezervyZPlne(a: Auto): number {
+  return a.spotreba > 0 ? (a.kapacita * (1 - TABULKA_AUT.rezervaPodil)) / a.spotreba : Number.POSITIVE_INFINITY;
+}
+
+function nejvydrzi(auta: readonly Auto[]): Auto {
+  return auta.reduce((nej, a) => (minutDoRezervyZPlne(a) > minutDoRezervyZPlne(nej) ? a : nej));
 }
 
 /** Stav nádrže v čase `ted` (setiny L, nikdy pod 0) – dopočet za čas směny od t0. */
@@ -187,10 +196,22 @@ export class Garaz {
     return { auto, nove: true };
   }
 
-  /** Nové kolo (odemčení benzínky, restart K000): všechny nádrže zpět na ⅔. */
-  noveKolo(ted: number): void {
-    for (const a of this.auta) {
-      a.stav0 = startovniStav(a.kapacita);
+  /**
+   * Nové kolo (odemčení benzínky, restart K000): rozvrh tankování, aby na rezervu nedojelo víc aut naráz
+   * (rodič 2026-11-28). Směna se rozdělí na stejná okénka podle počtu aut; každé auto dostane jedno a startovní
+   * nádrž tak, aby na rezervu dojelo právě v něm. První okénko = začátek: auto začne se ¼ a jede se tankovat
+   * hned. Pozdní okénka berou přednostně auta, která je s plnou nádrží stihnou (malá spotřeba); pořadí je
+   * jinak náhodné, každé kolo jiné.
+   */
+  noveKolo(ted: number, rng: () => number = Math.random): void {
+    const krok = DELKA_SMENY_MS / 60_000 / Math.max(1, this.auta.length);
+    const zbyva = [...this.auta];
+    for (let i = this.auta.length - 1; i >= 0; i--) {
+      const cas = i * krok;
+      const stihnou = zbyva.filter((a) => minutDoRezervyZPlne(a) >= cas);
+      const a = stihnou.length > 0 ? vyber(stihnou, rng) : nejvydrzi(zbyva);
+      zbyva.splice(zbyva.indexOf(a), 1);
+      a.stav0 = Math.min(a.kapacita, Math.round(a.kapacita * TABULKA_AUT.rezervaPodil + a.spotreba * cas));
       a.t0 = ted;
     }
     this.kanystrObsah = 0;
